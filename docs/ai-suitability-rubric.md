@@ -135,7 +135,7 @@ Rules are checked in order and the first match wins. The order implements AI Nec
 |---|---|---|
 | 1 | `rules_engine` | S ≤ 2, E ≤ 2, R ≤ 2, V ≤ 3, and G3 = yes |
 | 2 | `deterministic_software` | S ≤ 2, E ≤ 2, R ≤ 2, V ≤ 3 |
-| 3 | `traditional_ml` | S ≤ 3, R is 3 or 4, V ≤ 3, L ≤ 3, and G1 = yes |
+| 3 | `traditional_ml` | S ≤ 3, R is 3 or 4, V ≤ 3, L ≤ 2, and G1 = yes |
 | 4 | `agentic_workflow` | S ≥ 3, R ≥ 4, V ≥ 4 |
 | 5 | `llm_assisted` | S ≥ 3 or R ≥ 3 |
 | 6 | `deterministic_software` (fallback) | Nothing else matched. Prefer code and flag it. |
@@ -146,11 +146,13 @@ Rules are checked in order and the first match wins. The order implements AI Nec
 
 | Class | Overlay applies when |
 |---|---|
-| `deterministic_software`, `rules_engine` | T = 1 — severe and irreversible. A human signs off even when the logic is right, because the inputs may not be. |
+| `deterministic_software`, `rules_engine` | Never. Correct code does not fail unpredictably. Guard against bad inputs with validation, and keep an audit trail. |
 | `traditional_ml`, `llm_assisted` | T ≤ 2, or G2 = yes |
 | `agentic_workflow` | T ≤ 3, or G2 = yes |
 
 Agentic workflows get a lower bar because they act across several steps, and an early mistake compounds.
+
+**Human on the loop — every class.** Separate from per-output approval, every system gets monitoring, an audit log and exception review. There is always a human somewhere; the overlay only decides whether a person must approve each output before it takes effect.
 
 ### Warnings
 
@@ -193,10 +195,10 @@ Only the two reference cases from the original project brief appear here. Every 
 | — | Gates G2 and G3 | Regulation, and rules maintained by the business |
 | Gate 1 AI Necessity, Gate 2 AI Appropriateness | Kept as the two principles the classifier implements | They describe what the rules must achieve rather than checkable yes/no facts |
 
-## 9. Values to confirm before coding
+## 9. Threshold decisions
 
-Everything in section 5 is a proposal. The owner of this rubric should be able to defend every threshold aloud before the classifier is written. The three most worth challenging:
+All three thresholds below were challenged and decided by the rubric owner before any fixtures or code were written.
 
-1. Rule 3 — should traditional ML require moderate-to-high volume (L ≤ 3)?
-2. The overlay — should deterministic software ever get a human in the loop?
-3. The agentic bar of T ≤ 3 — too cautious, or not cautious enough?
+1. ~~Rule 3 — should traditional ML require moderate-to-high volume (L ≤ 3)?~~ **Decided: L ≤ 2 — high volume only.** Owner's reason: small samples are more exposed to outliers. Supporting reason: at moderate volume an LLM handles the task with no training, so a model's upkeep only pays off at high volume. Sample size itself is also checked by gate G1.
+2. ~~The overlay — should deterministic software ever get a human in the loop?~~ **Decided: never.** Per-output approval is only for probabilistic answers that are high-impact or irreversible. Deterministic systems rely on input validation and an audit trail, with a human on the loop for oversight.
+3. ~~The agentic bar of T ≤ 3 — too cautious, or not cautious enough?~~ **Decided: keep T ≤ 3.** An agent acts over several steps and each builds on the last, so a reversible mistake can be acted on several times before anyone notices.
