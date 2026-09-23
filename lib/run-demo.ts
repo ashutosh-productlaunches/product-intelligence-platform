@@ -38,7 +38,7 @@ function toJson(raw: string): unknown | undefined {
   }
 }
 
-export async function runDemo(intake: Intake, rawText: string): Promise<DemoResult> {
+export async function runDemo(intake: Intake, rawText: string, question?: string): Promise<DemoResult> {
   const text = TextSchema.safeParse(rawText);
   if (!text.success) return { ok: false, kind: "input", message: text.error.issues[0].message };
 
@@ -50,10 +50,14 @@ export async function runDemo(intake: Intake, rawText: string): Promise<DemoResu
   const started = Date.now();
   const meta: RunMeta = { ms: 0, calls: 0, inputTokens: 0, outputTokens: 0, model };
 
+  // The answer tool needs a question as well as the text.
+  const askedQuestion = (question ?? "").trim().slice(0, 200);
+  const questionLine = askedQuestion ? `Question: ${askedQuestion}` : "";
+
   const ask = async (correction?: string) => {
     const response = await ai.models.generateContent({
       model,
-      contents: [mvp.prompt, "---", text.data, correction ?? ""].filter(Boolean).join("\n\n"),
+      contents: [mvp.prompt, questionLine, "---", text.data, correction ?? ""].filter(Boolean).join("\n\n"),
       config: { responseMimeType: "application/json", temperature: 0 },
     });
     meta.calls += 1;

@@ -1,7 +1,10 @@
 // /demo — the working app, on its own screen.
-// A visitor can use it without reading anything: pick a tool, paste text, press Run.
-// Server component: the form reloads the page, the server makes one model call,
-// checks the reply, and renders it. No JavaScript ships to the browser.
+// Pick a tool, paste text, press Run. No JavaScript ships to the browser:
+// the form reloads the page, the server makes one model call, checks the
+// reply against a fixed shape, and renders it.
+//
+// This screen commits to one dark look on purpose. It is the product face of
+// the lab; the journey page it links back to stays light.
 import type { Metadata } from "next";
 import { getPattern, patterns } from "@/content/app-patterns";
 import { buildMvp, parseIntake, type Intake } from "@/lib/build-mvp";
@@ -17,32 +20,21 @@ export const metadata: Metadata = {
 type SearchParams = Record<string, string | string[] | undefined>;
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
 
-function statusChip(result: DemoResult | null) {
-  const base = "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium";
+const PANEL =
+  "flex min-h-[32rem] flex-col rounded-2xl border border-white/[.07] bg-gradient-to-b from-white/[.055] to-white/[.025] shadow-2xl shadow-black/40";
+const PANEL_HEAD = "border-b border-white/[.06] px-6 py-5";
+const LABEL = "text-[11px] font-semibold uppercase tracking-[0.12em] text-zinc-500";
+const PILL = "rounded-md bg-white/[.05] px-2 py-1 font-mono text-[11px] text-zinc-400";
+
+function Status({ result }: { result: DemoResult | null }) {
+  const shell = "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-medium";
   const dot = "h-1.5 w-1.5 rounded-full";
-  if (!result)
-    return (
-      <span className={`${base} bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400`}>
-        <span className={`${dot} bg-zinc-400`} /> Ready
-      </span>
-    );
+  if (!result) return <span className={`${shell} border-white/10 text-zinc-400`}><span className={`${dot} bg-zinc-500`} />Ready</span>;
   if (result.ok && result.repaired)
-    return (
-      <span className={`${base} bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-200`}>
-        <span className={`${dot} bg-amber-500`} /> Fixed on retry
-      </span>
-    );
+    return <span className={`${shell} border-amber-400/25 bg-amber-400/10 text-amber-300`}><span className={`${dot} bg-amber-400`} />Fixed on retry</span>;
   if (result.ok)
-    return (
-      <span className={`${base} bg-emerald-100 text-emerald-900 dark:bg-emerald-950 dark:text-emerald-200`}>
-        <span className={`${dot} bg-emerald-500`} /> Checked
-      </span>
-    );
-  return (
-    <span className={`${base} bg-red-100 text-red-900 dark:bg-red-950 dark:text-red-200`}>
-      <span className={`${dot} bg-red-500`} /> Stopped
-    </span>
-  );
+    return <span className={`${shell} border-emerald-400/25 bg-emerald-400/10 text-emerald-300`}><span className={`${dot} bg-emerald-400`} />Checked</span>;
+  return <span className={`${shell} border-red-400/25 bg-red-400/10 text-red-300`}><span className={`${dot} bg-red-400`} />Stopped</span>;
 }
 
 export default async function DemoPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
@@ -51,12 +43,15 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
   const parsed = one(params.input) ? parseIntake(params) : null;
   const intake: Intake = parsed?.ok ? parsed.intake : { pattern: pattern.id, ...pattern.example };
   const mvp = buildMvp(intake);
-  const text = one(params.text) ?? "";
-  const result: DemoResult | null = text ? await runDemo(intake, text) : null;
 
-  const keep = (id: string) => {
-    const q = new URLSearchParams({ pattern: id });
-    if (parsed?.ok && id === intake.pattern) {
+  const text = one(params.text) ?? "";
+  const question = one(params.question) ?? "";
+  const result: DemoResult | null = text ? await runDemo(intake, text, question) : null;
+
+  // Keep the learner's own wording when they switch tools or load a sample.
+  const link = (over: Record<string, string> = {}) => {
+    const q = new URLSearchParams({ pattern: pattern.id, ...over });
+    if (parsed?.ok) {
       q.set("input", intake.input);
       q.set("audience", intake.audience);
       q.set("detail", intake.detail);
@@ -64,164 +59,209 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
     return `/demo?${q.toString()}`;
   };
 
-  const card = "rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950";
-  const cardHead = "border-b border-zinc-200 px-5 py-4 dark:border-zinc-800";
-
   return (
-    <div className="min-h-full bg-zinc-50 dark:bg-black">
-      {/* top bar */}
-      <header className="sticky top-0 z-10 border-b border-zinc-200 bg-white/85 backdrop-blur dark:border-zinc-800 dark:bg-black/80">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
-          <span className="grid h-7 w-7 place-items-center rounded-md bg-zinc-900 text-[11px] font-bold text-white dark:bg-white dark:text-zinc-900">
-            AI
-          </span>
-          <span className="text-sm font-semibold tracking-tight">AI Tool Lab</span>
-          <span className="text-zinc-300 dark:text-zinc-700">/</span>
-          <span className="truncate text-sm text-zinc-600 dark:text-zinc-400">{mvp.name}</span>
-          <a
-            href="/"
-            className="ml-auto rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900"
-          >
-            Build this yourself
-          </a>
-        </div>
-      </header>
+    <div className="min-h-full bg-[#09090e] text-zinc-100">
+      <div
+        className="min-h-full"
+        style={{
+          backgroundImage:
+            "radial-gradient(60rem 30rem at 12% -10%, rgba(99,102,241,.26), transparent 60%), radial-gradient(40rem 24rem at 90% 0%, rgba(168,85,247,.16), transparent 60%)",
+        }}
+      >
+        <header className="sticky top-0 z-10 border-b border-white/[.06] bg-[#09090e]/80 backdrop-blur-xl">
+          <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
+            <span className="grid h-8 w-8 place-items-center rounded-lg bg-gradient-to-br from-indigo-400 to-violet-600 text-[11px] font-bold text-white shadow-lg shadow-indigo-500/25">
+              AI
+            </span>
+            <span className="text-[15px] font-semibold tracking-tight">Tool Lab</span>
+            <span className="hidden h-4 w-px bg-white/10 sm:block" />
+            <span className="hidden truncate text-sm text-zinc-400 sm:block">{mvp.name}</span>
+            <span className="rounded-full border border-emerald-400/25 bg-emerald-400/10 px-2 py-0.5 text-[11px] font-medium text-emerald-300">
+              Live
+            </span>
+            <a
+              href="/"
+              className="ml-auto rounded-lg bg-white/[.06] px-3.5 py-2 text-sm font-medium text-zinc-200 ring-1 ring-white/10 transition-colors hover:bg-white/[.1]"
+            >
+              Build this yourself →
+            </a>
+          </div>
+        </header>
 
-      <div className="mx-auto max-w-6xl gap-6 px-4 py-6 sm:px-6 lg:grid lg:grid-cols-[13rem_minmax(0,1fr)]">
-        {/* tool switcher */}
-        <nav aria-label="Tools" className="mb-6 lg:mb-0">
-          <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-wider text-zinc-500">Tools</p>
-          <ul className="flex gap-2 overflow-x-auto pb-1 lg:grid lg:gap-1 lg:overflow-visible">
-            {patterns.map((p) => {
-              const active = p.id === pattern.id;
-              return (
-                <li key={p.id} className="shrink-0">
-                  <a
-                    href={keep(p.id)}
-                    aria-current={active ? "page" : undefined}
-                    className={`flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-                      active
-                        ? "bg-zinc-900 font-medium text-white dark:bg-white dark:text-zinc-900"
-                        : "text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900"
-                    }`}
-                  >
-                    <ToolIcon id={p.id} />
-                    <span className="whitespace-nowrap">{p.name}</span>
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-          <p className="mt-4 hidden px-1 text-xs leading-relaxed text-zinc-500 lg:block">
-            Each tool is one model call with a checked, structured answer.
-          </p>
-        </nav>
-
-        {/* workspace */}
-        <main className="grid items-start gap-6 xl:grid-cols-2">
-          <section className={card}>
-            <div className={cardHead}>
-              <h1 className="text-[15px] font-semibold tracking-tight">{mvp.name}</h1>
-              <p className="mt-0.5 text-sm text-zinc-500">
-                {pattern.does} · for {mvp.audience}
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 sm:px-6 lg:grid-cols-[15rem_minmax(0,1fr)]">
+          <nav aria-label="Tools">
+            <p className={`mb-3 px-2 ${LABEL}`}>Tools</p>
+            <ul className="flex gap-2 overflow-x-auto pb-1 lg:grid lg:gap-1 lg:overflow-visible">
+              {patterns.map((p) => {
+                const active = p.id === pattern.id;
+                return (
+                  <li key={p.id} className="shrink-0">
+                    <a
+                      href={p.id === pattern.id ? link() : `/demo?pattern=${p.id}`}
+                      aria-current={active ? "page" : undefined}
+                      className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm whitespace-nowrap transition-colors ${
+                        active
+                          ? "bg-gradient-to-r from-indigo-500/20 to-transparent font-medium text-white ring-1 ring-inset ring-indigo-400/25"
+                          : "text-zinc-400 hover:bg-white/[.04] hover:text-zinc-200"
+                      }`}
+                    >
+                      {active && <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-full bg-indigo-400" />}
+                      <ToolIcon id={p.id} />
+                      {p.name}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+            <div className="mt-6 hidden rounded-xl border border-white/[.06] p-3 lg:block">
+              <p className={LABEL}>How it works</p>
+              <p className="mt-2 text-[13px] leading-relaxed text-zinc-400">
+                One model call. The answer is refused unless it matches a fixed shape.
               </p>
             </div>
-            <form method="get" action="/demo" className="px-5 py-4">
-              <input type="hidden" name="pattern" value={intake.pattern} />
-              <input type="hidden" name="input" value={intake.input} />
-              <input type="hidden" name="audience" value={intake.audience} />
-              <input type="hidden" name="detail" value={intake.detail} />
-              <label htmlFor="text" className="text-sm font-medium">
-                Paste {mvp.input}
-              </label>
-              <textarea
-                id="text"
-                name="text"
-                rows={9}
-                maxLength={MAX_TEXT}
-                defaultValue={text || mvp.sampleText}
-                spellCheck={false}
-                className="mt-2 w-full resize-y rounded-lg border border-zinc-300 bg-white px-3.5 py-3 text-[15px] leading-relaxed outline-none transition-colors placeholder:text-zinc-400 focus:border-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:focus:border-zinc-300"
-              />
-              <div className="mt-4 flex flex-wrap items-center gap-3">
-                <button
-                  type="submit"
-                  className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-                >
-                  Run
-                </button>
-                <a href={keep(pattern.id)} className="text-sm text-zinc-500 underline underline-offset-4 hover:text-zinc-900 dark:hover:text-zinc-200">
-                  Reset
-                </a>
-                <span className="ml-auto text-xs text-zinc-400 tabular-nums">max {MAX_TEXT.toLocaleString()} characters</span>
+          </nav>
+
+          <main className="grid gap-6 xl:grid-cols-2 xl:items-stretch">
+            {/* input */}
+            <section className={PANEL}>
+              <div className={PANEL_HEAD}>
+                <h1 className="text-lg font-semibold tracking-tight">{mvp.name}</h1>
+                <p className="mt-1 text-sm text-zinc-400">
+                  {pattern.does} · for {mvp.audience}
+                </p>
               </div>
-            </form>
-          </section>
 
-          <section className={card}>
-            <div className={`${cardHead} flex items-center justify-between gap-3`}>
-              <h2 className="text-[15px] font-semibold tracking-tight">Result</h2>
-              {statusChip(result)}
-            </div>
+              <form method="get" action="/demo" className="flex flex-1 flex-col px-6 py-5">
+                <input type="hidden" name="pattern" value={intake.pattern} />
+                <input type="hidden" name="input" value={intake.input} />
+                <input type="hidden" name="audience" value={intake.audience} />
+                <input type="hidden" name="detail" value={intake.detail} />
 
-            <div className="px-5 py-4" aria-live="polite">
-              {!result && (
-                <div className="grid gap-4">
-                  <p className="text-sm text-zinc-500">Press Run to see {mvp.resultShownAs}.</p>
-                  <div className="rounded-lg border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
-                    <ResultPlaceholder mvp={mvp} />
+                {pattern.asksQuestion && (
+                  <div className="mb-4">
+                    <label htmlFor="question" className={LABEL}>
+                      Your question
+                    </label>
+                    <input
+                      id="question"
+                      name="question"
+                      defaultValue={question}
+                      placeholder="Can I return a sale item?"
+                      maxLength={200}
+                      className="mt-2 w-full rounded-xl border border-white/[.08] bg-black/40 px-4 py-2.5 text-[15px] text-zinc-100 outline-none transition-colors placeholder:text-zinc-600 focus:border-indigo-400/60 focus:ring-4 focus:ring-indigo-500/10"
+                    />
                   </div>
+                )}
+
+                <div className="flex items-baseline justify-between">
+                  <label htmlFor="text" className={LABEL}>
+                    {mvp.input}
+                  </label>
+                  <span className="font-mono text-[11px] text-zinc-600 tabular-nums">max {MAX_TEXT.toLocaleString()}</span>
                 </div>
-              )}
+                <textarea
+                  id="text"
+                  name="text"
+                  rows={10}
+                  maxLength={MAX_TEXT}
+                  spellCheck={false}
+                  defaultValue={text || pattern.samples[0].text}
+                  className="mt-2 w-full flex-1 resize-y rounded-xl border border-white/[.08] bg-black/40 px-4 py-3.5 text-[15px] leading-relaxed text-zinc-100 outline-none transition-colors focus:border-indigo-400/60 focus:ring-4 focus:ring-indigo-500/10"
+                />
 
-              {result?.ok && <ResultView mvp={mvp} data={result.data} />}
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {pattern.samples.map((sample) => (
+                    <a
+                      key={sample.label}
+                      href={link({ text: sample.text })}
+                      className="rounded-lg border border-white/[.08] px-2.5 py-1 text-xs text-zinc-400 transition-colors hover:border-indigo-400/40 hover:text-zinc-100"
+                    >
+                      {sample.label}
+                    </a>
+                  ))}
+                </div>
 
-              {result && !result.ok && (
-                <div className="grid gap-4">
-                  <p className="rounded-lg border border-red-200 bg-red-50 px-3.5 py-3 text-[15px] leading-relaxed text-red-900 dark:border-red-900 dark:bg-red-950/50 dark:text-red-100">
+                <div className="mt-5 flex items-center gap-4">
+                  <button
+                    type="submit"
+                    className="rounded-xl bg-gradient-to-b from-indigo-400 to-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25 transition-opacity hover:opacity-90"
+                  >
+                    Run
+                  </button>
+                  <a href={link()} className="text-sm text-zinc-500 transition-colors hover:text-zinc-300">
+                    Reset
+                  </a>
+                </div>
+              </form>
+            </section>
+
+            {/* result */}
+            <section className={PANEL}>
+              <div className={`${PANEL_HEAD} flex items-center justify-between gap-3`}>
+                <h2 className="text-lg font-semibold tracking-tight">Result</h2>
+                <Status result={result} />
+              </div>
+
+              <div className="flex flex-1 flex-col px-6 py-5" aria-live="polite">
+                {!result && (
+                  <div className="grid gap-4">
+                    <p className="text-sm text-zinc-400">Press Run to see {mvp.resultShownAs}.</p>
+                    <div className="rounded-xl border border-dashed border-white/10 p-4">
+                      <ResultPlaceholder mvp={mvp} />
+                    </div>
+                  </div>
+                )}
+
+                {result?.ok && <ResultView mvp={mvp} data={result.data} />}
+
+                {result && !result.ok && (
+                  <p className="rounded-xl border border-red-400/25 bg-red-400/10 px-4 py-3 text-[15px] leading-relaxed text-red-200">
                     {result.message}
                   </p>
-                  <div className="rounded-lg border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
-                    <ResultPlaceholder mvp={mvp} />
+                )}
+
+                <div className="mt-auto pt-6">
+                  <div className="flex flex-wrap items-center gap-2">
+                    {result?.meta ? (
+                      <>
+                        <span className={`${PILL} tabular-nums`}>{(result.meta.ms / 1000).toFixed(1)}s</span>
+                        <span className={`${PILL} tabular-nums`}>
+                          {result.meta.inputTokens + result.meta.outputTokens} tokens
+                        </span>
+                        <span className={PILL}>{result.meta.model}</span>
+                        <span className={PILL}>
+                          {result.meta.calls} call{result.meta.calls > 1 ? "s" : ""}
+                        </span>
+                      </>
+                    ) : (
+                      <span className={PILL}>awaiting first run</span>
+                    )}
                   </div>
-                </div>
-              )}
-            </div>
 
-            <div className="border-t border-zinc-200 px-5 py-3 dark:border-zinc-800">
-              {result?.meta ? (
-                <p className="font-mono text-[11px] text-zinc-500 tabular-nums">
-                  {result.meta.model} · {(result.meta.ms / 1000).toFixed(1)}s ·{" "}
-                  {result.meta.inputTokens + result.meta.outputTokens} tokens ·{" "}
-                  {result.meta.calls} call{result.meta.calls > 1 ? "s" : ""}
-                </p>
-              ) : (
-                <p className="font-mono text-[11px] text-zinc-400">awaiting first run</p>
-              )}
-              <details className="mt-2">
-                <summary className="cursor-pointer text-xs text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-200">
-                  How this answer was checked
-                </summary>
-                <div className="mt-2 grid gap-2">
-                  <p className="text-xs text-zinc-500">The reply is refused unless it matches this shape:</p>
-                  <code className="block overflow-x-auto rounded-md bg-zinc-50 px-3 py-2 font-mono text-[11px] leading-relaxed dark:bg-zinc-900">
-                    {mvp.schemaCode}
-                  </code>
-                  <p className="text-xs text-zinc-500">{mvp.validationNote}</p>
+                  <details className="mt-4 border-t border-white/[.06] pt-3">
+                    <summary className="cursor-pointer text-[13px] text-zinc-500 transition-colors hover:text-zinc-300">
+                      How this answer was checked
+                    </summary>
+                    <div className="mt-3 grid gap-2">
+                      <code className="block overflow-x-auto rounded-lg bg-black/40 px-3 py-2 font-mono text-[11px] leading-relaxed text-zinc-300">
+                        {mvp.schemaCode}
+                      </code>
+                      <p className="text-[13px] leading-relaxed text-zinc-400">{mvp.validationNote}</p>
+                    </div>
+                  </details>
                 </div>
-              </details>
-            </div>
-          </section>
-        </main>
+              </div>
+            </section>
+          </main>
+        </div>
+
+        <footer className="mx-auto max-w-7xl px-4 pb-10 text-[13px] text-zinc-500 sm:px-6">
+          Free tier · every run is a real model call · nothing you paste is stored ·{" "}
+          <a href="/" className="underline underline-offset-4 hover:text-zinc-300">
+            see how it was built
+          </a>
+        </footer>
       </div>
-
-      <footer className="mx-auto max-w-6xl px-4 pb-10 text-xs text-zinc-500 sm:px-6">
-        A live demo on a free tier: every run makes a real model call, and nothing you paste is stored.{" "}
-        <a href="/" className="underline underline-offset-4">
-          See how it was built
-        </a>
-        .
-      </footer>
     </div>
   );
 }

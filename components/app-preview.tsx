@@ -3,7 +3,8 @@
 //   ResultView        — the real answer, after it has passed the Zod check
 import type { Mvp } from "@/lib/build-mvp";
 
-const bar = "block h-2 rounded bg-zinc-200 dark:bg-zinc-800";
+// These views live on the dark demo screen.
+const bar = "block h-2 rounded bg-white/10";
 
 export function ResultPlaceholder({ mvp }: { mvp: Mvp }) {
   const p = mvp.preview;
@@ -12,7 +13,7 @@ export function ResultPlaceholder({ mvp }: { mvp: Mvp }) {
       <ol className="grid gap-3">
         {Array.from({ length: p.count }, (_, i) => (
           <li key={i} className="flex items-start gap-3">
-            <span className="mt-1 font-mono text-xs text-zinc-400">{i + 1}</span>
+            <span className="mt-1 font-mono text-xs text-zinc-600">{i + 1}</span>
             <span className="grid flex-1 gap-1.5 pt-1.5">
               <span className={`${bar} w-full`} />
               <span className={`${bar} w-4/5`} />
@@ -26,7 +27,7 @@ export function ResultPlaceholder({ mvp }: { mvp: Mvp }) {
     return (
       <div className="flex flex-wrap gap-2">
         {p.categories.map((c) => (
-          <span key={c} className="rounded-md border border-zinc-200 px-2.5 py-1 text-sm text-zinc-400 dark:border-zinc-800">
+          <span key={c} className="rounded-lg border border-white/10 px-2.5 py-1 text-sm text-zinc-500">
             {c}
           </span>
         ))}
@@ -35,10 +36,10 @@ export function ResultPlaceholder({ mvp }: { mvp: Mvp }) {
   }
   if (p.kind === "fields") {
     return (
-      <dl className="grid gap-px overflow-hidden rounded-md bg-zinc-200 dark:bg-zinc-800">
+      <dl className="grid gap-px overflow-hidden rounded-xl bg-white/[.06]">
         {p.fields.map((f) => (
-          <div key={f.key} className="grid grid-cols-[10rem_minmax(0,1fr)] items-center gap-3 bg-white px-3 py-2.5 dark:bg-zinc-950">
-            <dt className="truncate text-sm text-zinc-500">{f.label}</dt>
+          <div key={f.key} className="grid grid-cols-[9rem_minmax(0,1fr)] items-center gap-4 bg-[#0d0d14] px-4 py-3.5">
+            <dt className="truncate text-[13px] text-zinc-500">{f.label}</dt>
             <dd className={`${bar} w-2/3`} />
           </div>
         ))}
@@ -62,8 +63,8 @@ export function ResultView({ mvp, data }: { mvp: Mvp; data: Record<string, unkno
     return (
       <ol className="grid gap-3">
         {points.map((point, i) => (
-          <li key={i} className="flex gap-3 text-[15px] leading-relaxed">
-            <span className="mt-0.5 font-mono text-xs text-zinc-400 tabular-nums">{i + 1}</span>
+          <li key={i} className="flex gap-3 text-[15px] leading-relaxed text-zinc-100">
+            <span className="mt-1 font-mono text-xs text-indigo-300/70 tabular-nums">{i + 1}</span>
             <span>{point}</span>
           </li>
         ))}
@@ -80,8 +81,8 @@ export function ResultView({ mvp, data }: { mvp: Mvp; data: Record<string, unkno
             key={c}
             className={
               c === chosen
-                ? "rounded-md bg-zinc-900 px-2.5 py-1 text-sm font-medium text-white dark:bg-white dark:text-zinc-900"
-                : "rounded-md border border-zinc-200 px-2.5 py-1 text-sm text-zinc-400 dark:border-zinc-800"
+                ? "rounded-lg bg-gradient-to-b from-indigo-400 to-indigo-600 px-3 py-1.5 text-sm font-semibold text-white shadow-lg shadow-indigo-600/25"
+                : "rounded-lg border border-white/10 px-3 py-1.5 text-sm text-zinc-500"
             }
           >
             {c}
@@ -93,13 +94,13 @@ export function ResultView({ mvp, data }: { mvp: Mvp; data: Record<string, unkno
 
   if (p.kind === "fields") {
     return (
-      <dl className="grid gap-px overflow-hidden rounded-md bg-zinc-200 dark:bg-zinc-800">
+      <dl className="grid gap-px overflow-hidden rounded-xl bg-white/[.06]">
         {p.fields.map((f) => {
           const value = data[f.key];
           return (
-            <div key={f.key} className="grid grid-cols-[10rem_minmax(0,1fr)] gap-3 bg-white px-3 py-2.5 dark:bg-zinc-950">
-              <dt className="truncate text-sm text-zinc-500">{f.label}</dt>
-              <dd className={value ? "text-[15px]" : "text-[15px] text-zinc-400"}>
+            <div key={f.key} className="grid grid-cols-[9rem_minmax(0,1fr)] gap-4 bg-[#0d0d14] px-4 py-3.5">
+              <dt className="truncate text-[13px] text-zinc-500">{f.label}</dt>
+              <dd className={value ? "text-[15px] text-zinc-100" : "text-[15px] text-zinc-600 italic"}>
                 {value ? String(value) : "not in the text"}
               </dd>
             </div>
@@ -113,13 +114,13 @@ export function ResultView({ mvp, data }: { mvp: Mvp; data: Record<string, unkno
     const found = Boolean(data.found);
     if (!found) {
       return (
-        <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2.5 text-[15px] text-amber-900 dark:border-amber-900 dark:bg-amber-950/50 dark:text-amber-100">
+        <p className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-[15px] text-amber-200">
           Not in the text. The app says so instead of guessing.
         </p>
       );
     }
-    return <p className="text-[15px] leading-relaxed">{String(data.answer ?? "")}</p>;
+    return <p className="text-[15px] leading-relaxed text-zinc-100">{String(data.answer ?? "")}</p>;
   }
 
-  return <p className="text-[15px] leading-relaxed whitespace-pre-line">{String(data.text ?? "")}</p>;
+  return <p className="text-[15px] leading-relaxed whitespace-pre-line text-zinc-100">{String(data.text ?? "")}</p>;
 }
