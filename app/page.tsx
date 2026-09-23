@@ -156,7 +156,54 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         ))}
       </ol>
 
-      <section className="mt-10 rounded-lg border border-dashed border-zinc-300 p-5 dark:border-zinc-700">
+      <section className="mt-10 rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
+        <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">
+          You&apos;re done
+        </p>
+        <h2 className="mt-2 text-xl font-semibold tracking-tight">
+          {parsed?.ok ? `${mvp.name} is live. Here's what you have.` : "Here's what you have."}
+        </h2>
+
+        <div className="mt-5 grid gap-6 sm:grid-cols-2">
+          <div>
+            <p className="text-sm font-semibold">What you built</p>
+            <ul className="mt-2 grid gap-2 text-sm text-zinc-700 dark:text-zinc-300">
+              {j.closing.have.map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">What it can&apos;t do yet</p>
+            <ul className="mt-2 grid gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+              {j.closing.notYet.map((item) => (
+                <li key={item} className="flex gap-2">
+                  <span aria-hidden className="text-zinc-400">·</span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <p className="mt-6 text-sm font-semibold">Three things to try before you stop</p>
+        <ol className="mt-2 grid gap-3">
+          {j.closing.tryNext.map((item, i) => (
+            <li key={item.title} className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+              <p className="text-sm font-medium">
+                <span className="mr-2 font-mono text-xs text-zinc-400">{i + 1}</span>
+                {item.title}
+              </p>
+              <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{item.text}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="mt-6 rounded-lg border border-dashed border-zinc-300 p-5 dark:border-zinc-700">
         <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Coming next</p>
         <h2 className="mt-2 text-lg font-semibold">{j.next.title}</h2>
         <p className="mt-1 text-zinc-600 dark:text-zinc-400">{j.next.teaser}</p>

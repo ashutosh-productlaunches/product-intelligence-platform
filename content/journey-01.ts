@@ -30,6 +30,13 @@ export type Journey = {
   promise: string;
   outcome: string[];
   steps: Step[];
+  // Shown after the last step: what they have, what it still can't do,
+  // and three small things to try. Closure, honestly.
+  closing: {
+    have: string[];
+    notYet: string[];
+    tryNext: { title: string; text: string }[];
+  };
   next: { title: string; teaser: string };
 };
 
@@ -249,6 +256,34 @@ export const journey01: Journey = {
       }),
     },
   ],
+  closing: {
+    have: [
+      "A live URL you can send to anyone: your own AI tool, running on the internet",
+      "Four files you can explain line by line — the model call, the check, the route and the screen",
+      "A working setup: Node, VS Code, a key, Git and Vercel, all connected",
+      "The habit that matters most: never show a user model output you haven't checked",
+    ],
+    notYet: [
+      "No memory and no database. Each run starts from nothing, and nothing is saved.",
+      "No limits. Every visitor spends your free quota, so keep the link to people you trust.",
+      "A plain screen. Making it beautiful is a different skill, and it can wait.",
+      "Nothing that searches, plans or uses tools. That is what the next journeys are for.",
+    ],
+    tryNext: [
+      {
+        title: "Change one line of the prompt",
+        text: "Ask for five points instead of three, or a different tone. Run it again. You have just done the cheapest kind of product iteration there is.",
+      },
+      {
+        title: "Break it on purpose",
+        text: "Change the Zod check to expect a field the model never sends. Run it, and watch your app refuse the answer instead of showing nonsense. That is the whole lesson of step 8, felt rather than read.",
+      },
+      {
+        title: "Point it at real work",
+        text: "Paste something from your actual job — real tickets, real notes, real feedback. Where it fails is more interesting than where it works, and it tells you what a second version would need.",
+      },
+    ],
+  },
   next: {
     title: "Journey 2 · When should the model not decide?",
     teaser:
