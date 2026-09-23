@@ -152,7 +152,6 @@ export const journey01: Journey = {
       action:
         "In your route, ask Gemini for JSON with an answer field. Start the app and open http://localhost:3000/api/ask-ai.",
       result: "Something like: {\"answer\":\"A Large Language Model is ...\"}",
-      link: { href: "/api/ask-ai", label: "See the live version of this route" },
       why: "Structured output is what turns a chatbot into a component you can build a product on.",
       personalize: (mvp) => ({
         idea: `Ask for structured output: tell Gemini exactly what shape to reply in. For ${mvp.name}, that shape is ${mvp.outputExample}. JSON is text that a program can turn into data.`,
