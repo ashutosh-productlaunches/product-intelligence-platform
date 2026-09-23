@@ -1,9 +1,9 @@
+import type { Mvp } from "@/lib/build-mvp";
+
 // Journey 1 content.
 // This file holds the words only. The layout lives in app/page.tsx.
 // To change what a learner reads, edit the text inside the quotes below.
 // You never need to touch app/page.tsx to change wording.
-
-import type { Mvp } from "@/lib/build-mvp";
 
 // The shape every step must follow. TypeScript checks this for you:
 // if a step is missing a required part, `npm run build` fails and says which one.
@@ -37,7 +37,7 @@ export const journey01: Journey = {
   number: 1,
   title: "How does an app talk to an AI model?",
   promise:
-    "Build a real web app that asks Gemini a question and checks the answer before trusting it. No coding experience needed — each step introduces one idea, when you need it.",
+    "Build a real web app that asks an AI model a question and checks the answer before trusting it. No coding experience needed — each step introduces one idea, when you need it.",
   outcome: [
     "A live website with a screen people can actually use",
     "An answer from an AI model, checked before it is shown",
@@ -79,7 +79,7 @@ export const journey01: Journey = {
         "Every model provider publishes an API: a door with rules. Send a request in their format, get a response back. They all work the same way, so learning one teaches you the rest. This journey uses Google's Gemini because its free tier needs no credit card.",
       diagram: "your app  ──request──▶  Gemini API\n          ◀──response──",
       action:
-        "Open Google AI Studio and try any prompt. Each time you press Run, the page sends an API request for you. By the end of this journey, your own app will send it.",
+        "Open aistudio.google.com, sign in with a Google account, and try any prompt. Each time you press Run, the page sends an API request for you. By the end of this journey, your own app will send it.",
       result: "Gemini answers your prompt.",
       why: "Every AI product — chat apps, copilots, agents — is built on this one move: send a request, get a response.",
     },
@@ -91,9 +91,9 @@ export const journey01: Journey = {
       idea:
         "VS Code is where you write code. Node.js runs it on your computer. The terminal is where you type instructions to your computer instead of clicking.",
       action:
-        "Install Node.js (the LTS version) and VS Code. In VS Code, open View → Terminal and type:",
-      code: "node -v",
-      result: "A version number, such as v24.21.0.",
+        "Install Node.js (choose the LTS version) from nodejs.org, and VS Code from code.visualstudio.com. Open VS Code, then View → Terminal, and type:",
+      code: "node -v\nnpm -v",
+      result: "Two version numbers, such as v24.21.0 and 11.19.0. If you see 'not recognised', close VS Code and open it again — it needs a restart to find newly installed programs.",
       why: "You now have the same basic setup professional developers use. All of it is free.",
       snag: "Some AI coding editors ask for payment upfront. You don't need one. VS Code is free, and a free assistant such as Gemini CLI, or any chat assistant, is enough.",
     },
@@ -104,12 +104,13 @@ export const journey01: Journey = {
         "Starting from an empty folder means writing thousands of lines before anything works.",
       idea:
         "npm installs ready-made packages of code. Next.js is one of them: a working web app in one command, with pages for visitors and server routes for private work.",
-      action: "In the terminal:",
-      code: "npx create-next-app@latest my-ai-app\ncd my-ai-app\nnpm run dev",
+      action:
+        "In the terminal, go to the folder where you keep projects, then run the command below. Answer Yes to TypeScript, Yes to App Router, and press Enter for the rest.",
+      code: "npx create-next-app@latest my-ai-app\ncd my-ai-app\nnpm install @google/genai zod\nnpm run dev",
       result:
-        "Open http://localhost:3000 and you'll see the Next.js starter page, running on your own computer.",
+        "Open http://localhost:3000 and you'll see the Next.js starter page, running on your own computer. In VS Code, use File → Open Folder and pick my-ai-app so you can edit it.",
       why: "localhost means \"this computer\". Nobody else can see it yet. That comes in step 10.",
-      snag: "On Windows PowerShell, npm and npx may be blocked. Use npm.cmd and npx.cmd instead.",
+      snag: "On Windows PowerShell, npm and npx may be blocked. Use npm.cmd and npx.cmd instead — every command in this journey works the same way.",
     },
     {
       title: "Prove it's you",
@@ -119,66 +120,80 @@ export const journey01: Journey = {
       idea:
         "An API key is a password for programs. It goes in a file called .env.local, which your project is set up never to upload.",
       action:
-        "Create a key in Google AI Studio. In your project folder, create a file named .env.local containing one line:",
+        "At aistudio.google.com/apikey, create a key and copy it. In VS Code, create a new file in your project folder called .env.local with exactly one line — no quotes, no spaces around the = sign:",
       code: "GEMINI_API_KEY=paste-your-key-here",
       result:
-        "Nothing visible, and that's the point. Open .gitignore and check it lists .env*.",
+        "Nothing visible, and that's the point. Open .gitignore and check it lists .env* — that line is what keeps your key off the internet.",
       why: "A leaked key lets anyone use your quota. While the key has no billing attached, the worst case is that it stops working until the daily limit resets.",
-      snag: "\"Don't share your key\" means don't paste it into a chat, a message or a code file. Storing it in your own server's settings later (step 10) is not sharing it.",
+      snag: "Stop the dev server (Ctrl+C) and run npm run dev again. It only reads .env.local at startup, so a key added afterwards is invisible until you restart. This one wastes a lot of people's evening.",
     },
     {
       title: "Keep the key off the browser",
       concept: "Server routes",
       problem:
-        "Anything sent to a visitor's browser can be read by that visitor. If the page called Gemini directly, your key would go with it.",
+        "Anything sent to a visitor's browser can be read by that visitor. If your page called Gemini directly, your key would go with it.",
       idea:
-        "Put the call in a server route: code that runs on your server, never in the browser. The browser asks your server. Only your server talks to Gemini.",
+        "A server route is code that runs on your server and never in the browser. The browser asks your server; only your server talks to Gemini. Before adding AI, build the route and check it answers.",
       diagram:
         "browser ──▶ your server route ──▶ Gemini\n              (holds the key)\n\nbrowser ──✗──▶ Gemini        never direct",
       action:
-        "Install Google's library and a validation library, then create the file app/api/ask-ai/route.ts. Ask your AI assistant to help write it, then read every line and have it explain anything you can't.",
-      code: "npm install @google/genai zod",
-      result: "The route file exists. Nothing runs yet.",
-      why: "This one boundary is how every serious AI product protects its keys.",
-      snag: "Never name the variable NEXT_PUBLIC_something. That prefix tells Next.js to send the value to the browser.",
+        "Create the folders app/api/ask-ai and inside them a file called route.ts, containing exactly this:",
+      code:
+        "// app/api/ask-ai/route.ts\nexport async function GET() {\n  return Response.json({ ok: true });\n}",
+      result: 'Open http://localhost:3000/api/ask-ai and you should see {"ok":true}. Your server just answered a request.',
+      why: "This one boundary is how every serious AI product protects its keys. Getting the empty route working first means that when the model call fails later, you know the route itself is fine.",
+      snag: "Never name a variable NEXT_PUBLIC_something for a secret. That prefix is an instruction to send the value to the browser.",
     },
     {
-      title: "Get an answer back",
+      title: "Ask the model",
       concept: "Structured output · JSON",
       problem:
         "Gemini replies in free text. Your app needs data it can use: a specific field, in a known place.",
       idea:
-        "Ask for structured output. Tell Gemini to reply in JSON with a fixed shape, such as { \"answer\": \"...\" }. JSON is text that a program can turn into data.",
+        "Ask for structured output. Tell Gemini to reply in JSON with a fixed shape, such as { \"points\": [...] }. JSON is text that a program can turn into data. Put the call in its own file so both your route and, later, your page can use it.",
       action:
-        "In your route, ask Gemini for JSON with an answer field. Start the app and open http://localhost:3000/api/ask-ai.",
-      result: "Something like: {\"answer\":\"A Large Language Model is ...\"}",
+        "Create a folder called lib with a file ask.ts inside it, then point your route at it.",
+      code:
+        '// lib/ask.ts\nimport { GoogleGenAI } from "@google/genai";\n\nconst ai = new GoogleGenAI({});\n\nexport async function askGemini(text: string) {\n  const response = await ai.models.generateContent({\n    model: "gemini-3.6-flash",\n    contents: `Summarise the following customer complaints into 3 key points.\n\n---\n\n${text}`,\n    config: { responseMimeType: "application/json", temperature: 0 },\n  });\n  return JSON.parse(response.text ?? "{}");\n}\n\n// app/api/ask-ai/route.ts\nimport { askGemini } from "@/lib/ask";\n\nexport async function GET(request: Request) {\n  const text = new URL(request.url).searchParams.get("text") ?? "";\n  return Response.json(await askGemini(text));\n}',
+      result:
+        'Open http://localhost:3000/api/ask-ai?text=The parcel arrived late and damaged — you should get JSON back, something like {"points":["..."]}.',
       why: "Structured output is what turns a chatbot into a component you can build a product on.",
       personalize: (mvp) => ({
-        idea: `Ask for structured output: tell Gemini exactly what shape to reply in. For ${mvp.name}, that shape is ${mvp.outputExample}. JSON is text that a program can turn into data.`,
-        action: `In your route, send Gemini this prompt, followed by the ${mvp.input} you want it to work on:`,
-        code: mvp.prompt,
-        result: `Something like: ${mvp.outputExample}`,
+        idea: `Ask for structured output: tell Gemini exactly what shape to reply in. For ${mvp.name}, that shape is ${mvp.outputExample}. Put the call in its own file so both your route and, later, your page can use it.`,
+        action: `Create a folder called lib with a file ask.ts inside it. Use your own prompt — the one ${mvp.name} needs — then point your route at it.`,
+        code:
+          '// lib/ask.ts\nimport { GoogleGenAI } from "@google/genai";\n\nconst ai = new GoogleGenAI({});\n\nexport async function askGemini(text: string) {\n  const response = await ai.models.generateContent({\n    model: "gemini-3.6-flash",\n    contents: `' +
+          mvp.prompt +
+          '\n\n---\n\n${text}`,\n    config: { responseMimeType: "application/json", temperature: 0 },\n  });\n  return JSON.parse(response.text ?? "{}");\n}\n\n// app/api/ask-ai/route.ts\nimport { askGemini } from "@/lib/ask";\n\nexport async function GET(request: Request) {\n  const text = new URL(request.url).searchParams.get("text") ?? "";\n  return Response.json(await askGemini(text));\n}',
+        result: `Open http://localhost:3000/api/ask-ai?text=some+${mvp.input.split(" ")[0]} and you should get ${mvp.outputExample} back.`,
       }),
     },
     {
       title: "Don't trust it blindly",
       concept: "Validation · Zod",
       problem:
-        "Asking for JSON doesn't guarantee it. The model can wrap it in extra text, leave out a field, or put a number where text belongs.",
+        "Asking for JSON doesn't guarantee it. The model can wrap it in extra text, leave out a field, or put a number where text belongs. JSON.parse would then throw, or worse, hand your app the wrong shape.",
       idea:
-        "Check the reply before you use it. Zod describes the shape you expect and tests every reply against it. A mismatch gives you a precise error instead of a silent bug.",
+        "Check the reply before you use it. Zod describes the shape you expect and tests every reply against it. If it doesn't match, ask once more — and tell the model exactly what was wrong. If the second try also fails, say so honestly instead of showing something broken.",
       diagram:
         "Gemini text ──▶ JSON.parse ──▶ Zod check ──✓──▶ your app uses it\n                                   └──✗──▶ retry once with the error, then fail clearly",
-      action:
-        "Describe the expected shape with Zod, and check Gemini's reply against it before returning it.",
-      result: "The same answer, but now your app has checked it first.",
+      action: "Replace lib/ask.ts with this version:",
+      code:
+        '// lib/ask.ts\nimport { GoogleGenAI } from "@google/genai";\nimport { z } from "zod";\n\nconst ai = new GoogleGenAI({});\nconst Reply = z.object({ points: z.array(z.string()).length(3) });\n\nasync function callModel(text: string, correction?: string) {\n  const response = await ai.models.generateContent({\n    model: "gemini-3.6-flash",\n    contents: [\n      "Summarise the following customer complaints into 3 key points.",\n      correction ?? "",\n      "---",\n      text,\n    ].filter(Boolean).join("\\n\\n"),\n    config: { responseMimeType: "application/json", temperature: 0 },\n  });\n  try {\n    return JSON.parse(response.text ?? "{}");\n  } catch {\n    return null;\n  }\n}\n\nexport async function askGemini(text: string) {\n  const first = Reply.safeParse(await callModel(text));\n  if (first.success) return { ok: true as const, data: first.data };\n\n  const problem = first.error.issues[0].message;\n  const second = Reply.safeParse(\n    await callModel(text, `Your last reply could not be used (${problem}). Reply again with JSON only.`),\n  );\n  if (second.success) return { ok: true as const, data: second.data };\n\n  return { ok: false as const, error: "The model did not reply in the shape this app expects." };\n}',
+      result:
+        "The same answer as before, but now your app has checked it. Your route will need a small change: return the result object as it is, and the page in step 11 decides what to show.",
+      why: "TypeScript's type checks disappear once the code is running. Zod's check keeps working in production. Good AI products never hand unchecked model output to a user.",
+      snag: "Retry only when the reply has the wrong shape, and send the error back to the model. A blind retry on every error just rolls the dice again — and a wrong API key would fail twice, slowly.",
       personalize: (mvp) => ({
-        action: `Describe the shape ${mvp.name} expects with Zod, and check every reply against it:`,
-        code: `const Reply = ${mvp.schemaCode};\nconst result = Reply.safeParse(JSON.parse(text));`,
+        action: `Replace lib/ask.ts with this version. The shape being checked is ${mvp.name}'s own:`,
+        code:
+          '// lib/ask.ts\nimport { GoogleGenAI } from "@google/genai";\nimport { z } from "zod";\n\nconst ai = new GoogleGenAI({});\nconst Reply = ' +
+          mvp.schemaCode +
+          ';\n\nasync function callModel(text: string, correction?: string) {\n  const response = await ai.models.generateContent({\n    model: "gemini-3.6-flash",\n    contents: [\n      "' +
+          mvp.prompt.replace(/"/g, '\\"') +
+          '",\n      correction ?? "",\n      "---",\n      text,\n    ].filter(Boolean).join("\\n\\n"),\n    config: { responseMimeType: "application/json", temperature: 0 },\n  });\n  try {\n    return JSON.parse(response.text ?? "{}");\n  } catch {\n    return null;\n  }\n}\n\nexport async function askGemini(text: string) {\n  const first = Reply.safeParse(await callModel(text));\n  if (first.success) return { ok: true as const, data: first.data };\n\n  const problem = first.error.issues[0].message;\n  const second = Reply.safeParse(\n    await callModel(text, `Your last reply could not be used (${problem}). Reply again with JSON only.`),\n  );\n  if (second.success) return { ok: true as const, data: second.data };\n\n  return { ok: false as const, error: "The model did not reply in the shape this app expects." };\n}',
         result: mvp.validationNote,
       }),
-      why: "TypeScript's type checks disappear once the code is running. Zod's check keeps working in production. Good AI products never hand unchecked model output to a user.",
-      snag: "A common first version retries on any error. Retry only when the reply has the wrong shape, and send the error back to the model. A blind retry just rolls the dice again, and a wrong key fails twice.",
     },
     {
       title: "Save your work",
@@ -186,12 +201,15 @@ export const journey01: Journey = {
       problem:
         "One bad edit can break everything, and right now your code only exists on one laptop.",
       idea:
-        "Git saves snapshots of your project, called commits. GitHub stores them online.",
-      action: "Create an empty repository on GitHub and connect it to your folder. Then:",
-      code: 'git add .\ngit commit -m "First AI route"\ngit push',
-      result: "Your files on github.com — with no .env.local among them.",
+        "Git saves snapshots of your project, called commits. GitHub stores them online. create-next-app already started Git for you, so you only need to connect it to GitHub.",
+      action:
+        "On github.com, press New repository, give it a name, leave every box unticked, and press Create. GitHub then shows you a URL ending in .git — copy it, and run these four commands, pasting your URL into the third one:",
+      code:
+        'git add .\ngit commit -m "My first AI app"\ngit remote add origin https://github.com/YOUR-NAME/YOUR-REPO.git\ngit push -u origin main',
+      result:
+        "Refresh the GitHub page and your files are there — with no .env.local among them. Check that, now, before going further.",
       why: "Your commit history is also a record of how you built it. That's useful in an interview.",
-      snag: "Commit package.json and package-lock.json along with your code. They tell other computers which packages to install; leave them out and the deploy fails. On Windows, \"LF will be replaced by CRLF\" warnings are harmless.",
+      snag: "Commit package.json and package-lock.json along with your code. They tell other computers which packages to install; leave them out and the deploy in the next step fails. On Windows, \"LF will be replaced by CRLF\" warnings are harmless.",
     },
     {
       title: "Put it online",
@@ -201,10 +219,12 @@ export const journey01: Journey = {
         "Vercel builds your app from GitHub and hosts it. Every push to GitHub triggers a new build.",
       diagram: "git push ──▶ GitHub ──▶ Vercel builds ──▶ live URL",
       action:
-        "Import your GitHub repository into Vercel. Add GEMINI_API_KEY under Settings → Environment Variables as a Secret. Then push a commit.",
-      result: "https://your-app.vercel.app/api/ask-ai returns a JSON answer.",
+        "Sign in at vercel.com with your GitHub account. Press Add New → Project, find your repository and press Import. Before pressing Deploy, open Environment Variables and add GEMINI_API_KEY with your key as the value. Then press Deploy and wait about a minute.",
+      code: "npm run build",
+      result:
+        "A live URL like https://my-ai-app.vercel.app. Add /api/ask-ai?text=something to it and you should get your JSON answer, from a server anywhere in the world.",
       why: "A link anyone can open. That's a shipped AI app.",
-      snag: "Add the key before you push: environment variables only apply to builds started after you add them. Vercel's Redeploy button rebuilds the old commit, so new code only goes live when you push it. Run npm run build on your own computer first; it's the same build Vercel runs.",
+      snag: "Run npm run build on your own computer first — it's the same build Vercel runs, and errors are much easier to read locally. Two Vercel traps: environment variables only apply to builds started after you add them, and the Redeploy button rebuilds the old commit, so new code only goes live when you push it.",
     },
     {
       title: "Give it a face",
@@ -212,21 +232,20 @@ export const journey01: Journey = {
       problem:
         "Your route returns JSON. Nobody wants to read JSON. Right now you have plumbing, not a product.",
       idea:
-        "Add a page with a box to paste text and a button. The page hands the text to your own route and shows the answer the way a person wants to read it. You can do this with no JavaScript in the browser: the form puts the text in the address bar, and the server does the rest. That is the same trick this lab uses.",
+        "Add a page with a box to paste text and a button. The page calls the same askGemini function your route uses, and shows the answer the way a person wants to read it. No JavaScript is needed in the browser: the form puts the text in the address bar, and the server does the rest.",
       diagram:
-        "person types ──▶ your page ──▶ your route ──▶ Gemini\n             ◀── a readable result ◀──",
-      action:
-        "Replace the starter home page with a form and a result area. The shape is short:",
+        "person types ──▶ your page ──▶ askGemini() ──▶ Gemini\n             ◀── a readable result ◀──",
+      action: "Replace everything in app/page.tsx with this:",
       code:
-        "// app/page.tsx — your app's screen\nexport default async function Page({ searchParams }) {\n  const { text } = await searchParams;\n  const result = text ? await askGemini(text) : null;\n\n  return (\n    <form>\n      <textarea name=\"text\" defaultValue={text} />\n      <button>Run</button>\n      {result && <Result data={result} />}\n    </form>\n  );\n}",
+        '// app/page.tsx\nimport { askGemini } from "@/lib/ask";\n\nexport default async function Page({\n  searchParams,\n}: {\n  searchParams: Promise<{ text?: string }>;\n}) {\n  const { text } = await searchParams;\n  const result = text ? await askGemini(text) : null;\n\n  return (\n    <main style={{ maxWidth: 640, margin: "3rem auto", padding: "0 1rem" }}>\n      <h1>Complaint Digest</h1>\n\n      <form>\n        <textarea name="text" rows={8} defaultValue={text} style={{ width: "100%" }} />\n        <button type="submit">Run</button>\n      </form>\n\n      {result?.ok && (\n        <ol>\n          {result.data.points.map((point) => (\n            <li key={point}>{point}</li>\n          ))}\n        </ol>\n      )}\n\n      {result && !result.ok && <p>{result.error}</p>}\n    </main>\n  );\n}',
       result:
-        "A screen you would be happy to show someone: paste text, press Run, read the answer.",
-      why: "This is where it stops being a demo and becomes a tool someone can use. Everything before this step was plumbing.",
+        "A screen you would be happy to show someone: paste text, press Run, read the answer. Commit and push, and it is live for everyone.",
+      why: "This is where it stops being a demo and becomes a tool someone can use. Everything before this step was plumbing. Make it beautiful later — working first.",
       snag:
         "Your page is public, so every visitor spends your free quota. Before sharing it widely, add a limit or keep the link to people you trust.",
       personalize: (mvp) => ({
-        action: `Build the screen for ${mvp.name}: a box to paste ${mvp.input}, a Run button, and the result shown as ${mvp.resultShownAs}. The shape is short:`,
-        result: `Your own copy of the demo app: paste ${mvp.input}, press Run, and ${mvp.audience} gets ${mvp.resultShownAs}.`,
+        action: `Replace everything in app/page.tsx with this. It is ${mvp.name}'s screen, showing ${mvp.resultShownAs}:`,
+        result: `Your own copy of the demo app: paste ${mvp.input}, press Run, and ${mvp.audience} gets ${mvp.resultShownAs}. Commit and push, and it is live for everyone.`,
       }),
     },
   ],
