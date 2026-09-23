@@ -3,6 +3,8 @@
 // To change what a learner reads, edit the text inside the quotes below.
 // You never need to touch app/page.tsx to change wording.
 
+import type { Mvp } from "@/lib/build-mvp";
+
 // The shape every step must follow. TypeScript checks this for you:
 // if a step is missing a required part, `npm run build` fails and says which one.
 export type Step = {
@@ -17,6 +19,9 @@ export type Step = {
   link?: { href: string; label: string }; // optional live example
   why: string; // the reflection: why this matters
   snag?: string; // optional: where people really get stuck
+  // Optional: how this step changes once the learner has chosen their app.
+  // Returns only the parts that change; everything else stays as written.
+  personalize?: (mvp: Mvp) => Partial<Omit<Step, "personalize">>;
 };
 
 export type Journey = {
@@ -40,12 +45,37 @@ export const journey01: Journey = {
   ],
   steps: [
     {
-      title: "Ask Gemini something",
-      concept: "API",
+      title: "Start with the end",
+      concept: "The shape of an AI app",
       problem:
-        "You want your app to get an answer from Gemini. But Gemini runs on Google's computers, not yours. How do two programs on different machines talk?",
+        "You want to build an AI tool, but you don't know where to begin — or even what the pieces are.",
       idea:
-        "Through an API: a door Google publishes, with rules. Send a request in this format, get a response in that format. Your app never sees inside Gemini. It only knows the door.",
+        "Almost every AI tool has the same three parts: a page the user sees, your server in the middle, and an AI model somewhere on the internet. Your server holds a secret key and passes messages between the other two. Every step in this journey builds one piece of this picture.",
+      diagram:
+        "you ──▶ your app's page ──▶ your server ──▶ AI model\n                             (holds a secret key)",
+      action:
+        "Open the finished version of what you're about to build. It asks an AI model a question and shows the answer it got back.",
+      result:
+        "A short answer about what an LLM is, in a format called JSON. It looks plain, and that's fine: by the end of this journey you'll have built it yourself.",
+      link: { href: "/api/ask-ai", label: "Open the finished result" },
+      why: "Knowing where you're heading makes every step make sense. When you get stuck later, find your place on this picture.",
+      personalize: (mvp) => {
+        const lead = `${mvp.audience} ──▶ your app's page ──▶ `;
+        return {
+          diagram: `${lead}your server ──▶ AI model\n${" ".repeat(lead.length)}(holds a secret key)`,
+          action: `You're building ${mvp.name}: a ${mvp.patternName.toLowerCase()} tool for ${mvp.audience}. Open this finished example to see the kind of answer an app like yours gets back.`,
+          result: `A JSON answer. Yours will look like this: ${mvp.outputExample}`,
+          link: { href: "/api/ask-ai", label: "Open a finished example" },
+        };
+      },
+    },
+    {
+      title: "Choose a model to talk to",
+      concept: "AI models · APIs",
+      problem:
+        "There are many AI models — OpenAI's, Anthropic's Claude, Google's Gemini. Which one? And how does your app reach it, when it runs on someone else's computers?",
+      idea:
+        "Every model provider publishes an API: a door with rules. Send a request in their format, get a response back. They all work the same way, so learning one teaches you the rest. This journey uses Google's Gemini because its free tier needs no credit card.",
       diagram: "your app  ──request──▶  Gemini API\n          ◀──response──",
       action:
         "Open Google AI Studio and try any prompt. Each time you press Run, the page sends an API request for you. By the end of this journey, your own app will send it.",
@@ -77,7 +107,7 @@ export const journey01: Journey = {
       code: "npx create-next-app@latest my-ai-app\ncd my-ai-app\nnpm run dev",
       result:
         "Open http://localhost:3000 and you'll see the Next.js starter page, running on your own computer.",
-      why: "localhost means \"this computer\". Nobody else can see it yet. That comes in step 9.",
+      why: "localhost means \"this computer\". Nobody else can see it yet. That comes in step 10.",
       snag: "On Windows PowerShell, npm and npx may be blocked. Use npm.cmd and npx.cmd instead.",
     },
     {
@@ -93,7 +123,7 @@ export const journey01: Journey = {
       result:
         "Nothing visible, and that's the point. Open .gitignore and check it lists .env*.",
       why: "A leaked key lets anyone use your quota. While the key has no billing attached, the worst case is that it stops working until the daily limit resets.",
-      snag: "\"Don't share your key\" means don't paste it into a chat, a message or a code file. Storing it in your own server's settings later (step 9) is not sharing it.",
+      snag: "\"Don't share your key\" means don't paste it into a chat, a message or a code file. Storing it in your own server's settings later (step 10) is not sharing it.",
     },
     {
       title: "Keep the key off the browser",
@@ -123,6 +153,12 @@ export const journey01: Journey = {
       result: "Something like: {\"answer\":\"A Large Language Model is ...\"}",
       link: { href: "/api/ask-ai", label: "See the live version of this route" },
       why: "Structured output is what turns a chatbot into a component you can build a product on.",
+      personalize: (mvp) => ({
+        idea: `Ask for structured output: tell Gemini exactly what shape to reply in. For ${mvp.name}, that shape is ${mvp.outputExample}. JSON is text that a program can turn into data.`,
+        action: `In your route, send Gemini this prompt, followed by the ${mvp.input} you want it to work on:`,
+        code: mvp.prompt,
+        result: `Something like: ${mvp.outputExample}`,
+      }),
     },
     {
       title: "Don't trust it blindly",
@@ -136,6 +172,11 @@ export const journey01: Journey = {
       action:
         "Describe the expected shape with Zod, and check Gemini's reply against it before returning it.",
       result: "The same answer, but now your app has checked it first.",
+      personalize: (mvp) => ({
+        action: `Describe the shape ${mvp.name} expects with Zod, and check every reply against it:`,
+        code: `const Reply = ${mvp.schemaCode};\nconst result = Reply.safeParse(JSON.parse(text));`,
+        result: mvp.validationNote,
+      }),
       why: "TypeScript's type checks disappear once the code is running. Zod's check keeps working in production. Good AI products never hand unchecked model output to a user.",
       snag: "A common first version retries on any error. Retry only when the reply has the wrong shape, and send the error back to the model. A blind retry just rolls the dice again, and a wrong key fails twice.",
     },
@@ -172,3 +213,12 @@ export const journey01: Journey = {
       "Some decisions need an AI model. Many don't. You'll build a tool that scores a task with an LLM, then lets plain code make the call.",
   },
 };
+
+// The steps a learner sees. With an MVP, steps that have a personalize()
+// swap in their app's details; the rest stay as written.
+export function stepsFor(mvp?: Mvp): Array<Step & { personalised: boolean }> {
+  return journey01.steps.map((step) => {
+    if (!mvp || !step.personalize) return { ...step, personalised: false };
+    return { ...step, ...step.personalize(mvp), personalised: true };
+  });
+}

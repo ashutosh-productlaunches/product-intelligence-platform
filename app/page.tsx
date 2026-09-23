@@ -1,16 +1,19 @@
-// Home page: renders Journey 1.
-// All wording comes from content/journey-01.ts. This file only decides layout.
-// It is a server component: it runs on the server and sends plain HTML,
-// so no JavaScript is needed in the browser to read the journey.
-import { journey01, type Step } from "@/content/journey-01";
+// Home page: the intake, then Journey 1.
+// All wording comes from content/. This file only decides layout and which state to show.
+// It is a server component: it runs on the server and sends plain HTML.
+// The learner's choices live in the URL (?pattern=...&input=...), so no browser storage is needed.
+import { journey01, stepsFor, type Step } from "@/content/journey-01";
+import { getPattern } from "@/content/app-patterns";
+import { buildMvp, parseIntake } from "@/lib/build-mvp";
+import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
 
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="grid gap-1 sm:grid-cols-[8.5rem_1fr] sm:gap-4">
+    <div className="grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-4">
       <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:pt-0.5">
         {label}
       </p>
-      <div className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+      <div className="min-w-0 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
         {children}
       </div>
     </div>
@@ -25,7 +28,7 @@ function Pre({ children }: { children: string }) {
   );
 }
 
-function StepCard({ step, index }: { step: Step; index: number }) {
+function StepCard({ step, index, personalised }: { step: Step; index: number; personalised: boolean }) {
   return (
     <li
       id={`step-${index + 1}`}
@@ -37,6 +40,11 @@ function StepCard({ step, index }: { step: Step; index: number }) {
         <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
           {step.concept}
         </span>
+        {personalised && (
+          <span className="rounded-full border border-emerald-600 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+            Your app
+          </span>
+        )}
       </div>
 
       <div className="grid gap-4">
@@ -74,17 +82,40 @@ function StepCard({ step, index }: { step: Step; index: number }) {
   );
 }
 
-export default function Home() {
+type SearchParams = Record<string, string | string[] | undefined>;
+const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+
+export default async function Home({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const params = await searchParams;
   const j = journey01;
+
+  // Which state? Nothing chosen → menu. Pattern chosen → questions. Answers given → MVP.
+  const pattern = getPattern(one(params.pattern));
+  const answered = one(params.input) !== undefined && one(params.edit) === undefined;
+  const result = pattern && answered ? parseIntake(params) : null;
+  const mvp = result?.ok ? buildMvp(result.intake) : undefined;
+  const steps = stepsFor(mvp);
+  const values = { input: one(params.input), audience: one(params.audience), detail: one(params.detail) };
+  const changeHref = `/?${new URLSearchParams({ pattern: pattern?.id ?? "", ...values, edit: "1" } as Record<string, string>).toString()}#build`;
+
+  let intake;
+  if (mvp) intake = <MvpCard mvp={mvp} changeHref={changeHref} />;
+  else if (pattern)
+    intake = <IntakeForm pattern={pattern} values={values} error={result && !result.ok ? result.message : undefined} />;
+  else intake = <PatternMenu />;
+
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
         AI Tool Lab for PMs · Journey {j.number}
+        {mvp && ` · building ${mvp.name}`}
       </p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
         {j.title}
       </h1>
       <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{j.promise}</p>
+
+      <div className="mt-6">{intake}</div>
 
       <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <p className="text-sm font-semibold">By the end you&apos;ll have</p>
@@ -96,7 +127,7 @@ export default function Home() {
       </div>
 
       <nav aria-label="Steps" className="mt-6 flex flex-wrap gap-2">
-        {j.steps.map((s, i) => (
+        {steps.map((s, i) => (
           <a
             key={s.title}
             href={`#step-${i + 1}`}
@@ -108,8 +139,8 @@ export default function Home() {
       </nav>
 
       <ol className="mt-8 grid gap-5">
-        {j.steps.map((s, i) => (
-          <StepCard key={s.title} step={s} index={i} />
+        {steps.map((s, i) => (
+          <StepCard key={s.title} step={s} index={i} personalised={s.personalised} />
         ))}
       </ol>
 
