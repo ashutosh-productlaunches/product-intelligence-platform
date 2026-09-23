@@ -6,6 +6,7 @@ import { journey01, stepsFor, type Step } from "@/content/journey-01";
 import { getPattern } from "@/content/app-patterns";
 import { buildMvp, parseIntake } from "@/lib/build-mvp";
 import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
+import { AppPreview } from "@/components/app-preview";
 
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -116,6 +117,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{j.promise}</p>
 
       <div className="mt-6">{intake}</div>
+      {mvp && <AppPreview mvp={mvp} />}
 
       <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <p className="text-sm font-semibold">By the end you&apos;ll have</p>

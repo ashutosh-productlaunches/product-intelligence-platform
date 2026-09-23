@@ -21,6 +21,14 @@ export const IntakeSchema = z.object({
 });
 export type Intake = z.infer<typeof IntakeSchema>;
 
+// How the learner's screen should show the result.
+export type Preview =
+  | { kind: "points"; count: number }
+  | { kind: "category"; categories: string[] }
+  | { kind: "fields"; fields: { label: string; key: string }[] }
+  | { kind: "text" }
+  | { kind: "answer" };
+
 export type Mvp = {
   pattern: PatternId;
   patternName: string;
@@ -31,6 +39,9 @@ export type Mvp = {
   outputExample: string; // the JSON shape it expects back
   schemaCode: string; // the Zod check the learner will write in step 8
   validationNote: string; // what that check protects against
+  preview: Preview; // how the screen shows the result
+  sampleText: string; // sample input shown on the preview screen
+  resultShownAs: string; // the result, described in plain words
 };
 
 export type IntakeResult = { ok: true; intake: Intake } | { ok: false; message: string };
@@ -97,7 +108,14 @@ export function buildMvp(intake: Intake): Mvp {
   const pattern = getPattern(intake.pattern)!; // safe: parseIntake already checked it
   const { input, audience } = intake;
   const title = titleCase(input);
-  const base = { pattern: pattern.id, patternName: pattern.name, input, audience };
+  const base = {
+    pattern: pattern.id,
+    patternName: pattern.name,
+    input,
+    audience,
+    sampleText: pattern.sampleText,
+    resultShownAs: pattern.resultShownAs,
+  };
 
   switch (intake.pattern) {
     case "summarise": {
@@ -109,6 +127,7 @@ export function buildMvp(intake: Intake): Mvp {
         outputExample: JSON.stringify({ points: Array.from({ length: n }, (_, i) => `Key point ${i + 1}`) }),
         schemaCode: `z.object({ points: z.array(z.string()).length(${n}) })`,
         validationNote: `If Gemini returns more or fewer than ${n} points, Zod rejects the reply.`,
+        preview: { kind: "points", count: n },
       };
     }
     case "classify": {
@@ -120,6 +139,7 @@ export function buildMvp(intake: Intake): Mvp {
         outputExample: JSON.stringify({ category: categories[0] }),
         schemaCode: `z.object({ category: z.enum([${categories.map((c) => JSON.stringify(c)).join(", ")}]) })`,
         validationNote: "If Gemini invents a category that isn't on your list, Zod rejects the reply.",
+        preview: { kind: "category", categories },
       };
     }
     case "extract": {
@@ -132,6 +152,7 @@ export function buildMvp(intake: Intake): Mvp {
         outputExample: JSON.stringify(Object.fromEntries(keys.map((k) => [k, "..."]))),
         schemaCode: `z.object({ ${keys.map((k) => `${k}: z.string().nullable()`).join(", ")} })`,
         validationNote: "A field that isn't in the text comes back as null instead of being made up.",
+        preview: { kind: "fields", fields: labels.map((label, i) => ({ label, key: keys[i] ?? label })) },
       };
     }
     case "rewrite": {
@@ -143,6 +164,7 @@ export function buildMvp(intake: Intake): Mvp {
         outputExample: JSON.stringify({ text: "Your rewritten text..." }),
         schemaCode: "z.object({ text: z.string().min(1) })",
         validationNote: "An empty rewrite is rejected instead of being shown to the user.",
+        preview: { kind: "text" },
       };
     }
     case "answer": {
@@ -154,6 +176,7 @@ export function buildMvp(intake: Intake): Mvp {
         schemaCode: "z.object({ found: z.boolean(), answer: z.string().nullable() })",
         validationNote:
           'When the answer isn\'t in the text, your app says so — "found": false — instead of guessing.',
+        preview: { kind: "answer" },
       };
     }
   }

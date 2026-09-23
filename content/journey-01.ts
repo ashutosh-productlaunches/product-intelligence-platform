@@ -39,7 +39,8 @@ export const journey01: Journey = {
   promise:
     "Build a real web app that asks Gemini a question and checks the answer before trusting it. No coding experience needed — each step introduces one idea, when you need it.",
   outcome: [
-    "A live website that gets an answer from an AI model",
+    "A live website with a screen people can actually use",
+    "An answer from an AI model, checked before it is shown",
     "Your API key kept safely off the internet",
     "Code you can explain line by line",
   ],
@@ -56,16 +57,16 @@ export const journey01: Journey = {
       action:
         "Open the finished version of what you're about to build. It asks an AI model a question and shows the answer it got back.",
       result:
-        "A short answer about what an LLM is, in a format called JSON. It looks plain, and that's fine: by the end of this journey you'll have built it yourself.",
-      link: { href: "/api/ask-ai", label: "Open the finished result" },
+        "A plain-looking answer in a format called JSON. That is the machine-readable half of an app: the part other programs talk to. Step 11 gives it a screen people can use.",
+      link: { href: "/api/ask-ai", label: "Open the raw answer" },
       why: "Knowing where you're heading makes every step make sense. When you get stuck later, find your place on this picture.",
       personalize: (mvp) => {
         const lead = `${mvp.audience} ──▶ your app's page ──▶ `;
         return {
           diagram: `${lead}your server ──▶ AI model\n${" ".repeat(lead.length)}(holds a secret key)`,
-          action: `You're building ${mvp.name}: a ${mvp.patternName.toLowerCase()} tool for ${mvp.audience}. Open this finished example to see the kind of answer an app like yours gets back.`,
-          result: `A JSON answer. Yours will look like this: ${mvp.outputExample}`,
-          link: { href: "/api/ask-ai", label: "Open a finished example" },
+          action: `You're building ${mvp.name}: a ${mvp.patternName.toLowerCase()} tool for ${mvp.audience}. The picture above the steps shows the screen you'll end up with.`,
+          result: `Behind that screen, the model's answer arrives as JSON: ${mvp.outputExample}. Step 11 turns it into ${mvp.resultShownAs}.`,
+          link: { href: "#preview", label: "See the screen you'll build" },
         };
       },
     },
@@ -205,6 +206,29 @@ export const journey01: Journey = {
       result: "https://your-app.vercel.app/api/ask-ai returns a JSON answer.",
       why: "A link anyone can open. That's a shipped AI app.",
       snag: "Add the key before you push: environment variables only apply to builds started after you add them. Vercel's Redeploy button rebuilds the old commit, so new code only goes live when you push it. Run npm run build on your own computer first; it's the same build Vercel runs.",
+    },
+    {
+      title: "Give it a face",
+      concept: "Your app's screen",
+      problem:
+        "Your route returns JSON. Nobody wants to read JSON. Right now you have plumbing, not a product.",
+      idea:
+        "Add a page with a box to paste text and a button. The page hands the text to your own route and shows the answer the way a person wants to read it. You can do this with no JavaScript in the browser: the form puts the text in the address bar, and the server does the rest. That is the same trick this lab uses.",
+      diagram:
+        "person types ──▶ your page ──▶ your route ──▶ Gemini\n             ◀── a readable result ◀──",
+      action:
+        "Replace the starter home page with a form and a result area. The shape is short:",
+      code:
+        "// app/page.tsx — your app's screen\nexport default async function Page({ searchParams }) {\n  const { text } = await searchParams;\n  const result = text ? await askGemini(text) : null;\n\n  return (\n    <form>\n      <textarea name=\"text\" defaultValue={text} />\n      <button>Run</button>\n      {result && <Result data={result} />}\n    </form>\n  );\n}",
+      result:
+        "A screen you would be happy to show someone: paste text, press Run, read the answer.",
+      why: "This is where it stops being a demo and becomes a tool someone can use. Everything before this step was plumbing.",
+      snag:
+        "Your page is public, so every visitor spends your free quota. Before sharing it widely, add a limit or keep the link to people you trust.",
+      personalize: (mvp) => ({
+        action: `Build the screen for ${mvp.name}: a box to paste ${mvp.input}, a Run button, and the result shown as ${mvp.resultShownAs}. The shape is short:`,
+        result: `The screen pictured above the steps, working for real: paste ${mvp.input}, press Run, and ${mvp.audience} gets ${mvp.resultShownAs}.`,
+      }),
     },
   ],
   next: {

@@ -14,6 +14,10 @@ export type Pattern = {
   detail: { label: string; hint: string } | null;
   // Example answers: shown as placeholders, and used by "Use the example answers".
   example: { input: string; audience: string; detail: string };
+  // Sample text shown in the preview screen, so a learner can see the shape of the app.
+  sampleText: string;
+  // How the result is shown on screen, in plain words.
+  resultShownAs: string;
 };
 
 export const patterns: Pattern[] = [
@@ -24,6 +28,8 @@ export const patterns: Pattern[] = [
     examples: ["Complaint digest", "Meeting notes", "Review roundup"],
     detail: { label: "How many key points?", hint: "A number from 1 to 10" },
     example: { input: "customer complaints", audience: "the support lead", detail: "3" },
+    sampleText: "Order #4471 arrived three days late.\nStill waiting on a refund for #4410.\nThe support chat was quick and helpful.",
+    resultShownAs: "a short list of key points",
   },
   {
     id: "classify",
@@ -36,6 +42,8 @@ export const patterns: Pattern[] = [
       audience: "the support team",
       detail: "billing, delivery, product, other",
     },
+    sampleText: "My card was charged twice for order #4471 and I need one of them back.",
+    resultShownAs: "the chosen category, highlighted",
   },
   {
     id: "extract",
@@ -48,6 +56,8 @@ export const patterns: Pattern[] = [
       audience: "the operations team",
       detail: "order number, issue, requested action",
     },
+    sampleText: "Hi — order #4471 arrived damaged on Tuesday. I would like a replacement, not a refund.",
+    resultShownAs: "a small table of fields",
   },
   {
     id: "rewrite",
@@ -56,6 +66,8 @@ export const patterns: Pattern[] = [
     examples: ["Reply drafts", "Release notes", "Tone fixes"],
     detail: { label: "What should the rewrite achieve?", hint: "e.g. a polite reply, plain English" },
     example: { input: "customer complaints", audience: "the customer", detail: "a polite, helpful reply" },
+    sampleText: "this is the third time im writing about order 4471 and no one has replied. sort it out.",
+    resultShownAs: "the rewritten text, ready to copy",
   },
   {
     id: "answer",
@@ -64,6 +76,8 @@ export const patterns: Pattern[] = [
     examples: ["Policy Q&A", "Spec lookup", "Contract questions"],
     detail: null,
     example: { input: "returns policy", audience: "store staff", detail: "" },
+    sampleText: "Items can be returned within 30 days if unused. Sale items are final. Refunds take 5 working days.",
+    resultShownAs: "the answer, or a clear \u201cnot in the text\u201d",
   },
 ];
 
