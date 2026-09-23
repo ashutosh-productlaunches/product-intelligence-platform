@@ -42,6 +42,7 @@ export type Mvp = {
   preview: Preview; // how the screen shows the result
   sampleText: string; // sample input shown on the preview screen
   resultShownAs: string; // the result, described in plain words
+  demoHref: string; // the live demo, set up as this app
 };
 
 export type IntakeResult = { ok: true; intake: Intake } | { ok: false; message: string };
@@ -115,6 +116,12 @@ export function buildMvp(intake: Intake): Mvp {
     audience,
     sampleText: pattern.sampleText,
     resultShownAs: pattern.resultShownAs,
+    demoHref: `/demo?${new URLSearchParams({
+      pattern: pattern.id,
+      input,
+      audience,
+      detail: intake.detail,
+    }).toString()}`,
   };
 
   switch (intake.pattern) {

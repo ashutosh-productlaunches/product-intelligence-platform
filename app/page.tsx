@@ -6,7 +6,7 @@ import { journey01, stepsFor, type Step } from "@/content/journey-01";
 import { getPattern } from "@/content/app-patterns";
 import { buildMvp, parseIntake } from "@/lib/build-mvp";
 import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
-import { AppPreview } from "@/components/app-preview";
+import { patterns } from "@/content/app-patterns";
 
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -90,34 +90,44 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   const params = await searchParams;
   const j = journey01;
 
-  // Which state? Nothing chosen → menu. Pattern chosen → questions. Answers given → MVP.
-  const pattern = getPattern(one(params.pattern));
+  // A live app is always on screen. Without any choices, it runs the first
+  // pattern's example, so a visitor can press Run within seconds of arriving.
+  const pattern = getPattern(one(params.pattern)) ?? patterns[0];
   const answered = one(params.input) !== undefined && one(params.edit) === undefined;
-  const result = pattern && answered ? parseIntake(params) : null;
-  const mvp = result?.ok ? buildMvp(result.intake) : undefined;
-  const steps = stepsFor(mvp);
-  const values = { input: one(params.input), audience: one(params.audience), detail: one(params.detail) };
-  const changeHref = `/?${new URLSearchParams({ pattern: pattern?.id ?? "", ...values, edit: "1" } as Record<string, string>).toString()}#build`;
+  const parsed = answered ? parseIntake(params) : null;
+  const intake = parsed?.ok ? parsed.intake : { pattern: pattern.id, ...pattern.example };
+  const mvp = buildMvp(intake);
+  const steps = stepsFor(parsed?.ok ? mvp : undefined);
 
-  let intake;
-  if (mvp) intake = <MvpCard mvp={mvp} changeHref={changeHref} />;
-  else if (pattern)
-    intake = <IntakeForm pattern={pattern} values={values} error={result && !result.ok ? result.message : undefined} />;
-  else intake = <PatternMenu />;
+  const values = { input: one(params.input), audience: one(params.audience), detail: one(params.detail) };
+  const changeHref = `/?${new URLSearchParams({ pattern: pattern.id, ...values, edit: "1" } as Record<string, string>).toString()}#build`;
+
+  let chooser;
+  if (parsed?.ok) chooser = <MvpCard mvp={mvp} changeHref={changeHref} />;
+  else if (one(params.pattern) && (one(params.edit) !== undefined || one(params.input) !== undefined || one(params.make) !== undefined))
+    chooser = <IntakeForm pattern={pattern} values={values} error={parsed && !parsed.ok ? parsed.message : undefined} />;
+  else chooser = <PatternMenu activeId={pattern.id} />;
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
         AI Tool Lab for PMs · Journey {j.number}
-        {mvp && ` · building ${mvp.name}`}
+        {parsed?.ok && ` · building ${mvp.name}`}
       </p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
         {j.title}
       </h1>
       <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{j.promise}</p>
 
-      <div className="mt-6">{intake}</div>
-      {mvp && <AppPreview mvp={mvp} />}
+      <a
+        href={mvp.demoHref}
+        className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-zinc-900 bg-zinc-900 px-5 py-4 text-white transition-colors hover:bg-zinc-800 dark:border-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+      >
+        <span className="text-[15px] font-semibold">Try {mvp.name} →</span>
+        <span className="text-sm opacity-75">A working app. Paste text, press Run, see a real answer.</span>
+      </a>
+
+      <div className="mt-6">{chooser}</div>
 
       <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-4 dark:border-zinc-800 dark:bg-zinc-900">
         <p className="text-sm font-semibold">By the end you&apos;ll have</p>

@@ -8,20 +8,25 @@ const box = "rounded-lg border-2 border-emerald-600/70 bg-white p-5 dark:bg-zinc
 const label = "text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400";
 
 // State 1: nothing chosen yet.
-export function PatternMenu() {
+export function PatternMenu({ activeId }: { activeId?: string }) {
   return (
     <section id="build" className={box}>
       <p className={label}>Start here</p>
       <h2 className="mt-1 text-xl font-semibold tracking-tight">What do you want to build?</h2>
       <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-        Pick the kind of AI tool closest to your idea. Most first AI tools are one of these five.
+        Pick the kind of AI tool closest to your idea and the app above changes to match.
+        Most first AI tools are one of these five.
       </p>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {patterns.map((p) => (
           <li key={p.id}>
             <a
-              href={`/?pattern=${p.id}#build`}
-              className="block h-full rounded-md border border-zinc-200 p-3 hover:border-emerald-600 dark:border-zinc-800"
+              href={`/?pattern=${p.id}#app`}
+              className={`block h-full rounded-md border p-3 hover:border-emerald-600 ${
+                p.id === activeId
+                  ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30"
+                  : "border-zinc-200 dark:border-zinc-800"
+              }`}
             >
               <span className="font-semibold">{p.name}</span>
               <span className="block text-sm text-zinc-600 dark:text-zinc-400">{p.does}</span>
@@ -30,7 +35,12 @@ export function PatternMenu() {
           </li>
         ))}
       </ul>
-      <p className="mt-3 text-sm text-zinc-500">Just exploring? Scroll down to read the general version.</p>
+      <p className="mt-4 text-sm">
+        <a href={`/?pattern=${activeId ?? "summarise"}&make=1#build`} className="font-medium underline underline-offset-4">
+          Make it yours →
+        </a>{" "}
+        <span className="text-zinc-500">Answer three questions and the app and the steps use your own wording.</span>
+      </p>
     </section>
   );
 }

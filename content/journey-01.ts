@@ -55,18 +55,18 @@ export const journey01: Journey = {
       diagram:
         "you ──▶ your app's page ──▶ your server ──▶ AI model\n                             (holds a secret key)",
       action:
-        "Open the finished version of what you're about to build. It asks an AI model a question and shows the answer it got back.",
+        "Open the live demo, paste some text and press Run. That app is the finished version of what you're about to build.",
       result:
-        "A plain-looking answer in a format called JSON. That is the machine-readable half of an app: the part other programs talk to. Step 11 gives it a screen people can use.",
-      link: { href: "/api/ask-ai", label: "Open the raw answer" },
+        "An answer from a real model, checked before it appeared. The eleven steps below build exactly that app, from an empty folder.",
+      link: { href: "/demo", label: "Open the live demo" },
       why: "Knowing where you're heading makes every step make sense. When you get stuck later, find your place on this picture.",
       personalize: (mvp) => {
         const lead = `${mvp.audience} ──▶ your app's page ──▶ `;
         return {
           diagram: `${lead}your server ──▶ AI model\n${" ".repeat(lead.length)}(holds a secret key)`,
-          action: `You're building ${mvp.name}: a ${mvp.patternName.toLowerCase()} tool for ${mvp.audience}. The picture above the steps shows the screen you'll end up with.`,
-          result: `Behind that screen, the model's answer arrives as JSON: ${mvp.outputExample}. Step 11 turns it into ${mvp.resultShownAs}.`,
-          link: { href: "#preview", label: "See the screen you'll build" },
+          action: `You're building ${mvp.name}: a ${mvp.patternName.toLowerCase()} tool for ${mvp.audience}. It already exists — open it, paste something in and press Run.`,
+          result: `${mvp.resultShownAs.charAt(0).toUpperCase()}${mvp.resultShownAs.slice(1)}. Behind the screen the model's answer arrives as JSON (${mvp.outputExample}) and is checked before anything is shown.`,
+          link: { href: mvp.demoHref, label: `Open ${mvp.name}` },
         };
       },
     },
@@ -227,7 +227,7 @@ export const journey01: Journey = {
         "Your page is public, so every visitor spends your free quota. Before sharing it widely, add a limit or keep the link to people you trust.",
       personalize: (mvp) => ({
         action: `Build the screen for ${mvp.name}: a box to paste ${mvp.input}, a Run button, and the result shown as ${mvp.resultShownAs}. The shape is short:`,
-        result: `The screen pictured above the steps, working for real: paste ${mvp.input}, press Run, and ${mvp.audience} gets ${mvp.resultShownAs}.`,
+        result: `Your own copy of the demo app: paste ${mvp.input}, press Run, and ${mvp.audience} gets ${mvp.resultShownAs}.`,
       }),
     },
   ],
