@@ -203,8 +203,8 @@ export const journey01: Journey = {
       layers: ["computer"],
       problem: "Code needs somewhere to be written and something to run it.",
       idea: "VS Code is where you write code. Node.js runs it. Git records versions. The terminal, also called the command line or CLI, is where you type commands instead of clicking; every tool in this journey is driven from it.",
-      action: "The slowest step: three downloads and three installers. Install them in this order, because Git's installer asks which editor to use, so VS Code should already be there. Each card says where to download from, what to pick on every screen, and gives a one-line command if you prefer the terminal.",
-      thenCheck: "Then close VS Code completely and open it again, so its terminal sees the new tools. Open View → Terminal (Ctrl+` on Windows and Mac) and run these one at a time:",
+      action: "The slowest step: three downloads and three installers. Install them in this order, because Git's installer asks which editor to use, so VS Code should already be there. Go through the parts below one at a time: each says where to download from, what to pick on every screen, and gives a one-line command if you prefer the terminal.",
+      thenCheck: "Once all three are installed, close VS Code completely and open it again, so its terminal sees the new tools. Open View → Terminal (Ctrl+` on Windows and Mac) and run these one at a time:",
       install: [
         {
           name: "Node.js",

@@ -13,6 +13,7 @@ import type { Look } from "@/content/looks";
 import { SectionNav } from "@/components/section-nav";
 import { JourneyPlayer } from "@/components/journey-player";
 import { Panes } from "@/components/panes";
+import { Parts } from "@/components/parts";
 import { Experiment, CopyHelp } from "@/components/lab";
 import { experiments01, type Experiment as ExperimentData } from "@/content/experiments-01";
 import { helpPrompt } from "@/lib/tutor-context";
@@ -203,20 +204,16 @@ function StepCard({
   const doIt = (
     <div key="do" className="min-w-0 text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200">
       {step.action}
-      {step.install && (
-        <div className="mt-3 grid min-w-0 gap-2">
-          {step.install.map((t, i) => (
-            <details key={t.name} open={i === 0} className="group min-w-0 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-              <summary className="flex cursor-pointer list-none items-center gap-3 p-3">
-                <span className="grid size-6 shrink-0 place-items-center rounded-full bg-zinc-900 text-xs font-semibold text-white dark:bg-zinc-100 dark:text-zinc-900">{i + 1}</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</span>
-                  <span className="block text-sm text-zinc-600 dark:text-zinc-400">{t.what}</span>
-                </span>
-                <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
-              </summary>
-              <div className="border-t border-zinc-200 px-3 pt-3 pb-4 text-sm leading-relaxed dark:border-zinc-800">
-                <p className="text-zinc-600 dark:text-zinc-400">
+      {step.install ? (
+        <Parts
+          step={index + 1}
+          labels={[...step.install.map((t) => t.name), "Check"]}
+          parts={[
+            ...step.install.map((t) => (
+              <div key={t.name} className="rounded-md border border-zinc-200 bg-white p-4 text-sm leading-relaxed dark:border-zinc-800 dark:bg-zinc-950">
+                <p className="font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</p>
+                <p className="text-zinc-600 dark:text-zinc-400">{t.what}</p>
+                <p className="mt-3 text-zinc-600 dark:text-zinc-400">
                   <span className="font-semibold text-zinc-900 dark:text-zinc-100">Download from: </span>
                   {t.from}
                 </p>
@@ -239,12 +236,19 @@ function StepCard({
                   {t.update}
                 </p>
               </div>
-            </details>
-          ))}
-        </div>
+            )),
+            <div key="check">
+              {step.thenCheck && <p>{step.thenCheck}</p>}
+              {step.code && <Code>{step.code}</Code>}
+            </div>,
+          ]}
+        />
+      ) : (
+        <>
+          {step.thenCheck && <p className="mt-4">{step.thenCheck}</p>}
+          {step.code && <Code>{step.code}</Code>}
+        </>
       )}
-      {step.thenCheck && <p className="mt-4">{step.thenCheck}</p>}
-      {step.code && <Code>{step.code}</Code>}
       {step.choices && (
         <div className="mt-3 grid min-w-0 gap-2">
           {step.choices.map((c, i) => (
