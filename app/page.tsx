@@ -281,6 +281,41 @@ function StepCard({
         <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">PM lens · why you should care</p>
         <p className="mt-1 text-[15px] leading-relaxed text-zinc-100">{step.pmLens}</p>
       </div>
+      {step.pmDetail && (
+        <details className="group bg-white sm:col-span-2 dark:bg-zinc-950">
+          <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm">
+            <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
+            <span className="font-semibold">In depth: cost, speed and safety, and what you decide</span>
+          </summary>
+          <div className="border-t border-zinc-200 px-4 py-4 dark:border-zinc-800">
+            <div className="grid gap-3 md:grid-cols-3">
+              {step.pmDetail.boxes.map((b) => (
+                <div key={b.name} className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
+                  <p className="text-sm font-semibold">{b.name}</p>
+                  <dl className="mt-2 grid gap-2 text-sm leading-snug">
+                    {(["cost", "speed", "safety"] as const).map((k) => (
+                      <div key={k}>
+                        <dt className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">{k}</dt>
+                        <dd className="text-zinc-700 dark:text-zinc-300">{b[k]}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+            <p className="mt-5 text-xs font-semibold tracking-wider text-sky-700 uppercase dark:text-sky-300">Decisions you own</p>
+            <ul className="mt-2 grid gap-2.5">
+              {step.pmDetail.decisions.map((d) => (
+                <li key={d.q} className="text-sm leading-snug">
+                  <span className="font-semibold">{d.q}</span>{" "}
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{d.trades}</span>
+                  <span className="mt-0.5 block text-zinc-600 dark:text-zinc-400">Start with: {d.start}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </details>
+      )}
     </div>
   );
 

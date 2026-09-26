@@ -26,6 +26,13 @@ export type Step = {
   link?: { href: string; label: string }; // optional live example
   understand: string; // what just happened, technically
   pmLens: string; // why a product manager should care, in two or three sentences
+  // Optional: the PM lens in depth, behind an expandable section.
+  // `boxes` shows how each part of the app affects cost, speed and safety;
+  // `decisions` are the calls a PM is expected to make, and which of the three each one trades.
+  pmDetail?: {
+    boxes: { name: string; cost: string; speed: string; safety: string }[];
+    decisions: { q: string; trades: string; start: string }[];
+  };
   fails?: { causes: string[]; fix: string }; // if this doesn't work: likely causes, then the most likely fix
   snag?: string; // optional: where people really get stuck
   // Optional: a few ready-made files to choose from, instead of one block of code.
@@ -90,6 +97,35 @@ export const journey01: Journey = {
       link: { href: "/demo", label: "Open the live demo" },
       understand: "That's the architecture of most AI products: page → server (holds the key) → model. When you get stuck later, find your place on this picture.",
       pmLens: "Cost, speed and safety decisions are almost always about one of these three boxes.",
+      pmDetail: {
+        boxes: [
+          {
+            name: "Page (in the browser)",
+            cost: "Runs on the user's device, so it costs you almost nothing.",
+            speed: "Decides how fast it feels: a loading state, a disabled button while waiting, the answer appearing as it arrives.",
+            safety: "Everything here is public. Never put a key here, and never trust what it sends.",
+          },
+          {
+            name: "Server (holds the key)",
+            cost: "Where you control spend: limits per user, a cap on input length, reusing answers to repeated questions.",
+            speed: "Adds a hop, and runs the checks. Every retry is another full model call the user waits for.",
+            safety: "Keeps the key, checks input and output, decides who may call the model at all.",
+          },
+          {
+            name: "Model (someone else's computers)",
+            cost: "Usually the biggest running cost: you pay per token, for what you send and what comes back. Bigger models cost more per token.",
+            speed: "Usually the slowest part. Longer answers and bigger models take longer.",
+            safety: "Sees everything you send, and can be wrong or be steered by what users type.",
+          },
+        ],
+        decisions: [
+          { q: "Which model, and which size?", trades: "Cost · speed vs quality", start: "The smallest model that passes your quality bar on real examples. Move up only where it fails." },
+          { q: "What data may we send to the provider?", trades: "Safety", start: "Read the provider's data use and retention terms. No customer or personal data until that's agreed." },
+          { q: "How much may one user spend?", trades: "Cost", start: "A daily limit per user, enforced on the server, and a clear message when they hit it." },
+          { q: "What does the user see while waiting, and when it fails?", trades: "Speed · safety", start: "A loading state, a time limit, and an honest error. Never a blank screen or unchecked output." },
+          { q: "Where is the answer checked before anyone uses it?", trades: "Safety", start: "On the server, before it's shown or saved. You'll build this in step 8." },
+        ],
+      },
       personalize: (mvp) => {
         const lead = `${mvp.audience} ──▶ your app's page ──▶ `;
         return {
