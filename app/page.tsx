@@ -207,7 +207,7 @@ function StepCard({
       {step.install ? (
         <Parts
           step={index + 1}
-          labels={[...step.install.map((t) => t.name), "Check"]}
+          labels={[...step.install.map((t) => t.name), ...(step.assistants ? ["AI assistant (optional)"] : []), "Check"]}
           parts={[
             ...step.install.map((t) => (
               <div key={t.name} className="rounded-md border border-zinc-200 bg-white p-4 text-sm leading-relaxed dark:border-zinc-800 dark:bg-zinc-950">
@@ -237,6 +237,25 @@ function StepCard({
                 </p>
               </div>
             )),
+            ...(step.assistants
+              ? [
+                  <div key="assistants" className="text-sm leading-relaxed">
+                    <p>{step.assistants.intro}</p>
+                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                      {step.assistants.tools.map((a) => (
+                        <div key={a.name} className="min-w-0 rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+                          <p className="font-semibold text-zinc-900 dark:text-zinc-100">{a.name}</p>
+                          <p className="text-zinc-600 dark:text-zinc-400">{a.cost}</p>
+                          {a.install && <Code>{`${a.install}\n\n# then start it\n${a.start}`}</Code>}
+                          {a.steps && <p className="mt-2 text-zinc-700 dark:text-zinc-300">{a.steps}</p>}
+                          <p className="mt-2 text-zinc-700 dark:text-zinc-300">{a.signIn}</p>
+                          {a.note && <p className="mt-1 text-zinc-500">{a.note}</p>}
+                        </div>
+                      ))}
+                    </div>
+                  </div>,
+                ]
+              : []),
             <div key="check">
               {step.thenCheck && <p>{step.thenCheck}</p>}
               {step.code && <Code>{step.code}</Code>}

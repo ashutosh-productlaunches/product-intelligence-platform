@@ -24,6 +24,12 @@ export type Step = {
   code?: string; // optional commands or file contents to type
   // Optional: software to install before the code, one expandable card per tool, in install order.
   thenCheck?: string; // optional: shown after the install cards, right above the code
+  // Optional: AI coding assistants the learner may add. Each installs and signs in differently.
+  assistants?: {
+    intro: string;
+    // install + start are terminal commands; steps is for tools set up by clicking instead.
+    tools: { name: string; cost: string; install?: string; start?: string; steps?: string; signIn: string; note?: string }[];
+  };
   install?: {
     name: string;
     what: string; // what it's for, in one line
@@ -204,6 +210,15 @@ export const journey01: Journey = {
       problem: "Code needs somewhere to be written and something to run it.",
       idea: "VS Code is where you write code. Node.js runs it. Git records versions. The terminal, also called the command line or CLI, is where you type commands instead of clicking; every tool in this journey is driven from it.",
       action: "The slowest step: three downloads and three installers. Install them in this order, because Git's installer asks which editor to use, so VS Code should already be there. Go through the parts below one at a time: each says where to download from, what to pick on every screen, and gives a one-line command if you prefer the terminal.",
+      assistants: {
+        intro: "Optional. An AI coding assistant runs next to your code: it can read your project, explain errors and suggest changes. Use it to understand what you paste, not to skip understanding. Each tool installs and signs in differently, so pick one. Run the install command in VS Code's terminal, then start it from inside your project folder (from step 4). Nothing to install? The Copy context for your AI button on every step works with any chat app in your browser.",
+        tools: [
+          { name: "Gemini CLI", cost: "Free with a personal Google account, within daily limits.", install: "npm install -g @google/gemini-cli", start: "gemini", signIn: "On first run, choose Login with Google and finish signing in in the browser window it opens.", note: "It doesn't need the API key you'll create in step 5." },
+          { name: "Claude Code", cost: "Needs a paid Claude plan, or Anthropic API billing.", install: "# Windows (PowerShell)\nirm https://claude.ai/install.ps1 | iex\n\n# Mac\ncurl -fsSL https://claude.ai/install.sh | bash", start: "claude", signIn: "On first run it opens your browser to sign in to your Claude account." },
+          { name: "Codex CLI (OpenAI)", cost: "Included with paid ChatGPT plans, or pay per use with an OpenAI API key.", install: "npm install -g @openai/codex", start: "codex", signIn: "On first run, choose Sign in with ChatGPT.", note: "On Windows, check OpenAI's Codex docs first: Windows support has been more limited." },
+          { name: "GitHub Copilot (in VS Code, not the terminal)", cost: "Has a free plan with monthly limits.", steps: "In VS Code, open Extensions (Ctrl+Shift+X), search GitHub Copilot and press Install. Then open the Chat view.", signIn: "Sign in with GitHub when asked. You'll need a GitHub account in step 9 anyway." },
+        ],
+      },
       thenCheck: "Once all three are installed, close VS Code completely and open it again, so its terminal sees the new tools. Open View → Terminal (Ctrl+` on Windows and Mac) and run these one at a time:",
       install: [
         {
@@ -274,10 +289,11 @@ export const journey01: Journey = {
           "PowerShell says 'running scripts is disabled'.",
           "node -v shows a version below v20.9: an older Node.js is installed. Install the current LTS over it.",
           "winget or brew isn't found: use the website installers instead. brew needs Homebrew (brew.sh) first.",
+          "npm install -g fails with EACCES on a Mac: put sudo in front of the command and enter your password.",
         ],
-        fix: "Close VS Code completely and open it again, so the terminal picks up the new tools. If PowerShell blocks npm, type npm.cmd instead.",
+        fix: "Close VS Code completely and open it again, so the terminal picks up the new tools. If PowerShell blocks npm or an assistant, add .cmd: npm.cmd, gemini.cmd.",
       },
-      snag: "You don't need a paid AI editor. VS Code is free, and a free assistant such as Gemini CLI is enough.",
+      snag: "You don't need a paid AI editor. VS Code is free, and a free assistant such as Gemini CLI (part 3.4) is enough.",
     },
     {
       title: "Create the app",
