@@ -138,7 +138,7 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
       </section>
 
       <nav aria-label="Tools" className="mx-auto max-w-7xl px-4 sm:px-6">
-        <ul className="flex gap-1 overflow-x-auto border-b border-(--border) md:justify-center">
+        <ul className="flex gap-1 overflow-x-auto overflow-y-hidden border-b border-(--border) md:justify-center">
           {patterns.map((p) => {
             const active = p.id === pattern.id;
             return (

@@ -35,7 +35,7 @@ export default async function ArchitecturePage({ searchParams }: { searchParams:
   const flow = getFlow(one(params.flow));
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6">
+    <main className="mx-auto w-full max-w-[74rem] px-4 py-12 sm:px-6">
       <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">AI Tool Lab for PMs · System map</p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">How every part fits together</h1>
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
