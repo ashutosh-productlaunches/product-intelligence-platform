@@ -31,8 +31,11 @@ export type Step = {
   // `decisions` are the calls a PM is expected to make, and which of the three each one trades.
   pmDetail?: {
     boxes: { name: string; cost: string; speed: string; safety: string }[];
-    decisions: { q: string; trades: string; start: string }[];
+    decisions: { q: string; trades: string; start: string; step?: number }[]; // step: where the journey applies it
   };
+  // Optional: earlier PM decisions this step puts into practice, shown in "Do it".
+  // `from` is the step that introduced the decision; `q` repeats its question word for word.
+  inPractice?: { from: number; q: string; here: string }[];
   fails?: { causes: string[]; fix: string }; // if this doesn't work: likely causes, then the most likely fix
   snag?: string; // optional: where people really get stuck
   // Optional: a few ready-made files to choose from, instead of one block of code.
@@ -119,11 +122,11 @@ export const journey01: Journey = {
           },
         ],
         decisions: [
-          { q: "Which model, and which size?", trades: "Cost · speed vs quality", start: "The smallest model that passes your quality bar on real examples. Move up only where it fails." },
-          { q: "What data may we send to the provider?", trades: "Safety", start: "Read the provider's data use and retention terms. No customer or personal data until that's agreed." },
-          { q: "How much may one user spend?", trades: "Cost", start: "A daily limit per user, enforced on the server, and a clear message when they hit it." },
-          { q: "What does the user see while waiting, and when it fails?", trades: "Speed · safety", start: "A loading state, a time limit, and an honest error. Never a blank screen or unchecked output." },
-          { q: "Where is the answer checked before anyone uses it?", trades: "Safety", start: "On the server, before it's shown or saved. You'll build this in step 8." },
+          { q: "Which model, and which size?", trades: "Cost · speed vs quality", start: "The smallest model that passes your quality bar on real examples. Move up only where it fails.", step: 7 },
+          { q: "What data may we send to the provider?", trades: "Safety", start: "Read the provider's data use and retention terms. No customer or personal data until that's agreed.", step: 5 },
+          { q: "How much may one user spend?", trades: "Cost", start: "A daily limit per user, enforced on the server, and a clear message when they hit it.", step: 10 },
+          { q: "What does the user see while waiting, and when it fails?", trades: "Speed · safety", start: "A loading state, a time limit, and an honest error. Never a blank screen or unchecked output.", step: 11 },
+          { q: "Where is the answer checked before anyone uses it?", trades: "Safety", start: "On the server, before it's shown or saved. You'll build this in step 8.", step: 8 },
         ],
       },
       personalize: (mvp) => {
@@ -151,7 +154,7 @@ export const journey01: Journey = {
         boxes: [
           {
             name: "Small, fast model (e.g. Flash)",
-            cost: "Lowest price per token. The default for most product features.",
+            cost: "Low price per token. The usual default for product features.",
             speed: "Fastest replies.",
             safety: "Fine for narrow tasks like summarising or sorting. More likely to miss nuance, so check its answers.",
           },
@@ -169,10 +172,10 @@ export const journey01: Journey = {
           },
         ],
         decisions: [
-          { q: "What does \"good enough\" mean for this feature?", trades: "Quality", start: "A small set of real inputs with the answer you'd accept. Test each model against them before choosing." },
-          { q: "Free tier or paid?", trades: "Cost · safety", start: "Free tiers can use what you send to improve their models; Gemini's free tier does. No real customer data until you're on paid terms." },
-          { q: "Tied to one provider, or free to switch?", trades: "Cost · safety", start: "Keep the model call in one file (step 7), so switching is a change in one place." },
-          { q: "What happens when the provider is down or you hit a limit?", trades: "Speed · safety", start: "A clear message to the user. Later, a second model to fall back to." },
+          { q: "What does \"good enough\" mean for this feature?", trades: "Quality", start: "A small set of real inputs with the answer you'd accept. Test each model against them before choosing.", step: 7 },
+          { q: "Free tier or paid?", trades: "Cost · safety", start: "Free tiers can use what you send to improve their models; Gemini's free tier does. No real customer data until you're on paid terms.", step: 5 },
+          { q: "Tied to one provider, or free to switch?", trades: "Cost · safety", start: "Keep the model call in one file (step 7), so switching is a change in one place.", step: 7 },
+          { q: "What happens when the provider is down or you hit a limit?", trades: "Speed · safety", start: "A clear message to the user. Later, a second model to fall back to.", step: 11 },
         ],
       },
       fails: {
@@ -234,6 +237,9 @@ export const journey01: Journey = {
       code: '# .env.local\nGEMINI_API_KEY=paste-your-key-here\n\n// try-key.mjs\nimport { GoogleGenAI } from "@google/genai";\n\nconst ai = new GoogleGenAI({});\nconst response = await ai.models.generateContent({\n  model: "gemini-3.6-flash",\n  contents: "In one sentence, what is an API?",\n});\nconsole.log(response.text);\n\n# in the terminal\nnode --env-file=.env.local try-key.mjs',
       result: "One sentence from Gemini in your terminal. That's your first model call, from your own computer. Notice it's prose: remember that in step 7. Also check that .gitignore lists .env*: that line keeps the key off GitHub.",
       understand: "--env-file loads .env.local into the environment, and the Gemini library reads GEMINI_API_KEY from there. Next.js does the same when the dev server starts. The key sits outside the code, so try-key.mjs is safe to share and commit.",
+      inPractice: [
+        { from: 2, q: "Free tier or paid?", here: "This key is on the free tier, so try things with made-up or public text, never real customer data." },
+      ],
       pmLens: "Every new third-party service raises one question: where does its key live? A leaked key costs quota or, with billing on, money.",
       fails: {
         causes: [
@@ -283,10 +289,10 @@ export const journey01: Journey = {
           },
         ],
         decisions: [
-          { q: "What must stay on the server?", trades: "Safety", start: "Anything the user shouldn't see or change: keys, prompts, permissions, prices." },
-          { q: "Who may call your route?", trades: "Cost · safety", start: "Right now, anyone with the URL. Before real users: sign-in, or a limit per visitor." },
+          { q: "What must stay on the server?", trades: "Safety", start: "Anything the user shouldn't see or change: keys, prompts, permissions, prices.", step: 11 },
+          { q: "Who may call your route?", trades: "Cost · safety", start: "Right now, anyone with the URL. Before real users: sign-in, or a limit per visitor.", step: 10 },
           { q: "What does the server log?", trades: "Safety", start: "Logs help you debug but can hold customer text. Decide what's kept, and for how long." },
-          { q: "Show the answer as it's written (streaming)?", trades: "Speed vs safety", start: "It feels faster, but you can't fully check an answer before it's finished. Check first, stream later." },
+          { q: "Show the answer as it's written (streaming)?", trades: "Speed vs safety", start: "It feels faster, but you can't fully check an answer before it's finished. Check first, stream later.", step: 11 },
         ],
       },
       fails: {
@@ -309,6 +315,11 @@ export const journey01: Journey = {
         '// lib/ask.ts\nimport { GoogleGenAI } from "@google/genai";\n\nconst ai = new GoogleGenAI({});\n\nexport async function askGemini(text: string) {\n  const response = await ai.models.generateContent({\n    model: "gemini-3.6-flash",\n    contents: `Summarise the following customer complaints into 3 key points.\n\n---\n\n${text}`,\n    config: { responseMimeType: "application/json", temperature: 0 },\n  });\n  return JSON.parse(response.text ?? "{}");\n}\n\n// app/api/ask-ai/route.ts\nimport { askGemini } from "@/lib/ask";\n\nexport async function GET(request: Request) {\n  const text = new URL(request.url).searchParams.get("text") ?? "";\n  return Response.json(await askGemini(text));\n}',
       result: "Open http://localhost:3000/api/ask-ai?text=The parcel arrived late and damaged. You should get JSON like {\"points\":[\"...\"]}.",
       understand: "The route reads the text, sends it with your prompt and returns Gemini's JSON. responseMimeType asks for JSON, temperature 0 reduces randomness, and JSON.parse turns text into data.",
+      inPractice: [
+        { from: 2, q: "Which model, and which size?", here: "model: gemini-3.6-flash is the small, fast tier: enough for this task, and far cheaper per call than a large model." },
+        { from: 2, q: "What does \"good enough\" mean for this feature?", here: "Run it on three or four realistic inputs and note which answers you'd accept. That's your first quality bar." },
+        { from: 2, q: "Tied to one provider, or free to switch?", here: "The whole model call lives in lib/ask.ts. Switching provider means changing this one file." },
+      ],
       pmLens: "If product logic depends on the answer, such as routing a ticket or saving a field, the shape must be predictable. Asking for structure is the cheapest guardrail.",
       fails: {
         causes: [
@@ -342,6 +353,9 @@ export const journey01: Journey = {
         '// lib/ask.ts\nimport { GoogleGenAI } from "@google/genai";\nimport { z } from "zod";\n\nconst ai = new GoogleGenAI({});\nconst Reply = z.object({ points: z.array(z.string()).length(3) });\n\nasync function callModel(text: string, correction?: string) {\n  const response = await ai.models.generateContent({\n    model: "gemini-3.6-flash",\n    contents: [\n      "Summarise the following customer complaints into 3 key points.",\n      correction ?? "",\n      "---",\n      text,\n    ].filter(Boolean).join("\\n\\n"),\n    config: { responseMimeType: "application/json", temperature: 0 },\n  });\n  try {\n    return JSON.parse(response.text ?? "{}");\n  } catch {\n    return null;\n  }\n}\n\nexport async function askGemini(text: string) {\n  const first = Reply.safeParse(await callModel(text));\n  if (first.success) return { ok: true as const, data: first.data };\n\n  const problem = first.error.issues[0].message;\n  const second = Reply.safeParse(\n    await callModel(text, `Your last reply could not be used (${problem}). Reply again with JSON only.`),\n  );\n  if (second.success) return { ok: true as const, data: second.data };\n\n  return { ok: false as const, error: "The model did not reply in the shape this app expects." };\n}',
       result: "The same answer, now checked. Return the result object from your route as it is; the page in step 11 decides what to show.",
       understand: "Zod describes the expected shape; safeParse returns the data or what's wrong, without crashing. That's what happens when the AI fails: detect, retry once, then fail honestly. Unlike TypeScript types, this check runs in production.",
+      inPractice: [
+        { from: 1, q: "Where is the answer checked before anyone uses it?", here: "Here: on the server, in lib/ask.ts, before any page sees the answer." },
+      ],
       pmLens: "Models are probabilistic, so decide upfront what the product does when they fail: retry, fall back or tell the user. Never show unchecked output.",
       pmDetail: {
         boxes: [
@@ -423,6 +437,10 @@ export const journey01: Journey = {
       code: "npm run build",
       result: "A live URL like https://my-ai-app.vercel.app. Add /api/ask-ai?text=hello to get JSON from a server anywhere.",
       understand: "Vercel runs npm install and npm run build on its servers and serves the result publicly. Its environment variable replaces .env.local. Each push builds a new version, which goes live if the build succeeds.",
+      inPractice: [
+        { from: 6, q: "Who may call your route?", here: "Your live /api/ask-ai has no sign-in: anyone with the URL can call it. Fine for learning, not for real users." },
+        { from: 1, q: "How much may one user spend?", here: "Nothing limits it yet. A stranger can use up your free daily quota; with billing on, your money." },
+      ],
       pmLens: "A prototype isn't a product until people can reach it reliably. Knowing how a push goes live shortens every release conversation.",
       fails: {
         causes: [
@@ -447,6 +465,11 @@ export const journey01: Journey = {
         '// app/page.tsx\nimport { askGemini } from "@/lib/ask";\n\nexport default async function Page({\n  searchParams,\n}: {\n  searchParams: Promise<{ text?: string }>;\n}) {\n  const { text } = await searchParams;\n  const result = text ? await askGemini(text) : null;\n\n  return (\n    <main style={{ maxWidth: 640, margin: "3rem auto", padding: "0 1rem" }}>\n      <h1>Complaint Digest</h1>\n\n      <form>\n        <textarea name="text" rows={8} defaultValue={text} style={{ width: "100%" }} />\n        <button type="submit">Run</button>\n      </form>\n\n      {result?.ok && (\n        <ol>\n          {result.data.points.map((point) => (\n            <li key={point}>{point}</li>\n          ))}\n        </ol>\n      )}\n\n      {result && !result.ok && <p>{result.error}</p>}\n    </main>\n  );\n}',
       result: "Paste text, press Run, read the answer. Push, and it's live.",
       understand: "The page is a server component: it runs on the server, calls askGemini directly and sends finished HTML. The form puts ?text=… in the address, and the server reads it and renders the result.",
+      inPractice: [
+        { from: 1, q: "What does the user see while waiting, and when it fails?", here: "While the model works, only the browser's own loading indicator shows. A wrong shape shows result.error, but a quota or network error still crashes the page. A real product catches both." },
+        { from: 6, q: "Show the answer as it's written (streaming)?", here: "The page waits for the whole, checked answer before showing anything: check first." },
+        { from: 6, q: "What must stay on the server?", here: "The page calls askGemini on the server, so your prompt and key still never reach the browser." },
+      ],
       pmLens: "The model isn't the product; the experience is. What people type, wait for and see when it fails decides whether they trust it.",
       fails: {
         causes: [

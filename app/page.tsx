@@ -223,6 +223,21 @@ function StepCard({
           ))}
         </div>
       )}
+      {step.inPractice && (
+        <div className="mt-4 rounded-lg border border-sky-600/30 bg-sky-50/60 px-4 py-3 dark:border-sky-400/30 dark:bg-sky-950/20">
+          <p className="text-xs font-semibold tracking-wider text-sky-700 uppercase dark:text-sky-300">Decisions in practice</p>
+          <ul className="mt-2 grid gap-2.5 text-sm leading-snug">
+            {step.inPractice.map((d) => (
+              <li key={d.q}>
+                <a href={`#step-${d.from}`} className="font-semibold text-zinc-900 hover:underline dark:text-zinc-100">
+                  ↩ Step {d.from} · {d.q}
+                </a>
+                <span className="mt-0.5 block text-zinc-700 dark:text-zinc-300">{d.here}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 
@@ -310,6 +325,11 @@ function StepCard({
                   <span className="font-semibold">{d.q}</span>{" "}
                   <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{d.trades}</span>
                   <span className="mt-0.5 block text-zinc-600 dark:text-zinc-400">Start with: {d.start}</span>
+                  {d.step && (
+                    <a href={`#step-${d.step}`} className="mt-0.5 inline-block text-xs font-medium text-sky-700 hover:underline dark:text-sky-300">
+                      Applied in step {d.step} →
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>
