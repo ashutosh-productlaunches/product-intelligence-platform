@@ -13,6 +13,9 @@ import type { Look } from "@/content/looks";
 import { SectionNav } from "@/components/section-nav";
 import { JourneyPlayer } from "@/components/journey-player";
 import { Panes } from "@/components/panes";
+import { Experiment, CopyHelp } from "@/components/lab";
+import { experiments01, type Experiment as ExperimentData } from "@/content/experiments-01";
+import { helpPrompt } from "@/lib/tutor-context";
 
 
 function Pre({ children }: { children: string }) {
@@ -175,6 +178,8 @@ function StepCard({
   next,
   personalised,
   check,
+  experiment,
+  help,
   built,
 }: {
   step: Step;
@@ -184,6 +189,8 @@ function StepCard({
   next?: { index: number; title: string };
   personalised: boolean;
   check?: Question[];
+  experiment?: ExperimentData;
+  help: string;
   built: Layer[];
 }) {
   const why = (
@@ -257,16 +264,7 @@ function StepCard({
               <span className="font-semibold text-zinc-900 dark:text-zinc-100">Most likely fix: </span>
               {step.fails.fix}
             </p>
-            <div className="mt-4 rounded-md border border-dashed border-zinc-300 px-3 py-2.5 dark:border-zinc-700">
-              <p className="flex flex-wrap items-center gap-2">
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">Stuck? Show me what you&apos;re seeing.</span>
-                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-800">Coming soon</span>
-              </p>
-              <p className="mt-1 text-xs text-zinc-500">
-                Paste an error, upload a screenshot or describe what happened. You&apos;ll get a diagnosis that explains what
-                happened and why, the fix, and the concept behind it, then asks you to check the result.
-              </p>
-            </div>
+            <CopyHelp prompt={help} />
           </div>
         </details>
       )}
@@ -286,8 +284,14 @@ function StepCard({
     </div>
   );
 
-  const labels = ["Why", "Do it", "See it work", "Understand"];
-  const panes = [why, doIt, see, understand];
+  const labels = ["Why", "Do it", "See it work"];
+  const panes = [why, doIt, see];
+  if (experiment) {
+    labels.push("Break it");
+    panes.push(<Experiment key="break" x={experiment} personalised={personalised} />);
+  }
+  labels.push("Understand");
+  panes.push(understand);
   if (check) {
     labels.push("Quiz");
     panes.push(<CheckUnderstanding key="quiz" questions={check} step={index + 1} />);
@@ -500,6 +504,28 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <p className="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">{j.promise}</p>
         <p className="mt-3 text-xs text-zinc-500">{site.providerNote}</p>
 
+        <div className="mt-6 grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-[3fr_2fr] dark:border-zinc-800 dark:bg-zinc-800">
+          <div className="bg-white px-4 py-3.5 dark:bg-zinc-950">
+            <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">Before you start</p>
+            <ul className="mt-2 grid gap-1.5 text-sm">
+              {site.before.need.map((n) => (
+                <li key={n} className="flex gap-2">
+                  <span aria-hidden className="text-emerald-600 dark:text-emerald-400">·</span>
+                  {n}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-zinc-50 px-4 py-3.5 dark:bg-zinc-900">
+            <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">Time</p>
+            <p className="mt-2 text-sm leading-relaxed">{site.before.time}</p>
+            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+              From step 5, each step has a <span className="font-semibold text-zinc-900 dark:text-zinc-100">Break it</span> experiment:
+              predict, break one thing on purpose, see what happens.
+            </p>
+          </div>
+        </div>
+
         <div className="mt-8">
           <JourneyPlayer
             meta={steps.map((st, i) => ({ n: i + 1, title: st.title, stage: phaseOf(i).title }))}
@@ -514,6 +540,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                 next={steps[i + 1] ? { index: i + 1, title: steps[i + 1].title } : undefined}
                 personalised={s.personalised}
                 check={checks01[i]}
+                experiment={experiments01[i]}
+                help={helpPrompt({ steps, index: i, appName: mvp.name })}
                 built={[...new Set(steps.slice(FIRST_BUILD_STEP - 1, i).flatMap((p) => p.layers))].filter((l) => !s.layers.includes(l))}
               />
             ))}

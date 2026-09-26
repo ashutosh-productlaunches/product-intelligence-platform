@@ -41,5 +41,16 @@ export const site = {
   // What's underneath every app in the journey. The "what you see" side comes from the app you pick.
   underneath: ["Browser", "Next.js page", "Server", "AI API", "LLM", "Structured output", "Validation", "Screen"],
 
+  // Shown above the journey: what to have ready, and an honest word on time.
+  // Replace with a measured time once the first testers have finished.
+  before: {
+    need: [
+      "A laptop where you can install software (a locked-down work laptop may block it)",
+      "A personal Google account, for the free Gemini key",
+      "A free GitHub account, and later a free Vercel account",
+    ],
+    time: "Plan for more than one sitting. Setup (steps 3–5) takes longest the first time. Your place is remembered in this browser.",
+  },
+
   providerNote: "We use Gemini because it's free to start. Everything here applies to OpenAI, Claude and others.",
 };

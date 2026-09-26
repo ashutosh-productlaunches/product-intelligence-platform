@@ -5,6 +5,10 @@
 // Links anywhere on the page (the side rail, "step 7" references) just change
 // the address, and the player follows. Without JavaScript every step shows,
 // stacked, via the <noscript> style in app/page.tsx.
+//
+// The last step visited is remembered in this browser, so a learner who comes
+// back later (the journey rarely fits one sitting) is offered their place.
+// Storage can be missing or blocked; then the offer simply doesn't appear.
 import { useEffect, useState, type ReactNode } from "react";
 
 type Meta = { n: number; title: string; stage: string };
@@ -16,6 +20,8 @@ export function stepFromHash(hash: string, total: number): number {
   const m = hash.match(/^#step-(\d+)$/);
   return m ? Math.min(Math.max(Number(m[1]), 1), total) : 0;
 }
+
+const SAVED = "buildailab:step";
 
 export function JourneyPlayer({
   meta,
@@ -30,12 +36,24 @@ export function JourneyPlayer({
 }) {
   const total = meta.length;
   const [cur, setCur] = useState(1);
+  const [resume, setResume] = useState(0);
 
   useEffect(() => {
     const follow = (scroll: boolean) => {
       const n = stepFromHash(window.location.hash, total);
-      if (!n) return;
+      if (!n) {
+        // No step in the address: offer the one saved last time, if any.
+        try {
+          const saved = Number(localStorage.getItem(SAVED));
+          if (saved > 1 && saved <= total + 1) setResume(saved);
+        } catch {}
+        return;
+      }
       setCur(n);
+      setResume(0);
+      try {
+        localStorage.setItem(SAVED, String(n));
+      } catch {}
       if (scroll) document.getElementById("player")?.scrollIntoView({ block: "start" });
     };
     follow(true);
@@ -50,6 +68,20 @@ export function JourneyPlayer({
 
   return (
     <div id="player" className="scroll-mt-6">
+      {resume > 0 && (
+        <a
+          href={hrefFor(resume)}
+          className="mb-3 flex items-center justify-between gap-3 rounded-xl border border-emerald-600/40 bg-emerald-50 px-4 py-3 text-sm hover:border-emerald-600 dark:border-emerald-500/30 dark:bg-emerald-950/30"
+        >
+          <span>
+            <span className="font-semibold">Welcome back.</span>{" "}
+            {resume > total ? "You finished the journey." : `You were on step ${resume}: ${meta[resume - 1]?.title}.`}
+          </span>
+          <span className="shrink-0 font-semibold text-emerald-700 dark:text-emerald-400">
+            {resume > total ? "See what you built →" : "Pick up where you left off →"}
+          </span>
+        </a>
+      )}
       {/* The stepper */}
       <div className="rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
         <div className="flex flex-wrap items-center justify-between gap-3">
