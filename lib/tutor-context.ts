@@ -43,6 +43,10 @@ export function helpPrompt({
     files.length ? `FILES I SHOULD HAVE BY NOW: ${files.join(", ")}.` : "",
     "",
     `WHAT THIS STEP ASKED ME TO DO: ${step.action}`,
+    step.install
+      ? `\nTOOLS I WAS ASKED TO INSTALL: ${step.install.map((t) => `${t.name} from ${t.from} (or: ${t.cli.windows} on Windows, ${t.cli.mac} on a Mac)`).join("; ")}.`
+      : "",
+    step.thenCheck ? step.thenCheck : "",
     step.code ? `\nTHE CODE I WAS GIVEN:\n\`\`\`\n${step.code}\n\`\`\`` : "",
     `\nWHAT I SHOULD SEE IF IT WORKED: ${step.result}`,
     step.fails

@@ -22,6 +22,17 @@ export type Step = {
   diagram?: string; // optional text diagram
   action: string; // what to do
   code?: string; // optional commands or file contents to type
+  // Optional: software to install before the code, one expandable card per tool, in install order.
+  thenCheck?: string; // optional: shown after the install cards, right above the code
+  install?: {
+    name: string;
+    what: string; // what it's for, in one line
+    from: string; // where to download it
+    windows: string[]; // installer screens, in order, defaults included
+    mac: string[];
+    cli: { windows: string; mac: string }; // the one-command alternative
+    update: string;
+  }[];
   result: string; // what they should see if it worked
   link?: { href: string; label: string }; // optional live example
   understand: string; // what just happened, technically
@@ -191,18 +202,80 @@ export const journey01: Journey = {
       concept: "Node.js · VS Code · the terminal",
       layers: ["computer"],
       problem: "Code needs somewhere to be written and something to run it.",
-      idea: "VS Code is where you write code. Node.js runs it. The terminal is where you type commands. Git records versions.",
-      action: "Install Node.js (LTS) from nodejs.org, VS Code from code.visualstudio.com and, on Windows, Git from git-scm.com. A Mac offers to install Git the first time you run git --version. In VS Code, open View → Terminal and run:",
+      idea: "VS Code is where you write code. Node.js runs it. Git records versions. The terminal, also called the command line or CLI, is where you type commands instead of clicking; every tool in this journey is driven from it.",
+      action: "The slowest step: three downloads and three installers. Install them in this order, because Git's installer asks which editor to use, so VS Code should already be there. Each card says where to download from, what to pick on every screen, and gives a one-line command if you prefer the terminal.",
+      thenCheck: "Then close VS Code completely and open it again, so its terminal sees the new tools. Open View → Terminal (Ctrl+` on Windows and Mac) and run these one at a time:",
+      install: [
+        {
+          name: "Node.js",
+          what: "Runs JavaScript on your computer. It comes with npm, which downloads code packages.",
+          from: "nodejs.org",
+          windows: [
+            "Go to nodejs.org and choose Download. Pick the version marked LTS (long-term support), not Current, and the Windows Installer (.msi).",
+            "Run the .msi. Press Next, tick \"I accept the terms in the License Agreement\", press Next.",
+            "Destination Folder: keep the default. Press Next.",
+            "Custom Setup: keep everything selected. It includes npm and \"Add to PATH\", which is what lets the terminal find node. Press Next.",
+            "Tools for Native Modules: leave the box unticked. It installs extra build tools this journey doesn't need, and takes a long time. Press Next.",
+            "Press Install, allow the administrator prompt, then Finish.",
+          ],
+          mac: [
+            "Go to nodejs.org and choose Download. Pick the version marked LTS, and the macOS Installer (.pkg).",
+            "Open the .pkg. Press Continue, Continue, then Agree to the licence.",
+            "Keep the default install location and press Install. Enter your Mac password when asked, then Close.",
+          ],
+          cli: { windows: "winget install OpenJS.NodeJS.LTS", mac: "brew install node" },
+          update: "Run the newer LTS installer over the old one. Or: winget upgrade OpenJS.NodeJS.LTS on Windows, brew upgrade node on a Mac.",
+        },
+        {
+          name: "VS Code",
+          what: "The editor where you create and change files. It has a terminal built in.",
+          from: "code.visualstudio.com",
+          windows: [
+            "Go to code.visualstudio.com and press Download for Windows. This is the User Installer: it needs no administrator rights.",
+            "Accept the agreement and press Next. Keep the default folder and Start Menu folder.",
+            "Select Additional Tasks: keep \"Add to PATH\" ticked. Also tick both \"Add 'Open with Code' action\" boxes, so you can right-click a folder and open it in VS Code. Press Next.",
+            "Press Install, keep \"Launch Visual Studio Code\" ticked, then Finish.",
+          ],
+          mac: [
+            "Go to code.visualstudio.com and press Download for macOS. You get a .zip file.",
+            "Open the .zip and drag Visual Studio Code into your Applications folder. Open it from there.",
+            "Optional: press Cmd+Shift+P, type shell command and choose \"Install 'code' command in PATH\". Then typing code . in a terminal opens that folder in VS Code.",
+          ],
+          cli: { windows: "winget install Microsoft.VisualStudioCode", mac: "brew install --cask visual-studio-code" },
+          update: "VS Code updates itself and asks you to restart when a new version is ready.",
+        },
+        {
+          name: "Git",
+          what: "Records versions of your code. You use it from step 9, but install it now while you're setting up.",
+          from: "git-scm.com on Windows, or the Mac developer tools",
+          windows: [
+            "Go to git-scm.com, choose Downloads, then Windows, and download the 64-bit Git for Windows Setup.",
+            "The installer has many screens. Press Next and keep the default on every screen except the two below.",
+            "Choosing the default editor used by Git: pick \"Use Visual Studio Code as Git's default editor\". The default, Vim, is hard to exit if you've never used it.",
+            "Adjusting the name of the initial branch: pick \"Override the default branch name for new repositories\" and keep main. Step 9 expects main.",
+            "Keep the defaults on the remaining screens, press Install, then Finish.",
+          ],
+          mac: [
+            "Open Terminal (Cmd+Space, type Terminal) and run git --version.",
+            "If Git isn't installed, macOS offers to install the command line developer tools. Press Install and agree. It's a large download, so let it finish.",
+            "Run git --version again. A version number means Git is ready.",
+          ],
+          cli: { windows: "winget install --id Git.Git -e", mac: "brew install git" },
+          update: "Windows: run git update-git-for-windows. Mac: Software Update keeps the developer tools current, or brew upgrade git.",
+        },
+      ],
       code: "node -v\nnpm -v\ngit --version",
-      result: "Three version numbers, e.g. v24.21.0, 11.19.0 and git version 2.50.1.",
+      result: "Three lines, one per command, like v24.21.0, 11.19.0 and git version 2.50.1. Your numbers will differ. What matters: node -v must be v20.9 or higher, because Next.js 16 needs it; npm -v and git --version just need to print a version. Each command asks one program \"are you installed, and which version?\" A version number means the terminal can find it.",
       understand: "Node.js runs JavaScript outside the browser: on your computer now, on Vercel's servers later. npm comes with it and downloads code packages.",
       pmLens: "\"Works on my machine\" bugs live in this layer: different runtimes and versions on different computers.",
       fails: {
         causes: [
-          "'not recognised': the terminal was open before you installed.",
+          "'not recognised' or 'command not found': the terminal was open before you installed.",
           "PowerShell says 'running scripts is disabled'.",
+          "node -v shows a version below v20.9: an older Node.js is installed. Install the current LTS over it.",
+          "winget or brew isn't found: use the website installers instead. brew needs Homebrew (brew.sh) first.",
         ],
-        fix: "Restart VS Code. If PowerShell blocks npm, type npm.cmd instead.",
+        fix: "Close VS Code completely and open it again, so the terminal picks up the new tools. If PowerShell blocks npm, type npm.cmd instead.",
       },
       snag: "You don't need a paid AI editor. VS Code is free, and a free assistant such as Gemini CLI is enough.",
     },
