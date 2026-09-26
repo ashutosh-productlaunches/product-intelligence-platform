@@ -4,6 +4,7 @@
 // The learner's choices live in the URL (?pattern=...&input=...), so no browser storage is needed.
 import { journey01, stepsFor, type Layer, type Step } from "@/content/journey-01";
 import { site } from "@/content/site";
+import { checks01, type Question } from "@/content/checks-01";
 import { getPattern } from "@/content/app-patterns";
 import { buildMvp, parseIntake } from "@/lib/build-mvp";
 import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
@@ -112,6 +113,62 @@ function Code({ children }: { children: string }) {
   );
 }
 
+// Five questions after each step. Each answer opens to say why it's right or why it's wrong.
+// Plain <details>, so no JavaScript and no score: a self-check, not an exam.
+// Put the correct answer in a varied position (A, B or C) so it can't be guessed by position.
+// Deterministic: the same question always shows the same order.
+function placed<T extends { correct?: true }>(answers: T[], step: number, qi: number): T[] {
+  const right = answers.find((a) => a.correct)!;
+  const wrong = answers.filter((a) => !a.correct);
+  const at = (qi * 2 + step) % answers.length;
+  return [...wrong.slice(0, at), right, ...wrong.slice(at)];
+}
+
+function CheckUnderstanding({ questions, step }: { questions: Question[]; step: number }) {
+  const letters = ["A", "B", "C", "D"];
+  return (
+    <details className="group/check rounded-lg border border-sky-600/40 bg-sky-50/40 dark:border-sky-400/30 dark:bg-sky-950/20">
+      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm">
+        <span aria-hidden className="text-sky-600 transition-transform group-open/check:rotate-90 dark:text-sky-400">›</span>
+        <span className="font-semibold">Check your understanding</span>
+        <span className="text-zinc-500">· {questions.length} questions</span>
+      </summary>
+      <ol className="grid gap-5 border-t border-sky-600/20 px-4 py-4 dark:border-sky-400/20">
+        {questions.map((qn, qi) => (
+          <li key={qn.q}>
+            <p className="text-[15px] font-medium">
+              <span className="mr-2 font-mono text-xs text-zinc-400">
+                {step}.{qi + 1}
+              </span>
+              {qn.q}
+            </p>
+            <div className="mt-2 grid gap-1.5">
+              {placed(qn.answers, step, qi).map((a, ai) => (
+                <details key={a.text} className="group/ans rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+                  <summary className="flex cursor-pointer list-none gap-2.5 px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900">
+                    <span className="font-mono text-xs leading-5 text-zinc-400">{letters[ai]}</span>
+                    <span>{a.text}</span>
+                  </summary>
+                  <p
+                    className={`border-t px-3 py-2 text-sm leading-relaxed ${
+                      a.correct
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
+                        : "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200"
+                    }`}
+                  >
+                    <span className="font-semibold">{a.correct ? "Correct. " : "Not quite. "}</span>
+                    {a.why}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </details>
+  );
+}
+
 function StepCard({
   step,
   index,
@@ -119,6 +176,7 @@ function StepCard({
   phase,
   next,
   personalised,
+  check,
 }: {
   step: Step;
   index: number;
@@ -126,6 +184,7 @@ function StepCard({
   phase: string;
   next?: { index: number; title: string };
   personalised: boolean;
+  check?: Question[];
 }) {
   return (
     <li
@@ -247,6 +306,8 @@ function StepCard({
             </div>
           </details>
         )}
+
+        {check && <CheckUnderstanding questions={check} step={index + 1} />}
       </div>
 
       <div className="mt-5 border-t border-zinc-100 pt-3 text-sm dark:border-zinc-900">
@@ -317,6 +378,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <h1 className="mt-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.6rem]">{site.headline}</h1>
         <p className="mt-4 text-xl leading-relaxed text-zinc-700 dark:text-zinc-300">{site.promise}</p>
         <p className="mt-3 leading-relaxed text-zinc-500">{site.audience}</p>
+        <p className="mt-3 leading-relaxed text-zinc-500">{site.codeLine}</p>
         <p className="mt-6 border-l-4 border-emerald-600 pl-4 text-lg font-semibold tracking-tight dark:border-emerald-400">
           {site.philosophy}
         </p>
@@ -437,6 +499,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                   phase={ph.title}
                   next={steps[i + 1] ? { index: i + 1, title: steps[i + 1].title } : undefined}
                   personalised={s.personalised}
+                  check={checks01[i]}
                 />
               </Fragment>
             );

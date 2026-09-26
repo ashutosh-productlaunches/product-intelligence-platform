@@ -7,6 +7,8 @@ export const site = {
   promise: "Build a real AI application from an empty folder, and understand every layer underneath it.",
   audience:
     "For PMs who already use ChatGPT or Claude, work closely with engineers, and want to know what's happening underneath. You don't need a software engineering background, just curiosity and a willingness to build.",
+  codeLine:
+    "You won't write code from scratch. Every step gives you the code, explains what it does, and tells you what you should see. Then five questions check you understood it.",
   philosophy: "AI can write the code. You should still understand it.",
 
   // Different tools for different goals. No criticism of either.
