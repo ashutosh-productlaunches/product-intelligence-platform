@@ -49,7 +49,7 @@ function Chain({ items, dark = false }: { items: string[]; dark?: boolean }) {
   return (
     <ol className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[13px]">
       {items.map((it, i) => (
-        <li key={it} className="flex items-center gap-1.5">
+        <li key={i} className="flex items-center gap-1.5">
           <span
             className={`rounded-md px-2 py-1 font-medium ${
               dark ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "border border-zinc-300 dark:border-zinc-700"

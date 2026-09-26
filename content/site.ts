@@ -39,7 +39,7 @@ export const site = {
   outcomeLine: "You won't become a software engineer. You'll understand AI apps well enough to reason about them.",
 
   // What's underneath every app in the journey. The "what you see" side comes from the app you pick.
-  underneath: ["Browser", "Next.js page", "Server", "AI API", "LLM", "Structured output", "Validation", "Screen"],
+  underneath: ["Browser", "Next.js page", "Server", "AI API", "LLM", "Structured output", "Validation", "Back to the browser"],
 
   // Shown above the journey: what to have ready, and an honest word on time.
   // Replace with a measured time once the first testers have finished.
