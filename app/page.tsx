@@ -7,6 +7,7 @@ import { getPattern } from "@/content/app-patterns";
 import { buildMvp, parseIntake } from "@/lib/build-mvp";
 import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
 import { patterns } from "@/content/app-patterns";
+import type { Look } from "@/content/looks";
 
 function Block({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -26,6 +27,22 @@ function Pre({ children }: { children: string }) {
     <pre className="mt-2 overflow-x-auto rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 font-mono text-[13px] leading-relaxed text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
       {children}
     </pre>
+  );
+}
+
+// A small picture of a look, drawn from its own tokens: background, text, surface and accent.
+function LookSwatch({ look }: { look: Look }) {
+  const t = look.tokens;
+  return (
+    <span
+      aria-hidden
+      className="grid h-14 w-24 shrink-0 content-center gap-1.5 overflow-hidden border px-2.5"
+      style={{ background: t.bg, borderColor: t.border, borderRadius: t.radius }}
+    >
+      <span className="block h-1.5 w-12 rounded-full" style={{ background: t.text }} />
+      <span className="block h-3 w-full border" style={{ background: t.surface, borderColor: t.border, borderRadius: t.radius }} />
+      <span className="block h-2 w-8 rounded-full" style={{ background: t.accent }} />
+    </span>
   );
 }
 
@@ -57,6 +74,25 @@ function StepCard({ step, index, personalised }: { step: Step; index: number; pe
         <Block label="Do this">
           {step.action}
           {step.code && <Pre>{step.code}</Pre>}
+          {step.choices && (
+            <div className="mt-3 grid min-w-0 gap-2">
+              {step.choices.map((c, i) => (
+                <details key={c.name} open={i === 0} className="group min-w-0 overflow-hidden rounded-md border border-zinc-200 dark:border-zinc-800">
+                  <summary className="flex cursor-pointer list-none items-center gap-4 p-3">
+                    <LookSwatch look={c.look} />
+                    <span className="min-w-0 flex-1">
+                      <span className="block font-semibold text-zinc-900 dark:text-zinc-100">{c.name}</span>
+                      <span className="block text-sm text-zinc-600 dark:text-zinc-400">{c.mood}</span>
+                    </span>
+                    <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
+                  </summary>
+                  <div className="border-t border-zinc-200 px-3 pb-3 dark:border-zinc-800">
+                    <Pre>{c.code}</Pre>
+                  </div>
+                </details>
+              ))}
+            </div>
+          )}
         </Block>
         <Block label="You should see">
           {step.result}
@@ -110,10 +146,26 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
 
   return (
     <main className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
-        AI Tool Lab for PMs · Journey {j.number}
-        {parsed?.ok && ` · building ${mvp.name}`}
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">
+          AI Tool Lab for PMs · Journey {j.number}
+          {parsed?.ok && ` · building ${mvp.name}`}
+        </p>
+        <nav aria-label="Site" className="flex gap-1 text-sm">
+          <a
+            href="/demo"
+            className="rounded-md px-3 py-1.5 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+          >
+            Live demo
+          </a>
+          <a
+            href="/architecture"
+            className="rounded-md px-3 py-1.5 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100"
+          >
+            System map
+          </a>
+        </nav>
+      </div>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">
         {j.title}
       </h1>
@@ -189,7 +241,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           </div>
         </div>
 
-        <p className="mt-6 text-sm font-semibold">Three things to try before you stop</p>
+        <p className="mt-6 text-sm font-semibold">Things to try before you stop</p>
         <ol className="mt-2 grid gap-3">
           {j.closing.tryNext.map((item, i) => (
             <li key={item.title} className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">

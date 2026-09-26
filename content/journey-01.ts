@@ -1,4 +1,5 @@
 import type { Mvp } from "@/lib/build-mvp";
+import { looks, lookCss, type Look } from "@/content/looks";
 
 // Journey 1 content.
 // This file holds the words only. The layout lives in app/page.tsx.
@@ -19,6 +20,8 @@ export type Step = {
   link?: { href: string; label: string }; // optional live example
   why: string; // the reflection: why this matters
   snag?: string; // optional: where people really get stuck
+  // Optional: a few ready-made files to choose from, instead of one block of code.
+  choices?: { name: string; mood: string; code: string; look: Look }[];
   // Optional: how this step changes once the learner has chosen their app.
   // Returns only the parts that change; everything else stays as written.
   personalize?: (mvp: Mvp) => Partial<Omit<Step, "personalize">>;
@@ -64,7 +67,7 @@ export const journey01: Journey = {
       action:
         "Open the live demo, paste some text and press Run. That app is the finished version of what you're about to build.",
       result:
-        "An answer from a real model, checked before it appeared. The eleven steps below build exactly that app, from an empty folder.",
+        "An answer from a real model, checked before it appeared. The steps below build exactly that app from an empty folder, and the last one gives it your own look.",
       link: { href: "/demo", label: "Open the live demo" },
       why: "Knowing where you're heading makes every step make sense. When you get stuck later, find your place on this picture.",
       personalize: (mvp) => {
@@ -247,7 +250,7 @@ export const journey01: Journey = {
         '// app/page.tsx\nimport { askGemini } from "@/lib/ask";\n\nexport default async function Page({\n  searchParams,\n}: {\n  searchParams: Promise<{ text?: string }>;\n}) {\n  const { text } = await searchParams;\n  const result = text ? await askGemini(text) : null;\n\n  return (\n    <main style={{ maxWidth: 640, margin: "3rem auto", padding: "0 1rem" }}>\n      <h1>Complaint Digest</h1>\n\n      <form>\n        <textarea name="text" rows={8} defaultValue={text} style={{ width: "100%" }} />\n        <button type="submit">Run</button>\n      </form>\n\n      {result?.ok && (\n        <ol>\n          {result.data.points.map((point) => (\n            <li key={point}>{point}</li>\n          ))}\n        </ol>\n      )}\n\n      {result && !result.ok && <p>{result.error}</p>}\n    </main>\n  );\n}',
       result:
         "A screen you would be happy to show someone: paste text, press Run, read the answer. Commit and push, and it is live for everyone.",
-      why: "This is where it stops being a demo and becomes a tool someone can use. Everything before this step was plumbing. Make it beautiful later — working first.",
+      why: "This is where it stops being a demo and becomes a tool someone can use. Everything before this step was plumbing. Working first; the next step makes it look like yours.",
       snag:
         "Your page is public, so every visitor spends your free quota. Before sharing it widely, add a limit or keep the link to people you trust.",
       personalize: (mvp) => ({
@@ -255,18 +258,38 @@ export const journey01: Journey = {
         result: `Your own copy of the demo app: paste ${mvp.input}, press Run, and ${mvp.audience} gets ${mvp.resultShownAs}. Commit and push, and it is live for everyone.`,
       }),
     },
+    {
+      title: "Make it look like yours",
+      concept: "Design tokens · CSS",
+      problem:
+        "Your app works, but it is wearing the browser's default clothes: a plain box and a grey button. People judge a tool in the first second, before they read a word of it.",
+      idea:
+        "A look is a handful of named values: a background colour, an accent colour, a font, how round the corners are. Designers call them design tokens. You write each value once, at the top of your stylesheet, and every rule underneath uses the name instead of the value. Change one token and the whole page follows. Your page.tsx stays exactly as it is: the stylesheet dresses the plain elements it already uses.",
+      diagram:
+        "tokens         --accent: #62e3ff\n   │\n   ▼\nrules          button { background: var(--accent) }\n   │\n   ▼\nyour page      every button is that colour",
+      action:
+        "Pick one of the three looks below. Open app/globals.css, replace everything in it with the look you picked, and save.",
+      choices: looks.map((look) => ({ name: look.name, mood: look.mood, code: lookCss(look), look })),
+      result:
+        "The same tool, dressed in the look you chose, the moment you save. Now change one value inside :root, say --accent, and save again: every button and list marker changes with it. Commit and push, and the new look is live.",
+      why: "This is how every design system works, from a two-person startup to Google's Material Design: decisions live in tokens, and screens only refer to them. When a designer talks about the primary colour or the corner radius, they are talking about tokens, and now you can change one yourself.",
+      snag:
+        "The two @import lines must stay at the top of the file, fonts first. CSS ignores an @import that comes after any other rule, and your page quietly falls back to a plain font. If the font looks wrong, check those lines first.",
+      personalize: (mvp) => ({
+        result: `${mvp.name}, dressed in the look you chose, the moment you save. Now change one value inside :root, say --accent, and save again: every button and list marker changes with it. Commit and push, and the new look is live.`,
+      }),
+    },
   ],
   closing: {
     have: [
       "A live URL you can send to anyone: your own AI tool, running on the internet",
-      "Four files you can explain line by line — the model call, the check, the route and the screen",
+      "Five files you can explain line by line — the model call, the check, the route, the screen and its look",
       "A working setup: Node, VS Code, a key, Git and Vercel, all connected",
       "The habit that matters most: never show a user model output you haven't checked",
     ],
     notYet: [
       "No memory and no database. Each run starts from nothing, and nothing is saved.",
       "No limits. Every visitor spends your free quota, so keep the link to people you trust.",
-      "A plain screen. Making it beautiful is a different skill, and it can wait.",
       "Nothing that searches, plans or uses tools. That is what the next journeys are for.",
     ],
     tryNext: [
@@ -281,6 +304,10 @@ export const journey01: Journey = {
       {
         title: "Point it at real work",
         text: "Paste something from your actual job — real tickets, real notes, real feedback. Where it fails is more interesting than where it works, and it tells you what a second version would need.",
+      },
+      {
+        title: "Let an AI restyle it, one file only",
+        text: "Ask an AI assistant for a look of your own, with one rule: \"Change only app/globals.css. Keep the :root tokens and change their values.\" Then press Run again to prove the tool still works. Giving an AI a small, checkable job is a habit worth more than any look.",
       },
     ],
   },
