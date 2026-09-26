@@ -117,11 +117,11 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
               href="/"
               className="rounded-full border border-(--border) px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:border-(--accent) hover:text-(--accent)"
             >
-              <span className="sm:hidden">Build yours →</span>
-              <span className="hidden sm:inline">Build this yourself →</span>
+              <span className="sm:hidden">How it works →</span>
+              <span className="hidden sm:inline">Learn how it&apos;s built →</span>
             </a>
-            <a href="/#step-12" className="mt-0.5 hidden text-[11px] text-(--muted) hover:text-(--text) sm:block">
-              Same tool, your look · step 12
+            <a href="/#step-1" className="mt-0.5 hidden text-[11px] text-(--muted) hover:text-(--text) sm:block">
+              12 steps, one layer at a time
             </a>
           </div>
         </div>
@@ -319,15 +319,16 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
       </section>
 
       <section className="mx-auto flex max-w-3xl flex-col items-center gap-4 px-4 py-14 text-center sm:px-6">
-        <h2 className={`${DISPLAY} text-3xl font-extralight tracking-[0.04em] text-balance sm:text-4xl`}>Build your own version</h2>
+        <h2 className={`${DISPLAY} text-3xl font-extralight tracking-[0.04em] text-balance sm:text-4xl`}>Want to understand how each layer works?</h2>
         <p className="text-(--muted)">
-          Eleven steps from an empty folder to a live tool like this one, then a twelfth to give it your own look.
+          Browser, Next.js, server, AI API, LLM, structured output, validation, deployment. The journey builds this app from an
+          empty folder, one layer at a time, and explains each one.
         </p>
         <a
           href="/"
           className="mt-2 rounded-full bg-gradient-to-r from-(--accent) to-(--accent-2) px-6 py-3 text-sm font-semibold text-(--bg) transition-opacity hover:opacity-90"
         >
-          Build this yourself →
+          Start the journey →
         </a>
       </section>
 

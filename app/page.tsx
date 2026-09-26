@@ -83,6 +83,26 @@ function LayerStrip({ active }: { active: Layer[] }) {
   );
 }
 
+// A left-to-right chain of labelled boxes, e.g. Browser → Server → Model. Wraps on small screens.
+function Chain({ items, dark = false }: { items: string[]; dark?: boolean }) {
+  return (
+    <ol className="mt-2 flex flex-wrap items-center gap-x-1.5 gap-y-2 text-[13px]">
+      {items.map((it, i) => (
+        <li key={it} className="flex items-center gap-1.5">
+          <span
+            className={`rounded-md px-2 py-1 font-medium ${
+              dark ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900" : "border border-zinc-300 dark:border-zinc-700"
+            }`}
+          >
+            {it}
+          </span>
+          {i < items.length - 1 && <span aria-hidden className="text-zinc-400">→</span>}
+        </li>
+      ))}
+    </ol>
+  );
+}
+
 // Code the learner types or runs: dark, like the editor they'll paste it into.
 function Code({ children }: { children: string }) {
   return (
@@ -177,11 +197,15 @@ function StepCard({
             </p>
           )}
         </Block>
-        <Block label="What just happened">{step.understand}</Block>
-
-        <div className="rounded-lg bg-zinc-900 px-4 py-3.5 text-[15px] leading-relaxed text-zinc-100 dark:bg-zinc-800">
-          <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">PM lens</p>
-          <p className="mt-1">{step.pmLens}</p>
+        <div className="grid gap-px overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200 sm:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-800">
+          <div className="bg-zinc-50 px-4 py-3.5 dark:bg-zinc-900">
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Technically, what just happened</p>
+            <p className="mt-1 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">{step.understand}</p>
+          </div>
+          <div className="bg-zinc-900 px-4 py-3.5 dark:bg-zinc-950">
+            <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">PM lens · why you should care</p>
+            <p className="mt-1 text-[15px] leading-relaxed text-zinc-100">{step.pmLens}</p>
+          </div>
         </div>
 
         {step.snag && (
@@ -210,6 +234,16 @@ function StepCard({
                 <span className="font-semibold text-zinc-900 dark:text-zinc-100">Most likely fix: </span>
                 {step.fails.fix}
               </p>
+              <div className="mt-4 rounded-md border border-dashed border-zinc-300 px-3 py-2.5 dark:border-zinc-700">
+                <p className="flex flex-wrap items-center gap-2">
+                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">Stuck? Show me what you&apos;re seeing.</span>
+                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-800">Coming soon</span>
+                </p>
+                <p className="mt-1 text-xs text-zinc-500">
+                  Paste an error, upload a screenshot or describe what happened. You&apos;ll get a diagnosis that explains what
+                  happened and why, the fix, and the concept behind it, then asks you to check the result.
+                </p>
+              </div>
             </div>
           </details>
         )}
@@ -277,44 +311,82 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         </nav>
       </div>
 
-      {/* Who it's for and what it is */}
+      {/* Who it's for, what you'll learn, what you'll do */}
       <header className="mt-10">
         <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>{site.eyebrow}</p>
         <h1 className="mt-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.6rem]">{site.headline}</h1>
-        <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{site.promise}</p>
-        <p className="mt-5 flex flex-wrap gap-2 text-xs">
-          {site.notThis.map((n) => (
-            <span key={n} className="rounded-full border border-zinc-300 px-2.5 py-1 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-              {n}
-            </span>
-          ))}
+        <p className="mt-4 text-xl leading-relaxed text-zinc-700 dark:text-zinc-300">{site.promise}</p>
+        <p className="mt-3 leading-relaxed text-zinc-500">{site.audience}</p>
+        <p className="mt-6 border-l-4 border-emerald-600 pl-4 text-lg font-semibold tracking-tight dark:border-emerald-400">
+          {site.philosophy}
         </p>
-        <div className="mt-6 grid overflow-hidden rounded-xl border border-zinc-200 sm:grid-cols-2 dark:border-zinc-800">
-          <div className="p-4 text-zinc-500">
-            <p className="text-xs font-semibold uppercase tracking-wider">{site.contrast.prototyper.label}</p>
-            <p className="mt-1 text-[15px]">&ldquo;{site.contrast.prototyper.quote}&rdquo;</p>
+      </header>
+
+      {/* Why this is different: a different goal, not a better builder */}
+      <section aria-label="Is this for you?" className="mt-8 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
+        {site.goals.map((g, i) => (
+          <div
+            key={g.goal}
+            className={`grid gap-1 p-4 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-4 ${
+              i === 1 ? "border-t border-zinc-200 bg-zinc-900 text-zinc-100 dark:border-zinc-800" : "text-zinc-600 dark:text-zinc-400"
+            }`}
+          >
+            <p className="text-sm">
+              If your goal is <span className={`font-semibold ${i === 1 ? "text-emerald-400" : "text-zinc-900 dark:text-zinc-100"}`}>{g.goal}</span>
+            </p>
+            <p className="text-sm">→ {g.answer}</p>
           </div>
-          <div className="border-t border-zinc-200 bg-zinc-900 p-4 text-zinc-100 sm:border-t-0 sm:border-l dark:border-zinc-800">
-            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-400">{site.contrast.builder.label} · this lab</p>
-            <p className="mt-1 text-[15px]">&ldquo;{site.contrast.builder.quote}&rdquo;</p>
+        ))}
+        <p className="border-t border-zinc-200 px-4 py-3 text-xs text-zinc-500 dark:border-zinc-800">
+          A course: {site.format.course.join(" → ")}. Here: <span className="font-semibold text-zinc-700 dark:text-zinc-300">{site.format.lab.join(" → ")}</span>.
+        </p>
+      </section>
+
+      {/* The demo as a hook: what you see, and what's underneath */}
+      <section aria-label="The app you'll build" className="mt-10">
+        <h2 className="text-sm font-semibold">The app you&apos;ll build, and what&apos;s underneath it</h2>
+        <div className="mt-3 grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] dark:border-zinc-800 dark:bg-zinc-800">
+          <div className="bg-white p-4 dark:bg-zinc-950">
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">What you see</p>
+            <Chain items={site.demo.sees} />
+          </div>
+          <div className="bg-zinc-50 p-4 dark:bg-zinc-900">
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">What&apos;s actually happening</p>
+            <Chain items={site.demo.underneath} dark />
           </div>
         </div>
-        <p className="mt-4 text-[15px] text-zinc-700 italic dark:text-zinc-300">{site.philosophy}</p>
-      </header>
+        <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
+          <a
+            href={mvp.demoHref}
+            className="rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            Try {mvp.name} →
+          </a>
+          <a href="#step-1" className="text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+            Want to understand each layer? Start the journey ↓
+          </a>
+        </div>
+      </section>
+
+      {/* The real value: understanding */}
+      <section aria-label="What you'll understand" className="mt-10">
+        <h2 className="text-xl font-bold tracking-tight">What you&apos;ll actually understand</h2>
+        <ul className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+          {site.understand.map((u) => (
+            <li key={u} className="flex gap-2.5 text-[15px] leading-snug">
+              <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
+              {u}
+            </li>
+          ))}
+        </ul>
+        <p className="mt-5 font-medium">{site.outcomeLine}</p>
+      </section>
 
       {/* Journey 1 */}
       <section className="mt-12 border-t border-zinc-200 pt-10 dark:border-zinc-800">
         <p className={`${eyebrow} text-zinc-500`}>Journey {j.number}</p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{j.name}</h2>
         <p className="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">{j.promise}</p>
-
-        <a
-          href={mvp.demoHref}
-          className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-zinc-900 bg-zinc-900 px-5 py-4 text-white transition-colors hover:bg-zinc-800 dark:border-white dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-        >
-          <span className="text-[15px] font-semibold">Try {mvp.name} →</span>
-          <span className="text-sm opacity-75">The finished app, live</span>
-        </a>
 
         <div className="mt-6">{chooser}</div>
 
@@ -375,11 +447,11 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <section id="done" className="mt-12 scroll-mt-6 rounded-2xl border-2 border-zinc-900 bg-white p-6 sm:p-8 dark:border-zinc-200 dark:bg-zinc-950">
           <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>Journey {j.number} complete</p>
           <h2 className="mt-2 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
-            {parsed?.ok ? `You built ${mvp.name}, your first AI product.` : "You built your first AI product."}
+            {parsed?.ok ? `You built ${mvp.name}. More importantly, you understand it.` : "You built an AI app. More importantly, you understand it."}
           </h2>
           <p className="mt-3 leading-relaxed text-zinc-600 dark:text-zinc-400">{c.intro}</p>
 
-          <h3 className="mt-8 text-sm font-semibold">Your application</h3>
+          <h3 className="mt-8 text-sm font-semibold">What your app does, and you can now explain</h3>
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {c.built.map((b) => (
               <li key={b.text} className="flex gap-2.5 text-[15px] leading-snug">
@@ -394,7 +466,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             ))}
           </ul>
 
-          <h3 className="mt-8 text-sm font-semibold">How it works, end to end</h3>
+          <h3 className="mt-8 text-sm font-semibold">The anatomy of an AI application</h3>
           <ol className="mt-3 flex flex-wrap items-stretch gap-x-2 gap-y-3">
             {c.flow.map((f, i) => (
               <li key={i} className="flex items-center gap-2">
@@ -406,11 +478,17 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               </li>
             ))}
           </ol>
+          <p className="mt-3 text-sm text-zinc-500">
+            Around it sits the development lifecycle: <span className="font-medium text-zinc-700 dark:text-zinc-300">Git</span> records
+            versions, <span className="font-medium text-zinc-700 dark:text-zinc-300">GitHub</span> shares them, and{" "}
+            <span className="font-medium text-zinc-700 dark:text-zinc-300">Vercel</span> turns a push into a live URL.
+          </p>
 
           <div id="pattern" className="mt-10 scroll-mt-6">
-            <h3 className="text-xl font-semibold tracking-tight">The pattern you now own</h3>
+            <h3 className="text-xl font-semibold tracking-tight">The same anatomy powers many AI products</h3>
             <p className="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Most AI features share this architecture. For a new product, change the prompt and the schema; keep the rest.
+              Only the prompt and the schema change. Once you can see this anatomy, you can reason about almost any AI feature an
+              engineer describes to you.
             </p>
             <p className="mt-4 flex flex-wrap items-center gap-2 text-sm">
               {c.pattern.stages.map((st, i) => (
@@ -443,11 +521,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                 </tbody>
               </table>
             </div>
-            <a
-              href="/#build"
-              className="mt-5 inline-flex rounded-lg bg-emerald-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-emerald-800"
-            >
-              Now build something of your own →
+            <a href="/architecture" className="mt-4 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+              Explore every layer on the system map →
             </a>
           </div>
 

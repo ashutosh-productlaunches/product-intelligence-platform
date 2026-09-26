@@ -62,7 +62,7 @@ export const journey01: Journey = {
   number: 1,
   name: "Build your first AI application",
   title: "How does an app talk to an AI model?",
-  promise: "From an empty folder to a live URL, one layer at a time. No coding experience needed.",
+  promise: "From an empty folder to a live URL, one layer at a time. Every step explains what it does, why it exists and where it fits.",
   outcome: [
     "A live website with a screen people can actually use",
     "An answer from an AI model, checked before it is shown",
@@ -366,7 +366,7 @@ export const journey01: Journey = {
     },
   ],
   closing: {
-    intro: "An app you can explain file by file, change and ship again.",
+    intro: "You can now have a real technical conversation with engineers about AI products, and build and change simple AI applications yourself.",
     built: [
       { text: "Talks to a large language model through a real API", step: 7 },
       { text: "Keeps its API key on the server, out of the browser and off GitHub", step: 5 },
@@ -379,13 +379,16 @@ export const journey01: Journey = {
       { text: "Has a look you chose, set by design tokens", step: 12 },
     ],
     flow: [
-      { label: "Person", note: "types or pastes text" },
-      { label: "Your page", note: "app/page.tsx, a form" },
-      { label: "Your server", note: "Next.js, holds the key" },
-      { label: "The model", note: "Gemini, through its API" },
-      { label: "Structured reply", note: "JSON in a fixed shape" },
-      { label: "Validation", note: "Zod: use it, retry, or fail" },
-      { label: "Person", note: "sees a checked answer" },
+      { label: "User", note: "types or pastes text" },
+      { label: "UI", note: "your page, a form" },
+      { label: "Application", note: "Next.js" },
+      { label: "Server", note: "a route that holds the key" },
+      { label: "AI API", note: "Gemini's endpoint" },
+      { label: "LLM", note: "writes the reply" },
+      { label: "Structured output", note: "JSON in a fixed shape" },
+      { label: "Validation", note: "Zod: use, retry or fail" },
+      { label: "Application", note: "renders the result" },
+      { label: "User", note: "sees a checked answer" },
     ],
     pattern: {
       stages: ["Input", "Your app", "AI model", "Structured output", "Validation", "Screen"],
