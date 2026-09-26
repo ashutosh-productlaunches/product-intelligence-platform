@@ -193,5 +193,5 @@ export function buildMvp(intake: Intake): Mvp {
 export function exampleHref(patternId: PatternId): string {
   const p = getPattern(patternId)!;
   const q = new URLSearchParams({ pattern: p.id, ...p.example });
-  return `/?${q.toString()}`;
+  return `/?${q.toString()}#underneath`;
 }

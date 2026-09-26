@@ -10,20 +10,10 @@ import { buildMvp, parseIntake } from "@/lib/build-mvp";
 import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
 import { patterns } from "@/content/app-patterns";
 import type { Look } from "@/content/looks";
-import { Fragment } from "react";
+import { SectionNav } from "@/components/section-nav";
+import { JourneyPlayer } from "@/components/journey-player";
+import { Panes } from "@/components/panes";
 
-function Block({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="grid gap-1 sm:grid-cols-[8.5rem_minmax(0,1fr)] sm:gap-4">
-      <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500 sm:pt-0.5">
-        {label}
-      </p>
-      <div className="min-w-0 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
-        {children}
-      </div>
-    </div>
-  );
-}
 
 function Pre({ children }: { children: string }) {
   return (
@@ -49,40 +39,7 @@ function LookSwatch({ look }: { look: Look }) {
   );
 }
 
-const LAYERS: { id: Layer; label: string }[] = [
-  { id: "computer", label: "Your computer" },
-  { id: "page", label: "Page" },
-  { id: "server", label: "Server" },
-  { id: "model", label: "Model" },
-  { id: "internet", label: "GitHub + Vercel" },
-];
 
-// "Where this fits": the app's layers, with the ones this step touches filled in.
-function LayerStrip({ active }: { active: Layer[] }) {
-  return (
-    <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[11px]" aria-label={`Where this fits: ${active.join(", ")}`}>
-      <span className="mr-1 font-semibold uppercase tracking-wider text-zinc-400">Where this fits</span>
-      {LAYERS.map((l, i) => {
-        const on = active.includes(l.id);
-        const arrow = i >= 2 && i <= 3; // page → server → model is the request path
-        return (
-          <span key={l.id} className="flex items-center gap-1.5">
-            {i > 0 && <span aria-hidden className="text-zinc-300 dark:text-zinc-700">{arrow ? "→" : "·"}</span>}
-            <span
-              className={`rounded px-1.5 py-0.5 font-medium ${
-                on
-                  ? "bg-emerald-700 text-white dark:bg-emerald-500 dark:text-zinc-950"
-                  : "text-zinc-400 ring-1 ring-inset ring-zinc-200 dark:text-zinc-600 dark:ring-zinc-800"
-              }`}
-            >
-              {l.label}
-            </span>
-          </span>
-        );
-      })}
-    </div>
-  );
-}
 
 // A left-to-right chain of labelled boxes, e.g. Browser → Server → Model. Wraps on small screens.
 function Chain({ items, dark = false }: { items: string[]; dark?: boolean }) {
@@ -127,45 +84,86 @@ function placed<T extends { correct?: true }>(answers: T[], step: number, qi: nu
 function CheckUnderstanding({ questions, step }: { questions: Question[]; step: number }) {
   const letters = ["A", "B", "C", "D"];
   return (
-    <details className="group/check rounded-lg border border-sky-600/40 bg-sky-50/40 dark:border-sky-400/30 dark:bg-sky-950/20">
-      <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm">
-        <span aria-hidden className="text-sky-600 transition-transform group-open/check:rotate-90 dark:text-sky-400">›</span>
-        <span className="font-semibold">Check your understanding</span>
-        <span className="text-zinc-500">· {questions.length} questions</span>
-      </summary>
-      <ol className="grid gap-5 border-t border-sky-600/20 px-4 py-4 dark:border-sky-400/20">
-        {questions.map((qn, qi) => (
-          <li key={qn.q}>
-            <p className="text-[15px] font-medium">
-              <span className="mr-2 font-mono text-xs text-zinc-400">
-                {step}.{qi + 1}
-              </span>
-              {qn.q}
-            </p>
-            <div className="mt-2 grid gap-1.5">
-              {placed(qn.answers, step, qi).map((a, ai) => (
-                <details key={a.text} className="group/ans rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-                  <summary className="flex cursor-pointer list-none gap-2.5 px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900">
-                    <span className="font-mono text-xs leading-5 text-zinc-400">{letters[ai]}</span>
-                    <span>{a.text}</span>
-                  </summary>
-                  <p
-                    className={`border-t px-3 py-2 text-sm leading-relaxed ${
-                      a.correct
-                        ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
-                        : "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200"
-                    }`}
-                  >
-                    <span className="font-semibold">{a.correct ? "Correct. " : "Not quite. "}</span>
-                    {a.why}
-                  </p>
-                </details>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ol>
-    </details>
+    <ol className="grid gap-5">
+      {questions.map((qn, qi) => (
+        <li key={qn.q}>
+          <p className="text-[15px] font-medium">
+            <span className="mr-2 font-mono text-xs text-zinc-400">
+              {step}.{qi + 1}
+            </span>
+            {qn.q}
+          </p>
+          <div className="mt-2 grid gap-1.5">
+            {placed(qn.answers, step, qi).map((a, ai) => (
+              <details key={a.text} className="group/ans rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+                <summary className="flex cursor-pointer list-none gap-2.5 px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900">
+                  <span className="font-mono text-xs leading-5 text-zinc-400">{letters[ai]}</span>
+                  <span>{a.text}</span>
+                </summary>
+                <p
+                  className={`border-t px-3 py-2 text-sm leading-relaxed ${
+                    a.correct
+                      ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
+                      : "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200"
+                  }`}
+                >
+                  <span className="font-semibold">{a.correct ? "Correct. " : "Not quite. "}</span>
+                  {a.why}
+                </p>
+              </details>
+            ))}
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+// The app's architecture as a picture, at the top of every step.
+// Filled: what this step builds. Outlined: what earlier steps already built. Dashed: still to come.
+const ARCH: { id: Layer; label: string; short: string; note: string }[] = [
+  { id: "computer", label: "Your computer", short: "Laptop", note: "VS Code · Node" },
+  { id: "page", label: "Page", short: "Page", note: "what people see" },
+  { id: "server", label: "Server", short: "Server", note: "holds the key" },
+  { id: "model", label: "Model", short: "Model", note: "Gemini" },
+  { id: "internet", label: "GitHub + Vercel", short: "Online", note: "live URL" },
+];
+
+function ArchitectureBar({ current, built }: { current: Layer[]; built: Layer[] }) {
+  const box = (id: Layer) =>
+    current.includes(id)
+      ? "border-emerald-700 bg-emerald-700 text-white dark:border-emerald-500 dark:bg-emerald-500 dark:text-zinc-950"
+      : built.includes(id)
+        ? "border-emerald-600/50 bg-emerald-50 text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-950/40 dark:text-emerald-200"
+        : "border-dashed border-zinc-300 text-zinc-400 dark:border-zinc-700 dark:text-zinc-600";
+  const cell = (l: (typeof ARCH)[number]) => (
+    <div className={`min-w-0 flex-1 rounded-lg border px-1 py-2 text-center transition-colors sm:px-2 ${box(l.id)}`}>
+      <p className="truncate text-[11px] leading-tight font-semibold sm:text-[13px]">
+        <span className="sm:hidden">{l.short}</span>
+        <span className="hidden sm:inline">{l.label}</span>
+      </p>
+      <p className="hidden truncate text-[11px] leading-tight opacity-75 sm:block">{l.note}</p>
+    </div>
+  );
+  const [computer, page, server, model, internet] = ARCH;
+  return (
+    <div aria-label={`This step works on: ${current.join(", ")}`}>
+      <div className="flex items-stretch gap-1 sm:gap-2">
+        {cell(computer)}
+        <span aria-hidden className="self-center text-zinc-300 dark:text-zinc-700">|</span>
+        {cell(page)}
+        <span aria-hidden className="self-center text-zinc-400">→</span>
+        {cell(server)}
+        <span aria-hidden className="self-center text-zinc-400">→</span>
+        {cell(model)}
+        <span aria-hidden className="self-center text-zinc-300 dark:text-zinc-700">|</span>
+        {cell(internet)}
+      </div>
+      <p className="mt-1.5 flex gap-4 text-[11px] text-zinc-400">
+        <span><span className="mr-1 inline-block h-2 w-2 rounded-sm bg-emerald-700 align-middle dark:bg-emerald-500" />this step</span>
+        <span><span className="mr-1 inline-block h-2 w-2 rounded-sm border border-emerald-600/50 bg-emerald-50 align-middle dark:bg-emerald-950" />built earlier</span>
+      </p>
+    </div>
   );
 }
 
@@ -177,6 +175,7 @@ function StepCard({
   next,
   personalised,
   check,
+  built,
 }: {
   step: Step;
   index: number;
@@ -185,12 +184,117 @@ function StepCard({
   next?: { index: number; title: string };
   personalised: boolean;
   check?: Question[];
+  built: Layer[];
 }) {
+  const why = (
+    <div key="why" className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
+      {step.idea}
+      {step.diagram && <Pre>{step.diagram}</Pre>}
+    </div>
+  );
+
+  const doIt = (
+    <div key="do" className="min-w-0 text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200">
+      {step.action}
+      {step.code && <Code>{step.code}</Code>}
+      {step.choices && (
+        <div className="mt-3 grid min-w-0 gap-2">
+          {step.choices.map((c, i) => (
+            <details key={c.name} open={i === 0} className="group min-w-0 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+              <summary className="flex cursor-pointer list-none items-center gap-4 p-3">
+                <LookSwatch look={c.look} />
+                <span className="min-w-0 flex-1">
+                  <span className="block font-semibold text-zinc-900 dark:text-zinc-100">{c.name}</span>
+                  <span className="block text-sm text-zinc-600 dark:text-zinc-400">{c.mood}</span>
+                </span>
+                <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
+              </summary>
+              <div className="border-t border-zinc-200 px-3 pb-3 dark:border-zinc-800">
+                <Code>{c.code}</Code>
+              </div>
+            </details>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  const see = (
+    <div key="see" className="grid gap-4">
+      <div className="flex gap-3 rounded-lg border border-emerald-600/40 bg-emerald-50/50 p-4 text-[15px] leading-relaxed dark:border-emerald-500/30 dark:bg-emerald-950/20">
+        <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
+        <div>
+          {step.result}
+          {step.link && (
+            <p className="mt-1">
+              <a href={step.link.href} className="font-medium text-emerald-700 underline underline-offset-4 dark:text-emerald-400">
+                {step.link.label} →
+              </a>
+            </p>
+          )}
+        </div>
+      </div>
+      {step.snag && (
+        <div className="rounded-md border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
+          <span className="font-semibold">Where people get stuck: </span>
+          {step.snag}
+        </div>
+      )}
+      {step.fails && (
+        <details className="group rounded-md border border-zinc-200 dark:border-zinc-800">
+          <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm">
+            <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
+            <span className="font-semibold">Didn&apos;t work?</span>
+            <span className="text-zinc-500">· {step.fails.causes.length} likely causes</span>
+          </summary>
+          <div className="border-t border-zinc-200 px-4 py-3 text-sm leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
+            <ol className="grid list-decimal gap-1.5 pl-5">
+              {step.fails.causes.map((c) => (
+                <li key={c}>{c}</li>
+              ))}
+            </ol>
+            <p className="mt-3">
+              <span className="font-semibold text-zinc-900 dark:text-zinc-100">Most likely fix: </span>
+              {step.fails.fix}
+            </p>
+            <div className="mt-4 rounded-md border border-dashed border-zinc-300 px-3 py-2.5 dark:border-zinc-700">
+              <p className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold text-zinc-900 dark:text-zinc-100">Stuck? Show me what you&apos;re seeing.</span>
+                <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-800">Coming soon</span>
+              </p>
+              <p className="mt-1 text-xs text-zinc-500">
+                Paste an error, upload a screenshot or describe what happened. You&apos;ll get a diagnosis that explains what
+                happened and why, the fix, and the concept behind it, then asks you to check the result.
+              </p>
+            </div>
+          </div>
+        </details>
+      )}
+    </div>
+  );
+
+  const understand = (
+    <div key="understand" className="grid gap-px overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200 sm:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-800">
+      <div className="bg-zinc-50 px-4 py-3.5 dark:bg-zinc-900">
+        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Technically, what happened</p>
+        <p className="mt-1 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">{step.understand}</p>
+      </div>
+      <div className="bg-zinc-900 px-4 py-3.5 dark:bg-zinc-950">
+        <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">PM lens · why you should care</p>
+        <p className="mt-1 text-[15px] leading-relaxed text-zinc-100">{step.pmLens}</p>
+      </div>
+    </div>
+  );
+
+  const labels = ["Why", "Do it", "See it work", "Understand"];
+  const panes = [why, doIt, see, understand];
+  if (check) {
+    labels.push("Quiz");
+    panes.push(<CheckUnderstanding key="quiz" questions={check} step={index + 1} />);
+  }
+
   return (
-    <li
-      id={`step-${index + 1}`}
-      className="scroll-mt-6 rounded-xl border border-zinc-200 bg-white p-5 sm:p-6 dark:border-zinc-800 dark:bg-zinc-950"
-    >
+    <article className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6 dark:border-zinc-800 dark:bg-zinc-950">
       <p className="font-mono text-xs text-zinc-500">
         Step {index + 1} of {total} · {phase}
       </p>
@@ -205,125 +309,43 @@ function StepCard({
           </span>
         )}
       </div>
-      <div className="mt-3">
-        <LayerStrip active={step.layers} />
+
+      <div className="mt-4">
+        <ArchitectureBar current={step.layers} built={built} />
       </div>
 
-      <div className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-5">
-        <Block label="The problem">{step.problem}</Block>
-        <Block label="The idea">
-          {step.idea}
-          {step.diagram && <Pre>{step.diagram}</Pre>}
-        </Block>
+      <p className="mt-4 text-lg leading-snug font-medium text-balance">{step.problem}</p>
 
-        <div className="min-w-0 rounded-lg border border-emerald-600/40 bg-emerald-50/40 p-4 dark:border-emerald-500/30 dark:bg-emerald-950/20">
-          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-800 dark:text-emerald-400">Do this</p>
-          <div className="mt-1.5 min-w-0 text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200">
-            {step.action}
-            {step.code && <Code>{step.code}</Code>}
-            {step.choices && (
-              <div className="mt-3 grid min-w-0 gap-2">
-                {step.choices.map((c, i) => (
-                  <details key={c.name} open={i === 0} className="group min-w-0 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-                    <summary className="flex cursor-pointer list-none items-center gap-4 p-3">
-                      <LookSwatch look={c.look} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-semibold text-zinc-900 dark:text-zinc-100">{c.name}</span>
-                        <span className="block text-sm text-zinc-600 dark:text-zinc-400">{c.mood}</span>
-                      </span>
-                      <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
-                    </summary>
-                    <div className="border-t border-zinc-200 px-3 pb-3 dark:border-zinc-800">
-                      <Code>{c.code}</Code>
-                    </div>
-                  </details>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <Block label="You should see">
-          {step.result}
-          {step.link && (
-            <p className="mt-1">
-              <a
-                href={step.link.href}
-                className="font-medium text-emerald-700 underline underline-offset-4 dark:text-emerald-400"
-              >
-                {step.link.label} →
-              </a>
-            </p>
-          )}
-        </Block>
-        <div className="grid gap-px overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200 sm:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-800">
-          <div className="bg-zinc-50 px-4 py-3.5 dark:bg-zinc-900">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Technically, what just happened</p>
-            <p className="mt-1 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">{step.understand}</p>
-          </div>
-          <div className="bg-zinc-900 px-4 py-3.5 dark:bg-zinc-950">
-            <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">PM lens · why you should care</p>
-            <p className="mt-1 text-[15px] leading-relaxed text-zinc-100">{step.pmLens}</p>
-          </div>
-        </div>
-
-        {step.snag && (
-          <div className="rounded-md border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
-            <span className="font-semibold">Where people get stuck: </span>
-            {step.snag}
-          </div>
-        )}
-
-        {step.fails && (
-          <details className="group rounded-md border border-zinc-200 dark:border-zinc-800">
-            <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm">
-              <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
-              <span className="font-semibold">If this doesn&apos;t work</span>
-              <span className="text-zinc-500">
-                · {step.fails.causes.length} likely cause{step.fails.causes.length > 1 ? "s" : ""}
-              </span>
-            </summary>
-            <div className="border-t border-zinc-200 px-4 py-3 text-sm leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
-              <ol className="grid list-decimal gap-1.5 pl-5">
-                {step.fails.causes.map((c) => (
-                  <li key={c}>{c}</li>
-                ))}
-              </ol>
-              <p className="mt-3">
-                <span className="font-semibold text-zinc-900 dark:text-zinc-100">Most likely fix: </span>
-                {step.fails.fix}
-              </p>
-              <div className="mt-4 rounded-md border border-dashed border-zinc-300 px-3 py-2.5 dark:border-zinc-700">
-                <p className="flex flex-wrap items-center gap-2">
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">Stuck? Show me what you&apos;re seeing.</span>
-                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-[11px] font-medium text-zinc-500 dark:bg-zinc-800">Coming soon</span>
-                </p>
-                <p className="mt-1 text-xs text-zinc-500">
-                  Paste an error, upload a screenshot or describe what happened. You&apos;ll get a diagnosis that explains what
-                  happened and why, the fix, and the concept behind it, then asks you to check the result.
-                </p>
-              </div>
-            </div>
-          </details>
-        )}
-
-        {check && <CheckUnderstanding questions={check} step={index + 1} />}
+      <div className="mt-5">
+        <Panes
+          labels={labels}
+          panes={panes}
+          after={
+            <a
+              href={next ? `#step-${next.index + 1}` : "#done"}
+              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900"
+            >
+              {next ? `Next step: ${next.title} →` : "Finish: see what you built →"}
+            </a>
+          }
+        />
       </div>
-
-      <div className="mt-5 border-t border-zinc-100 pt-3 text-sm dark:border-zinc-900">
-        {next ? (
-          <a href={`#step-${next.index + 1}`} className="text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100">
-            Next: {next.index + 1} · {next.title} ↓
-          </a>
-        ) : (
-          <a href="#done" className="font-medium text-emerald-700 hover:underline dark:text-emerald-400">
-            Finish: see what you built ↓
-          </a>
-        )}
-      </div>
-    </li>
+    </article>
   );
 }
+
+const SECTIONS = [
+  { id: "overview", label: "Overview" },
+  { id: "build", label: "Your app" },
+  { id: "journey", label: "Journey" },
+];
+const PAGES = [
+  { label: "Live demo", href: "/demo" },
+  { label: "System map", href: "/architecture" },
+];
+// Steps 1–2 only show the shape of an AI app; building starts at step 3.
+const FIRST_BUILD_STEP = 3;
+const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
 
 type SearchParams = Record<string, string | string[] | undefined>;
 const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
@@ -351,70 +373,109 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   else chooser = <PatternMenu activeId={pattern.id} />;
 
   const phaseOf = (i: number) => j.phases.find((ph) => i + 1 >= ph.steps[0] && i + 1 <= ph.steps[1])!;
-  const nav = "rounded-md px-3 py-1.5 text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-zinc-100";
   const eyebrow = "text-xs font-semibold uppercase tracking-widest";
+  const navStages = j.phases.map((ph) => ({
+    title: ph.title,
+    steps: steps.slice(ph.steps[0] - 1, ph.steps[1]).map((st, k) => ({ n: ph.steps[0] + k, title: st.title })),
+  }));
   const c = j.closing;
 
   return (
-    <main className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className={`${eyebrow} text-zinc-500`}>
-          AI Tool Lab for PMs
-          {parsed?.ok && ` · building ${mvp.name}`}
-        </p>
-        <nav aria-label="Site" className="flex gap-1 text-sm">
-          <a href="/demo" className={nav}>
-            Live demo
-          </a>
-          <a href="/architecture" className={nav}>
-            System map
-          </a>
-        </nav>
-      </div>
+    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:grid lg:grid-cols-[15rem_minmax(0,48rem)] lg:justify-center lg:gap-12">
+      <SectionNav brand="AI Tool Lab for PMs" sections={SECTIONS} stages={navStages} links={PAGES} />
 
-      {/* Who it's for, what you'll learn, what you'll do */}
-      <header className="mt-10">
-        <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>{site.eyebrow}</p>
-        <h1 className="mt-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.6rem]">{site.headline}</h1>
-        <p className="mt-4 text-xl leading-relaxed text-zinc-700 dark:text-zinc-300">{site.promise}</p>
-        <p className="mt-3 leading-relaxed text-zinc-500">{site.audience}</p>
-        <p className="mt-3 leading-relaxed text-zinc-500">{site.codeLine}</p>
-        <p className="mt-6 border-l-4 border-emerald-600 pl-4 text-lg font-semibold tracking-tight dark:border-emerald-400">
-          {site.philosophy}
-        </p>
-      </header>
+    <main className="min-w-0 pt-6 pb-24 lg:pt-8">
+      <noscript>
+        <style>{".jp-hide{display:block!important}"}</style>
+      </noscript>
+      <p className={`${eyebrow} text-zinc-500 lg:hidden`}>
+        AI Tool Lab for PMs
+        {parsed?.ok && ` · building ${mvp.name}`}
+      </p>
 
-      {/* Why this is different: a different goal, not a better builder */}
-      <section aria-label="Is this for you?" className="mt-8 overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-800">
-        {site.goals.map((g, i) => (
-          <div
-            key={g.goal}
-            className={`grid gap-1 p-4 sm:grid-cols-[15rem_minmax(0,1fr)] sm:gap-4 ${
-              i === 1 ? "border-t border-zinc-200 bg-zinc-900 text-zinc-100 dark:border-zinc-800" : "text-zinc-600 dark:text-zinc-400"
-            }`}
-          >
-            <p className="text-sm">
-              If your goal is <span className={`font-semibold ${i === 1 ? "text-emerald-400" : "text-zinc-900 dark:text-zinc-100"}`}>{g.goal}</span>
-            </p>
-            <p className="text-sm">→ {g.answer}</p>
-          </div>
-        ))}
-        <p className="border-t border-zinc-200 px-4 py-3 text-xs text-zinc-500 dark:border-zinc-800">
-          A course: {site.format.course.join(" → ")}. Here: <span className="font-semibold text-zinc-700 dark:text-zinc-300">{site.format.lab.join(" → ")}</span>.
-        </p>
+      {/* Overview: who it's for, what you'll learn, how it differs */}
+      <section id="overview" className="scroll-mt-6 pt-6 lg:pt-2">
+        <header>
+          <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>{site.eyebrow}</p>
+          <h1 className="mt-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.6rem]">{site.headline}</h1>
+          <p className="mt-3 text-2xl leading-[1.3] font-semibold tracking-tight text-zinc-400 sm:text-3xl dark:text-zinc-500">
+            Understand every layer:{" "}
+            <span className="ticker text-emerald-700 dark:text-emerald-400">
+              <span aria-hidden className="ticker-track">
+                {[...site.layers, site.layers[0]].map((w, i) => (
+                  <span key={i} className="ticker-word">
+                    {w}
+                  </span>
+                ))}
+              </span>
+            </span>
+            <span className="sr-only">{site.layers.join(", ")}</span>
+          </p>
+          <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{site.promise}</p>
+          <p className="mt-6 border-l-4 border-emerald-600 pl-4 text-lg font-semibold tracking-tight dark:border-emerald-400">
+            {site.philosophy}
+          </p>
+        </header>
+
+        {/* Different tools for different goals */}
+        <div className="reveal mt-8 overflow-x-auto rounded-xl border border-zinc-200 dark:border-zinc-800">
+          <table className="w-full min-w-[34rem] text-left text-sm">
+            <thead>
+              <tr className="border-b border-zinc-200 dark:border-zinc-800">
+                <th className="w-[26%] px-4 py-3" />
+                <th className="w-[37%] px-4 py-3 align-bottom font-semibold">
+                  {site.compare.builders.label}
+                  <span className="block text-xs font-normal text-zinc-500">{site.compare.builders.examples}</span>
+                </th>
+                <th className="w-[37%] bg-zinc-900 px-4 py-3 align-bottom font-semibold text-emerald-400 dark:bg-zinc-800">
+                  {site.compare.lab.label}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {site.compare.rows.map((r) => (
+                <tr key={r.label} className="border-b border-zinc-200 last:border-b-0 dark:border-zinc-800">
+                  <th scope="row" className="px-4 py-3 align-top text-xs font-semibold tracking-wider text-zinc-500 uppercase">
+                    {r.label}
+                  </th>
+                  <td className="px-4 py-3 align-top text-zinc-600 dark:text-zinc-400">{r.builders}</td>
+                  <td className="bg-zinc-900 px-4 py-3 align-top text-zinc-100 dark:bg-zinc-800">{r.lab}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-10">
+          <h2 className="text-xl font-bold tracking-tight">What you&apos;ll actually understand</h2>
+          <ul className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+            {site.understand.map((u) => (
+              <li key={u} className="reveal flex gap-2.5 text-[15px] leading-snug">
+                <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
+                {u}
+              </li>
+            ))}
+          </ul>
+          <p className="mt-5 font-medium">{site.outcomeLine}</p>
+        </div>
       </section>
 
-      {/* The demo as a hook: what you see, and what's underneath */}
-      <section aria-label="The app you'll build" className="mt-10">
-        <h2 className="text-sm font-semibold">The app you&apos;ll build, and what&apos;s underneath it</h2>
-        <div className="mt-3 grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] dark:border-zinc-800 dark:bg-zinc-800">
+      {/* Your app: choose it and see what's underneath, in one place */}
+      <section id="build" className="mt-12 scroll-mt-6 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+        <p className={`${eyebrow} text-zinc-500`}>Your app</p>
+        <h2 className="mt-2 text-2xl font-bold tracking-tight">Pick an app. See what&apos;s underneath it.</h2>
+
+        <div className="mt-5">{chooser}</div>
+
+        <div id="underneath" className="scroll-mt-6 pt-6">
+        <div className="reveal grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] dark:border-zinc-800 dark:bg-zinc-800">
           <div className="bg-white p-4 dark:bg-zinc-950">
-            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">What you see</p>
-            <Chain items={site.demo.sees} />
+            <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">What you see · {mvp.name}</p>
+            <Chain items={[cap(mvp.input), "AI", cap(mvp.resultShownAs)]} />
           </div>
           <div className="bg-zinc-50 p-4 dark:bg-zinc-900">
             <p className="text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">What&apos;s actually happening</p>
-            <Chain items={site.demo.underneath} dark />
+            <Chain items={site.underneath} dark />
           </div>
         </div>
         <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -424,100 +485,53 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           >
             Try {mvp.name} →
           </a>
-          <a href="#step-1" className="text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+          <a href="#journey" className="text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
             Want to understand each layer? Start the journey ↓
           </a>
         </div>
-      </section>
 
-      {/* The real value: understanding */}
-      <section aria-label="What you'll understand" className="mt-10">
-        <h2 className="text-xl font-bold tracking-tight">What you&apos;ll actually understand</h2>
-        <ul className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
-          {site.understand.map((u) => (
-            <li key={u} className="flex gap-2.5 text-[15px] leading-snug">
-              <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
-              {u}
-            </li>
-          ))}
-        </ul>
-        <p className="mt-5 font-medium">{site.outcomeLine}</p>
+        </div>
       </section>
 
       {/* Journey 1 */}
-      <section className="mt-12 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+      <section id="journey" className="mt-12 scroll-mt-6 border-t border-zinc-200 pt-10 dark:border-zinc-800">
         <p className={`${eyebrow} text-zinc-500`}>Journey {j.number}</p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{j.name}</h2>
         <p className="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">{j.promise}</p>
+        <p className="mt-3 text-xs text-zinc-500">{site.providerNote}</p>
 
-        <div className="mt-6">{chooser}</div>
-
-        <p className="mt-4 text-xs text-zinc-500">{site.providerNote}</p>
-
-        {/* The route: where am I, what's next */}
-        <nav aria-label="Your route" className="mt-8">
-          <p className="text-sm font-semibold">Your route · {steps.length} steps</p>
-          <ol className="mt-3 grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-5 dark:border-zinc-800 dark:bg-zinc-800">
-            {j.phases.map((ph, pi) => (
-              <li key={ph.title} className="bg-white p-3 dark:bg-zinc-950">
-                <p className="font-mono text-[11px] text-zinc-400">{String(pi + 1).padStart(2, "0")}</p>
-                <p className="text-[13px] leading-snug font-semibold">{ph.title}</p>
-                <ul className="mt-2 grid gap-1">
-                  {steps.slice(ph.steps[0] - 1, ph.steps[1]).map((st, k) => {
-                    const n = ph.steps[0] + k;
-                    return (
-                      <li key={st.title}>
-                        <a href={`#step-${n}`} className="flex gap-1.5 text-xs leading-snug text-zinc-600 hover:text-emerald-700 dark:text-zinc-400 dark:hover:text-emerald-400">
-                          <span className="font-mono text-zinc-400">{n}</span>
-                          {st.title}
-                        </a>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </li>
+        <div className="mt-8">
+          <JourneyPlayer
+            meta={steps.map((st, i) => ({ n: i + 1, title: st.title, stage: phaseOf(i).title }))}
+            stages={j.phases.map((ph) => ({ title: ph.title, from: ph.steps[0], to: ph.steps[1] }))}
+            cards={steps.map((s, i) => (
+              <StepCard
+                key={s.title}
+                step={s}
+                index={i}
+                total={steps.length}
+                phase={phaseOf(i).title}
+                next={steps[i + 1] ? { index: i + 1, title: steps[i + 1].title } : undefined}
+                personalised={s.personalised}
+                check={checks01[i]}
+                built={[...new Set(steps.slice(FIRST_BUILD_STEP - 1, i).flatMap((p) => p.layers))].filter((l) => !s.layers.includes(l))}
+              />
             ))}
-          </ol>
-        </nav>
-
-        <ol className="mt-10 grid grid-cols-[minmax(0,1fr)] gap-5">
-          {steps.map((s, i) => {
-            const ph = phaseOf(i);
-            const firstOfPhase = i + 1 === ph.steps[0];
-            return (
-              <Fragment key={s.title}>
-                {firstOfPhase && (
-                  <li className="mt-4 first:mt-0">
-                    <p className="font-mono text-xs text-zinc-400">Stage {j.phases.indexOf(ph) + 1} of {j.phases.length}</p>
-                    <p className="text-lg font-semibold tracking-tight">{ph.title}</p>
-                  </li>
-                )}
-                <StepCard
-                  step={s}
-                  index={i}
-                  total={steps.length}
-                  phase={ph.title}
-                  next={steps[i + 1] ? { index: i + 1, title: steps[i + 1].title } : undefined}
-                  personalised={s.personalised}
-                  check={checks01[i]}
-                />
-              </Fragment>
-            );
-          })}
-        </ol>
-
-        {/* The finish line */}
-        <section id="done" className="mt-12 scroll-mt-6 rounded-2xl border-2 border-zinc-900 bg-white p-6 sm:p-8 dark:border-zinc-200 dark:bg-zinc-950">
-          <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>Journey {j.number} complete</p>
-          <h2 className="mt-2 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
-            {parsed?.ok ? `You built ${mvp.name}. More importantly, you understand it.` : "You built an AI app. More importantly, you understand it."}
-          </h2>
-          <p className="mt-3 leading-relaxed text-zinc-600 dark:text-zinc-400">{c.intro}</p>
-
-          <h3 className="mt-8 text-sm font-semibold">What your app does, and you can now explain</h3>
+            finish={
+              <section className="rounded-2xl border-2 border-zinc-900 bg-white p-6 sm:p-8 dark:border-zinc-200 dark:bg-zinc-950">
+                <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>Journey {j.number} complete</p>
+                <h2 className="mt-2 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+                  {parsed?.ok ? `You built ${mvp.name}. More importantly, you understand it.` : "You built an AI app. More importantly, you understand it."}
+                </h2>
+                <p className="mt-3 leading-relaxed text-zinc-600 dark:text-zinc-400">{c.intro}</p>
+                <div className="mt-6">
+                  <Panes
+                    labels={["What you built", "The anatomy", "Reuse the pattern", "Questions", "What's next"]}
+                    panes={[
+                      <div key="built">
           <ul className="mt-3 grid gap-2 sm:grid-cols-2">
             {c.built.map((b) => (
-              <li key={b.text} className="flex gap-2.5 text-[15px] leading-snug">
+              <li key={b.text} className="reveal flex gap-2.5 text-[15px] leading-snug">
                 <span aria-hidden className="mt-0.5 text-emerald-600 dark:text-emerald-400">✓</span>
                 <span>
                   {b.text}{" "}
@@ -529,7 +543,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             ))}
           </ul>
 
-          <h3 className="mt-8 text-sm font-semibold">The anatomy of an AI application</h3>
+                      </div>,
+                      <div key="anatomy">
           <ol className="mt-3 flex flex-wrap items-stretch gap-x-2 gap-y-3">
             {c.flow.map((f, i) => (
               <li key={i} className="flex items-center gap-2">
@@ -547,8 +562,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             <span className="font-medium text-zinc-700 dark:text-zinc-300">Vercel</span> turns a push into a live URL.
           </p>
 
-          <div id="pattern" className="mt-10 scroll-mt-6">
-            <h3 className="text-xl font-semibold tracking-tight">The same anatomy powers many AI products</h3>
+                      </div>,
+                      <div key="pattern">
             <p className="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">
               Only the prompt and the schema change. Once you can see this anatomy, you can reason about almost any AI feature an
               engineer describes to you.
@@ -587,24 +602,29 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             <a href="/architecture" className="mt-4 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
               Explore every layer on the system map →
             </a>
-          </div>
-
-          <h3 className="mt-10 text-sm font-semibold">Questions you can now answer</h3>
+                      </div>,
+                      <div key="questions">
           <ol className="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
             {c.questions.map((q, i) => (
               <li key={q.q} className="flex gap-2 text-sm leading-snug">
                 <span className="w-5 shrink-0 font-mono text-xs text-zinc-400">{i + 1}</span>
                 <span>
                   {q.q}{" "}
-                  <a href={q.step ? `#step-${q.step}` : "#pattern"} className="font-mono text-xs whitespace-nowrap text-zinc-400 hover:text-emerald-700">
-                    {q.step ? `step ${q.step}` : "the pattern"}
-                  </a>
+                  {q.step ? (
+                    <a href={`#step-${q.step}`} className="font-mono text-xs whitespace-nowrap text-zinc-400 hover:text-emerald-700">
+                      step {q.step}
+                    </a>
+                  ) : (
+                    <span className="font-mono text-xs whitespace-nowrap text-zinc-400">see “Reuse the pattern”</span>
+                  )}
                 </span>
               </li>
             ))}
           </ol>
 
-          <div className="mt-10 grid gap-6 border-t border-zinc-200 pt-6 sm:grid-cols-2 dark:border-zinc-800">
+                      </div>,
+                      <div key="next">
+          <div className="grid gap-6 sm:grid-cols-2">
             <div>
               <p className="text-sm font-semibold">What it can&apos;t do yet</p>
               <ul className="mt-2 grid gap-2 text-sm text-zinc-600 dark:text-zinc-400">
@@ -631,14 +651,26 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               </ol>
             </div>
           </div>
-        </section>
-
-        <section className="mt-6 rounded-lg border border-dashed border-zinc-300 p-5 dark:border-zinc-700">
-          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Coming next</p>
-          <h2 className="mt-2 text-lg font-semibold">{j.next.title}</h2>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">{j.next.teaser}</p>
-        </section>
+                        <div className="mt-6 rounded-lg border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
+                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Coming next</p>
+                          <p className="mt-1 font-semibold">{j.next.title}</p>
+                          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{j.next.teaser}</p>
+                        </div>
+                      </div>,
+                    ]}
+                    after={
+                      <a href="/demo" className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900">
+                        Open the live demo →
+                      </a>
+                    }
+                  />
+                </div>
+              </section>
+            }
+          />
+        </div>
       </section>
     </main>
+    </div>
   );
 }

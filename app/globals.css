@@ -24,3 +24,65 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
+
+/* ---- Home page motion (CSS only, no JavaScript) ---- */
+
+/* The rolling word under the headline: one layer at a time, then loops.
+   The list repeats its first word at the end so the loop is seamless. */
+.ticker {
+  display: inline-block;
+  height: 1.3em;
+  overflow: hidden;
+  vertical-align: top;
+}
+.ticker-track {
+  display: block;
+  animation: ticker 16s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+}
+.ticker-word {
+  display: block;
+  height: 1.3em;
+  line-height: 1.3em;
+  white-space: nowrap;
+}
+@keyframes ticker {
+  0.00%, 10.00% { transform: translateY(-0.00em); }
+  12.50%, 22.50% { transform: translateY(-1.30em); }
+  25.00%, 35.00% { transform: translateY(-2.60em); }
+  37.50%, 47.50% { transform: translateY(-3.90em); }
+  50.00%, 60.00% { transform: translateY(-5.20em); }
+  62.50%, 72.50% { transform: translateY(-6.50em); }
+  75.00%, 85.00% { transform: translateY(-7.80em); }
+  87.50%, 97.50% { transform: translateY(-9.10em); }
+  100% { transform: translateY(-10.40em); }
+}
+
+/* Content slides in as it scrolls into view. Only in browsers that support
+   scroll-driven animations; everywhere else it simply shows, as before. */
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: none; }
+}
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 35%;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track { animation: none; }
+}
+
+/* ---- Journey player ---- */
+/* Steps and panes that aren't on screen. Shown again, stacked, when JavaScript is off (see app/page.tsx). */
+.jp-hide { display: none; }
+@keyframes pane-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .pane-in { animation: pane-in 0.25s ease-out; }
+}

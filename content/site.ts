@@ -4,18 +4,22 @@
 export const site = {
   eyebrow: "For product managers who want to go beyond prompting",
   headline: "Learn how AI applications are actually built.",
-  promise: "Build a real AI application from an empty folder, and understand every layer underneath it.",
-  audience:
-    "For PMs who already use ChatGPT or Claude, work closely with engineers, and want to know what's happening underneath. You don't need a software engineering background, just curiosity and a willingness to build.",
-  codeLine:
-    "You won't write code from scratch. Every step gives you the code, explains what it does, and tells you what you should see. Then five questions check you understood it.",
+  promise: "Build a real AI app from an empty folder. You get the code; every step explains what's happening underneath.",
+  // The rolling word under the headline, one layer at a time.
+  layers: ["LLM", "API", "server", "secret key", "structured output", "validation", "Git", "deployment"],
   philosophy: "AI can write the code. You should still understand it.",
 
-  // Different tools for different goals. No criticism of either.
-  goals: [
-    { goal: "get an app built quickly", answer: "AI app builders such as Lovable, Replit, Bolt, v0 or Cursor are excellent at this." },
-    { goal: "understand how AI applications are built", answer: "That's what this lab is for. You build with real tools, and every step explains what's happening." },
-  ],
+  // Different tools for different goals. A comparison, not a criticism.
+  compare: {
+    builders: { label: "AI app builders", examples: "Lovable, Replit, Bolt, v0, Cursor" },
+    lab: { label: "This lab" },
+    rows: [
+      { label: "Built for", builders: "Getting an app built quickly", lab: "Understanding how AI apps are built" },
+      { label: "What you do", builders: "Describe what you want; the tool writes and runs the code", lab: "Build step by step with real tools; every step explains the code" },
+      { label: "You leave with", builders: "A working app", lab: "A working app, and knowing how it works underneath" },
+      { label: "When something breaks", builders: "Ask the tool to fix it", lab: "Know where to look, and why it broke" },
+    ],
+  },
   format: {
     course: ["Watch", "learn", "maybe build later"],
     lab: ["See", "build", "understand", "get stuck", "debug", "ship"],
@@ -24,25 +28,18 @@ export const site = {
   // What the learner leaves with. The app is the vehicle; this is the value.
   understand: [
     "What an LLM does inside an application",
-    "How an application talks to an AI model",
-    "What an API actually is",
-    "Why server-side logic exists",
-    "Why API keys must stay secret",
-    "What Node.js and Next.js provide",
-    "How to get structured output from an AI",
-    "Why AI responses need validation",
+    "How an app talks to a model through an API",
+    "Why keys and logic live on the server",
+    "What Node.js and Next.js actually do",
+    "How to get structured output, and why to validate it",
     "What happens when the AI fails",
-    "How Git and GitHub fit into development",
-    "How deployment works",
-    "How all the layers fit together",
+    "How Git, GitHub and deployment fit together",
+    "How all the layers connect",
   ],
-  outcomeLine: "You won't become a software engineer. You'll become a PM who understands AI applications well enough to reason about them.",
+  outcomeLine: "You won't become a software engineer. You'll understand AI apps well enough to reason about them.",
 
-  // The demo as a hook: what you see, then what's underneath.
-  demo: {
-    sees: ["Customer complaints", "AI", "Key points"],
-    underneath: ["Browser", "Next.js page", "Server", "AI API", "LLM", "Structured output", "Validation", "Screen"],
-  },
+  // What's underneath every app in the journey. The "what you see" side comes from the app you pick.
+  underneath: ["Browser", "Next.js page", "Server", "AI API", "LLM", "Structured output", "Validation", "Screen"],
 
   providerNote: "We use Gemini because it's free to start. Everything here applies to OpenAI, Claude and others.",
 };

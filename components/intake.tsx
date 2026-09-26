@@ -10,17 +10,17 @@ const label = "text-xs font-semibold uppercase tracking-wider text-emerald-700 d
 // State 1: nothing chosen yet.
 export function PatternMenu({ activeId }: { activeId?: string }) {
   return (
-    <section id="build" className={box}>
+    <section className={box}>
       <p className={label}>Start here</p>
       <h2 className="mt-1 text-xl font-semibold tracking-tight">What do you want to build?</h2>
       <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-        Pick the closest match. Most first AI tools are one of these five.
+        Pick the closest match. The picture below shows what you see, and what&apos;s underneath.
       </p>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {patterns.map((p) => (
           <li key={p.id}>
             <a
-              href={`/?pattern=${p.id}#build`}
+              href={`/?pattern=${p.id}#underneath`}
               className={`block h-full rounded-md border p-3 hover:border-emerald-600 ${
                 p.id === activeId
                   ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30"
@@ -57,7 +57,7 @@ export function IntakeForm({
   const field =
     "mt-1 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-[15px] dark:border-zinc-700 dark:bg-zinc-900";
   return (
-    <section id="build" className={box}>
+    <section className={box}>
       <p className={label}>Start here · {pattern.name}</p>
       <h2 className="mt-1 text-xl font-semibold tracking-tight">Tell us about your app</h2>
       {error && (
@@ -65,7 +65,7 @@ export function IntakeForm({
           {error}
         </p>
       )}
-      <form method="get" action="/" className="mt-4 grid gap-4">
+      <form method="get" action="/#underneath" className="mt-4 grid gap-4">
         <input type="hidden" name="pattern" value={pattern.id} />
         <label className="block">
           <span className="font-medium">1. What will people put in?</span>
@@ -104,7 +104,7 @@ export function MvpCard({ mvp, changeHref }: { mvp: Mvp; changeHref: string }) {
   const code =
     "overflow-x-auto rounded bg-zinc-50 px-2 py-1 font-mono text-[13px] dark:bg-zinc-900";
   return (
-    <section id="build" className={box}>
+    <section className={box}>
       <p className={label}>Your MVP · {mvp.patternName}</p>
       <h2 className="mt-1 text-xl font-semibold tracking-tight">{mvp.name}</h2>
       <div className="mt-4 grid gap-3 text-[15px]">
