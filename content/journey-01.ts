@@ -147,6 +147,34 @@ export const journey01: Journey = {
       result: "Gemini answers your prompt.",
       understand: "An LLM is a model trained on huge amounts of text to predict what comes next. It runs on the provider's servers. The API is the contract for reaching it: request in, response out.",
       pmLens: "Model choice trades quality against speed, cost and capabilities. The architecture is the same across providers, so the model call lives in one swappable file (step 7).",
+      pmDetail: {
+        boxes: [
+          {
+            name: "Small, fast model (e.g. Flash)",
+            cost: "Lowest price per token. The default for most product features.",
+            speed: "Fastest replies.",
+            safety: "Fine for narrow tasks like summarising or sorting. More likely to miss nuance, so check its answers.",
+          },
+          {
+            name: "Large model (e.g. Pro)",
+            cost: "Costs more per token, and every request pays it.",
+            speed: "Slower replies.",
+            safety: "Follows long, complex instructions better. Still wrong sometimes, so the checks stay.",
+          },
+          {
+            name: "Thinking mode",
+            cost: "You also pay for the thinking tokens you never see.",
+            speed: "Can pause for seconds before the first word.",
+            safety: "Helps on multi-step problems. Rarely needed to extract or summarise.",
+          },
+        ],
+        decisions: [
+          { q: "What does \"good enough\" mean for this feature?", trades: "Quality", start: "A small set of real inputs with the answer you'd accept. Test each model against them before choosing." },
+          { q: "Free tier or paid?", trades: "Cost · safety", start: "Free tiers can use what you send to improve their models; Gemini's free tier does. No real customer data until you're on paid terms." },
+          { q: "Tied to one provider, or free to switch?", trades: "Cost · safety", start: "Keep the model call in one file (step 7), so switching is a change in one place." },
+          { q: "What happens when the provider is down or you hit a limit?", trades: "Speed · safety", start: "A clear message to the user. Later, a second model to fall back to." },
+        ],
+      },
       fails: {
         causes: [
           "A work or school Google account, with AI Studio switched off by an admin.",
@@ -233,6 +261,34 @@ export const journey01: Journey = {
       result: "Open http://localhost:3000/api/ask-ai and you should see {\"ok\":true}.",
       understand: "Any route.ts under app/api/ is a server route. The browser gets its answer, never its code or secrets. With the empty route working, any later failure is in the model call.",
       pmLens: "What runs on the server and what runs in the browser decides security, speed and cost. Ask it about every AI feature.",
+      pmDetail: {
+        boxes: [
+          {
+            name: "In the browser",
+            cost: "Runs on the visitor's device, so it's free to you.",
+            speed: "No trip over the network: instant for the screen itself.",
+            safety: "The visitor can read and change all of it, and everything sent to it.",
+          },
+          {
+            name: "In a server route",
+            cost: "You pay for every request it serves and every model call it makes.",
+            speed: "One extra hop, small next to the model's own time.",
+            safety: "Code and keys stay private. The only place you can enforce limits and checks.",
+          },
+          {
+            name: "Browser straight to the model",
+            cost: "Anyone who copies your key spends your quota, or your money.",
+            speed: "Saves one hop, which barely matters.",
+            safety: "The key is visible to every visitor. Never do this.",
+          },
+        ],
+        decisions: [
+          { q: "What must stay on the server?", trades: "Safety", start: "Anything the user shouldn't see or change: keys, prompts, permissions, prices." },
+          { q: "Who may call your route?", trades: "Cost · safety", start: "Right now, anyone with the URL. Before real users: sign-in, or a limit per visitor." },
+          { q: "What does the server log?", trades: "Safety", start: "Logs help you debug but can hold customer text. Decide what's kept, and for how long." },
+          { q: "Show the answer as it's written (streaming)?", trades: "Speed vs safety", start: "It feels faster, but you can't fully check an answer before it's finished. Check first, stream later." },
+        ],
+      },
       fails: {
         causes: [
           "404: the file isn't exactly app/api/ask-ai/route.ts. Often it's named ask-ai.ts.",
@@ -287,6 +343,34 @@ export const journey01: Journey = {
       result: "The same answer, now checked. Return the result object from your route as it is; the page in step 11 decides what to show.",
       understand: "Zod describes the expected shape; safeParse returns the data or what's wrong, without crashing. That's what happens when the AI fails: detect, retry once, then fail honestly. Unlike TypeScript types, this check runs in production.",
       pmLens: "Models are probabilistic, so decide upfront what the product does when they fail: retry, fall back or tell the user. Never show unchecked output.",
+      pmDetail: {
+        boxes: [
+          {
+            name: "Retry, with the error",
+            cost: "Another full model call.",
+            speed: "The user waits about twice as long.",
+            safety: "The answer is still checked. Often fixes a one-off slip in shape.",
+          },
+          {
+            name: "Fall back",
+            cost: "A second model or a rule to build and maintain.",
+            speed: "Fast if the fallback is a rule, slow if it's another model.",
+            safety: "The fallback must be right too, and clearly labelled as such.",
+          },
+          {
+            name: "Tell the user",
+            cost: "Nothing.",
+            speed: "Fastest.",
+            safety: "Honest. But if it happens often, people stop trusting the feature.",
+          },
+        ],
+        decisions: [
+          { q: "How many retries?", trades: "Cost · speed", start: "One, with the error attached. Each extra try adds a full wait and a full call." },
+          { q: "What counts as a failure?", trades: "Safety", start: "A wrong shape is easy to catch. A well-shaped but wrong answer isn't, so decide where a person reviews." },
+          { q: "What failure rate is acceptable?", trades: "Safety · cost", start: "Log every failure with its reason, and look at how often it happens on real inputs." },
+          { q: "Where must a person stay in the loop?", trades: "Safety", start: "Anything that saves, sends or charges. The AI suggests, a person confirms." },
+        ],
+      },
       fails: {
         causes: [
           "'Cannot find module zod': run npm install zod.",
