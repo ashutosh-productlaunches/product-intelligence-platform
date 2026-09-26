@@ -14,14 +14,13 @@ export function PatternMenu({ activeId }: { activeId?: string }) {
       <p className={label}>Start here</p>
       <h2 className="mt-1 text-xl font-semibold tracking-tight">What do you want to build?</h2>
       <p className="mt-1 text-zinc-600 dark:text-zinc-400">
-        Pick the kind of AI tool closest to your idea and the app above changes to match.
-        Most first AI tools are one of these five.
+        Pick the closest match. Most first AI tools are one of these five.
       </p>
       <ul className="mt-4 grid gap-3 sm:grid-cols-2">
         {patterns.map((p) => (
           <li key={p.id}>
             <a
-              href={`/?pattern=${p.id}#app`}
+              href={`/?pattern=${p.id}#build`}
               className={`block h-full rounded-md border p-3 hover:border-emerald-600 ${
                 p.id === activeId
                   ? "border-emerald-600 bg-emerald-50/60 dark:bg-emerald-950/30"
@@ -39,7 +38,7 @@ export function PatternMenu({ activeId }: { activeId?: string }) {
         <a href={`/?pattern=${activeId ?? "summarise"}&make=1#build`} className="font-medium underline underline-offset-4">
           Make it yours →
         </a>{" "}
-        <span className="text-zinc-500">Answer three questions and the app and the steps use your own wording.</span>
+        <span className="text-zinc-500">Answer three questions and every step uses your wording.</span>
       </p>
     </section>
   );
@@ -127,7 +126,7 @@ export function MvpCard({ mvp, changeHref }: { mvp: Mvp; changeHref: string }) {
         </div>
       </div>
       <p className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-        The steps below are now built around {mvp.name}. Steps marked <b>Your app</b> use your details.
+        Steps marked <b>Your app</b> now use {mvp.name}&apos;s details.
       </p>
       <p className="mt-2 flex flex-wrap gap-4 text-sm">
         <a href={changeHref} className="underline underline-offset-4">Change answers</a>
