@@ -536,6 +536,17 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             <span className="sr-only">{site.ticker.join(", ")}</span>
           </p>
           <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{site.promise}</p>
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
+            <a
+              href="#build"
+              className="rounded-lg bg-zinc-900 px-5 py-3 text-[15px] font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+            >
+              {site.cta.primary}
+            </a>
+            <a href={mvp.demoHref} className="text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100">
+              {site.cta.secondary}
+            </a>
+          </div>
           <p className="mt-6 border-l-4 border-emerald-600 pl-4 text-lg font-semibold tracking-tight dark:border-emerald-400">
             {site.philosophy}
           </p>

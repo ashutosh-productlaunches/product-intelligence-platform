@@ -17,6 +17,8 @@ export const site = {
   ],
   promise: "Not to become an engineer. To make better AI product calls, and hold real conversations with your engineers.",
   philosophy: "AI can write the code. You should still understand it.",
+  // The hero's only actions: start the flow (pick an app first), or see the finished app.
+  cta: { primary: "Start building ↓", secondary: "See the finished app →" },
 
   // Different tools for different goals. A comparison, not a criticism.
   compare: {
