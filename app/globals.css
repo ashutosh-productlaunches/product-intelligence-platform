@@ -27,8 +27,9 @@ body {
 
 /* ---- Home page motion (CSS only, no JavaScript) ---- */
 
-/* The rolling word under the headline: one layer at a time, then loops.
-   The list repeats its first word at the end so the loop is seamless. */
+/* The rolling line under the headline: one phrase at a time, then loops.
+   The list repeats its first phrase at the end so the loop is seamless.
+   Timed for six phrases (site.ticker): each holds, then slides up 1.3em. */
 .ticker {
   display: inline-block;
   height: 1.3em;
@@ -37,7 +38,7 @@ body {
 }
 .ticker-track {
   display: block;
-  animation: ticker 16s cubic-bezier(0.7, 0, 0.3, 1) infinite;
+  animation: ticker 15s cubic-bezier(0.7, 0, 0.3, 1) infinite;
 }
 .ticker-word {
   display: block;
@@ -46,15 +47,13 @@ body {
   white-space: nowrap;
 }
 @keyframes ticker {
-  0.00%, 10.00% { transform: translateY(-0.00em); }
-  12.50%, 22.50% { transform: translateY(-1.30em); }
-  25.00%, 35.00% { transform: translateY(-2.60em); }
-  37.50%, 47.50% { transform: translateY(-3.90em); }
-  50.00%, 60.00% { transform: translateY(-5.20em); }
-  62.50%, 72.50% { transform: translateY(-6.50em); }
-  75.00%, 85.00% { transform: translateY(-7.80em); }
-  87.50%, 97.50% { transform: translateY(-9.10em); }
-  100% { transform: translateY(-10.40em); }
+  0.00%, 13.33% { transform: translateY(-0.00em); }
+  16.67%, 30.00% { transform: translateY(-1.30em); }
+  33.33%, 46.67% { transform: translateY(-2.60em); }
+  50.00%, 63.33% { transform: translateY(-3.90em); }
+  66.67%, 80.00% { transform: translateY(-5.20em); }
+  83.33%, 96.67% { transform: translateY(-6.50em); }
+  100% { transform: translateY(-7.80em); }
 }
 
 /* Content slides in as it scrolls into view. Only in browsers that support

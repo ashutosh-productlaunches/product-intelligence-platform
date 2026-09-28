@@ -523,17 +523,17 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>{site.eyebrow}</p>
           <h1 className="mt-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.6rem]">{site.headline}</h1>
           <p className="mt-3 text-2xl leading-[1.3] font-semibold tracking-tight text-zinc-400 sm:text-3xl dark:text-zinc-500">
-            Understand every layer:{" "}
+            {site.tickerLead}{" "}
             <span className="ticker text-emerald-700 dark:text-emerald-400">
               <span aria-hidden className="ticker-track">
-                {[...site.layers, site.layers[0]].map((w, i) => (
+                {[...site.ticker, site.ticker[0]].map((w, i) => (
                   <span key={i} className="ticker-word">
                     {w}
                   </span>
                 ))}
               </span>
             </span>
-            <span className="sr-only">{site.layers.join(", ")}</span>
+            <span className="sr-only">{site.ticker.join(", ")}</span>
           </p>
           <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{site.promise}</p>
           <p className="mt-6 border-l-4 border-emerald-600 pl-4 text-lg font-semibold tracking-tight dark:border-emerald-400">

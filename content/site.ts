@@ -3,10 +3,19 @@
 
 export const site = {
   eyebrow: "For product managers who want to go beyond prompting",
-  headline: "Learn how AI applications are actually built.",
-  promise: "Build a real AI app from an empty folder. You get the code; every step explains what's happening underneath.",
-  // The rolling word under the headline, one layer at a time.
-  layers: ["LLM", "API", "server", "secret key", "structured output", "validation", "Git", "deployment"],
+  headline: "Understand how AI apps actually work, by building one.",
+  // The rolling line under the headline: questions PMs meet in real AI work, in plain words.
+  // Each one is answered in Journey 1 (steps 2, 7, 2, 1–2, 8, 8). Keep six: app/globals.css times the loop for six.
+  tickerLead: "You'll know",
+  ticker: [
+    "why it makes things up",
+    "why answers vary",
+    "what a bigger model buys",
+    "why it takes seconds",
+    "what to do when it fails",
+    "when to trust the output",
+  ],
+  promise: "Not to become an engineer. To make better AI product calls, and hold real conversations with your engineers.",
   philosophy: "AI can write the code. You should still understand it.",
 
   // Different tools for different goals. A comparison, not a criticism.
