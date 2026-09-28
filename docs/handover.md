@@ -23,10 +23,10 @@ It began as "Product Intelligence Agent", a ten-node research pipeline, abandone
 
 Next.js 16 (App Router), TypeScript, Tailwind 4, Zod 4, `@google/genai`, Vitest, Vercel. Gemini `gemini-3.6-flash` free tier (daily quota per Google project, resets midnight Pacific). No database; state in the URL.
 
-## Home page structure (as of 26 Sep night)
+## Home page structure (updated 28 Sep)
 
-- **Side rail** (`components/section-nav.tsx`): desktop table of contents fixed on the left — Overview, Your app, Journey (12 steps grouped by 5 stages, ✓ done, current highlighted), Live demo →, System map →. Phones: one bottom button "Step N of 12 · Contents". No top tab bar (he rejected two bars and a "Finish" tab).
-- **Overview**: eyebrow, headline "Learn how AI applications are actually built.", rolling word "Understand every layer: LLM / API / server / …" (CSS only), one-sentence promise, principle quote, comparison matrix (AI app builders vs this lab), 8 "What you'll actually understand" items. Copy in `content/site.ts`. Scroll-reveal animations via CSS `animation-timeline: view()` (Maven-inspired).
+- **Side rail** (`components/section-nav.tsx`): desktop table of contents fixed on the left — Overview, Your app, Journey (12 steps grouped by 5 stages, ✓ done, current highlighted), Live demo →, System map →, What you'll learn →. Phones: one bottom button "Step N of 12 · Contents". No top tab bar (he rejected two bars and a "Finish" tab).
+- **Overview**: eyebrow "For product managers who want to go beyond prompting", headline "Understand how AI apps actually work, by building one.", rolling line "You'll know why it makes things up / why answers vary / what a bigger model buys / why AI can be slow / what to do when it fails / why answers need checking" (CSS only, timed for six), promise "Not to become an engineer. To make better AI product calls, and hold real conversations with your engineers.", buttons **Start building ↓** (to `#build`) and quiet **See the finished app →** (demo), principle quote, comparison matrix, then "What you'll actually understand": 9 concepts in 3 groups (how it works / trustworthy / product call), a stack line, an honest "Not in Journey 1" line and a link to `/roadmap`. Copy in `content/site.ts`. Scroll-reveal animations via CSS `animation-timeline: view()` (Maven-inspired).
 - **Your app**: pick the pattern first, then "What you see / What's actually happening" picture below it; picking scrolls to `#underneath`.
 - **Journey player** (`components/journey-player.tsx`): one step on screen at a time, stepper with 12 segments by stage, Back/Next; the step in the address (`#step-6`, `#done`). Each step: architecture bar (this step filled, earlier built outlined; building counts from step 3) + one-line problem + tabs **Why · Do it · See it work · Break it (steps 5–10) · Understand · Quiz** (`components/panes.tsx`, experiments in `components/lab.tsx` + `content/experiments-01.ts`). Last step remembered in localStorage (`buildailab:step`) with a Welcome back banner. Finish is the last card with tabs: What you built · The anatomy · Reuse the pattern · Questions · What's next.
 - **Quiz**: 60 questions in `content/checks-01.ts` (5 per step, 3 answers, each with its own explanation; correct position balanced 20/20/20).
@@ -39,6 +39,7 @@ Next.js 16 (App Router), TypeScript, Tailwind 4, Zod 4, `@google/genai`, Vitest,
 - He wants the site short and visual, not text-heavy. Prefer interaction and pictures over paragraphs.
 - Design direction Transmutation for `/demo`; journey page light.
 - Never fake model output. No gamification.
+- **Positioning (agreed 28 Sep):** Journey 1 is AI engineering literacy with a PM lens, not AI product management. Keep "Understand how AI apps actually work, by building one"; don't rename to "AI PM" or "AI engineering for PMs" until Journeys 2–3 exist. Thesis: PMs don't need to become engineers, but buzzword fluency isn't enough; build a real AI app to understand what your team builds and make better product calls. AI PM is the destination, built up across journeys (each adds one capability plus the PM decisions it creates), not a separate final journey. The homepage promises only what Journey 1 teaches. Don't rewrite the hero before testers see it.
 
 ## How to work with him
 
@@ -78,6 +79,7 @@ An external "AI PM roadmap" was used as a coverage checklist, not as the lab's r
 
 ## Next
 
+- **Highest priority: decide the primary segment by testing.** Hypothesis: PMs on teams shipping AI features now (vs PMs preparing for AI roles). Success: 3 of 5 testers finish Journey 1 and, the next day without the site, draw the request path and explain one trade-off (model, cost or failure handling). Also ask which journey they'd want next.
 - First: run the steps 5–10 experiments once with a real key and fix any wording that doesn't match what actually happens. Then run 3–5 PMs through it one by one on a call, with him as the tutor; record errors, questions and completion time.
 - He may still want to do the learning review (Round 1 questions on stage 1 were sent, unanswered).
 - P1 ideas not built: "Should this use AI?" framework. Then Journey 2 step 1.3 (schemas, he writes).
