@@ -105,6 +105,10 @@ export default async function ArchitecturePage({ searchParams }: { searchParams:
         <a href="/demo" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Try the live demo
         </a>
+        {" · "}
+        <a href="/roadmap" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
+          What you&apos;ll learn
+        </a>
       </p>
     </main>
   );

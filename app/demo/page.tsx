@@ -111,6 +111,7 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
           <nav aria-label="Site" className={`${DISPLAY} ml-auto hidden gap-6 text-xs uppercase tracking-[0.22em] text-(--muted) lg:flex`}>
             <a href="/" className="transition-colors hover:text-(--text)">Journey</a>
             <a href="/architecture" className="transition-colors hover:text-(--text)">System map</a>
+            <a href="/roadmap" className="transition-colors hover:text-(--text)">What you&apos;ll learn</a>
           </nav>
           <div className="ml-auto flex flex-col items-end lg:ml-6">
             <a

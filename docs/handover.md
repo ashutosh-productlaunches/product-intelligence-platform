@@ -15,7 +15,7 @@ It began as "Product Intelligence Agent", a ten-node research pipeline, abandone
 | Local repo | `C:\Personal Projects\product-intelligence-platform` (Windows, PowerShell) |
 | GitHub | `github.com/ashutosh-productlaunches/product-intelligence-platform` (public) |
 | **Live site** | **`https://buildailab.vercel.app/`** (free Vercel name, added 26 Sep; checked publicly reachable). Also still works: `product-intelligence-platform-ashutosh.vercel.app`. `buildai.lab` is attached to the project but can never work: `.lab` isn't a real top-level domain. He wants no paid domain. |
-| Pages | `/` overview + journey · `/demo` live tool · `/architecture` system map |
+| Pages | `/` overview + journey · `/demo` live tool · `/architecture` system map · `/roadmap` what you'll learn |
 | Vercel | project `product-intelligence-platform` (id `prj_7UD6Yrtv91WyCw6JWjrdintYvrnc`, team `pro-launch`). Every push to `main` deploys to production. |
 | Rubric | `docs/ai-suitability-rubric.md` — source of truth for Journey 2 |
 
@@ -61,6 +61,14 @@ Strategy agreed: the 12 lessons aren't a moat; make the core loop a lab (predict
 - **Not verified**: experiments against a real Gemini key (cloud can't reach Google). He should run steps 5–10 experiments once himself; the exact wording of Google's invalid-key error and how often step 8's retry succeeds are unconfirmed.
 - Commit status: written to his laptop 26 Sep night. If `git status` shows them uncommitted, he runs `git add app components content lib docs`, `git commit -m "Lab: Break it experiments, step 5 first call, copy context for your AI, resume"`, `git push`.
 - He writes a test for `lib/tutor-context.ts` (`filesIn`, `helpPrompt`) — tests are his.
+
+## Roadmap (agreed 28 Sep)
+
+An external "AI PM roadmap" was used as a coverage checklist, not as the lab's roadmap. The lab extends one app, one capability per journey, and measuring quality comes before data or agents:
+
+1. Build your first AI app (built) · 2. When should the model not decide? (planned; the rubric) · 3. Is it good enough? (eval set, scoring script, cost per call) · 4. Give it your data (simple RAG) · 5. Let it act (one tool, a loop, human approval). Multi-agent systems only if learners ask.
+
+`/roadmap` shows this plus a topic checklist (Covered / Partly / Not yet) from `content/roadmap.ts`. Update statuses there when a journey ships. Build Journeys 3–5 only after testers finish Journey 1; ask each tester which they'd do next.
 
 ## Open items
 

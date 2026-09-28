@@ -465,6 +465,7 @@ const SECTIONS = [
 const PAGES = [
   { label: "Live demo", href: "/demo" },
   { label: "System map", href: "/architecture" },
+  { label: "What you'll learn", href: "/roadmap" },
 ];
 // Steps 1–2 only show the shape of an AI app; building starts at step 3.
 const FIRST_BUILD_STEP = 3;
