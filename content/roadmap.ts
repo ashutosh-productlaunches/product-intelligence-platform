@@ -29,6 +29,7 @@ export const topics: {
     status: "covered",
     now: [
       { text: "What an LLM and an API are", step: 2 },
+      { text: "Why answers can be fluent and false (hallucination)", step: 2 },
       { text: "Your first model call, with a key", step: 5 },
       { text: "Temperature and why answers vary", step: 7 },
     ],

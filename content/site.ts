@@ -26,17 +26,37 @@ export const site = {
   },
 
   // What the learner leaves with. The app is the vehicle; this is the value.
+  // Grouped by what a PM does with it. Each term is followed by what it means, not just its name.
+  // Claim only what Journey 1 teaches; anything else goes in `notYet` and on /roadmap.
   understand: [
-    "What an LLM does inside an application",
-    "How an app talks to a model through an API",
-    "Why keys and logic live on the server",
-    "What Node.js and Next.js actually do",
-    "How to get structured output, and why to validate it",
-    "What happens when the AI fails",
-    "How Git, GitHub and deployment fit together",
-    "How all the layers connect",
+    {
+      group: "How an AI app works",
+      items: [
+        { term: "The request path", meaning: "every hop from a user's input to the answer on screen" },
+        { term: "LLMs and prompts", meaning: "why models predict, vary, and can be confidently wrong" },
+        { term: "Structured output", meaning: "getting data your product can use, not just prose" },
+      ],
+    },
+    {
+      group: "How to make it trustworthy",
+      items: [
+        { term: "Validation and guardrails", meaning: "catch malformed answers before anyone sees them" },
+        { term: "Failure handling", meaning: "when to retry, fall back, or tell the user" },
+        { term: "Quality bars", meaning: "define \"good enough\" on real inputs, the first step to evals" },
+      ],
+    },
+    {
+      group: "How to make the product call",
+      items: [
+        { term: "Model, cost and latency", meaning: "what a bigger model buys, in money and waiting time" },
+        { term: "What runs where", meaning: "why keys and logic stay on the server" },
+        { term: "Human in the loop", meaning: "which outputs need a person before they save, send or charge" },
+      ],
+    },
   ],
-  outcomeLine: "You won't become a software engineer. You'll understand AI apps well enough to reason about them.",
+  outcomeLine: "You won't become an engineer. You'll follow what your AI engineers are talking about, and ask the questions that change the decision.",
+  stackLine: "Built with the real stack: Gemini, Node.js, Next.js, Git, GitHub, Vercel.",
+  notYet: "Not in Journey 1: context windows, RAG, embeddings, tool calling and agents.",
 
   // What's underneath every app in the journey. The "what you see" side comes from the app you pick.
   underneath: ["Browser", "Next.js page", "Server", "AI API", "LLM", "Structured output", "Validation", "Back to the browser"],

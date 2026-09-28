@@ -572,15 +572,37 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
 
         <div className="mt-10">
           <h2 className="text-xl font-bold tracking-tight">What you&apos;ll actually understand</h2>
-          <ul className="mt-4 grid gap-x-6 gap-y-2 sm:grid-cols-2">
-            {site.understand.map((u) => (
-              <li key={u} className="reveal flex gap-2.5 text-[15px] leading-snug">
-                <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
-                {u}
-              </li>
+          <div className="mt-4 grid gap-x-6 gap-y-5 md:grid-cols-3">
+            {site.understand.map((g) => (
+              <div key={g.group} className="reveal">
+                <p className="text-xs font-semibold tracking-wider text-emerald-700 uppercase dark:text-emerald-400">{g.group}</p>
+                <ul className="mt-2 grid gap-2.5">
+                  {g.items.map((it) => (
+                    <li key={it.term} className="flex gap-2.5 text-[15px] leading-snug">
+                      <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
+                      <span>
+                        <span className="font-semibold">{it.term}</span>
+                        <span className="text-zinc-600 dark:text-zinc-400">: {it.meaning}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
-          <p className="mt-5 font-medium">{site.outcomeLine}</p>
+          </div>
+          <p className="mt-6 font-medium">{site.outcomeLine}</p>
+          <p className="mt-3 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
+            {site.stackLine} {site.notYet}{" "}
+            <a href="/roadmap" className="font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+              See what&apos;s covered and what&apos;s next →
+            </a>
+          </p>
+          <a
+            href="#build"
+            className="mt-5 inline-block rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          >
+            Pick your app ↓
+          </a>
         </div>
       </section>
 

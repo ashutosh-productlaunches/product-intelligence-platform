@@ -165,7 +165,7 @@ export const journey01: Journey = {
       diagram: "your app  ──request──▶  Gemini API\n          ◀──response──",
       action: "Sign in at aistudio.google.com and run any prompt. Each Run sends an API request. By the end, your app will send it.",
       result: "Gemini answers your prompt.",
-      understand: "An LLM is a model trained on huge amounts of text to predict what comes next. It runs on the provider's servers. The API is the contract for reaching it: request in, response out.",
+      understand: "An LLM is a model trained on huge amounts of text to predict what comes next. It runs on the provider's servers. The API is the contract for reaching it: request in, response out. A prediction can be fluent and still false: that's called a hallucination. Step 8 checks an answer's shape; whether it's true needs a person or an eval.",
       pmLens: "Model choice trades quality against speed, cost and capabilities. The architecture is the same across providers, so the model call lives in one swappable file (step 7).",
       pmDetail: {
         boxes: [
@@ -406,7 +406,7 @@ export const journey01: Journey = {
       understand: "The route reads the text, sends it with your prompt and returns Gemini's JSON. responseMimeType asks for JSON, temperature 0 reduces randomness, and JSON.parse turns text into data.",
       inPractice: [
         { from: 2, q: "Which model, and which size?", here: "model: gemini-3.6-flash is the small, fast tier: enough for this task, and far cheaper per call than a large model." },
-        { from: 2, q: "What does \"good enough\" mean for this feature?", here: "Run it on three or four realistic inputs and note which answers you'd accept. That's your first quality bar." },
+        { from: 2, q: "What does \"good enough\" mean for this feature?", here: "Run it on three or four realistic inputs and note which answers you'd accept. That's your first quality bar, and the start of an eval set." },
         { from: 2, q: "Tied to one provider, or free to switch?", here: "The whole model call lives in lib/ask.ts. Switching provider means changing this one file." },
       ],
       pmLens: "If product logic depends on the answer, such as routing a ticket or saving a field, the shape must be predictable. Asking for structure is the cheapest guardrail.",
