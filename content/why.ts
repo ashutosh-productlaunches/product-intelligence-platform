@@ -3,24 +3,51 @@
 
 export const why = {
   title: "Why I built this",
-  intro: "Built by a product manager, for product managers.",
+  // His LinkedIn profile URL, e.g. "https://www.linkedin.com/in/your-name". The link stays hidden while empty.
+  linkedin: "https://www.linkedin.com/in/a123mishra/",
 
-  // In his words (2 Oct). Keep it true to what he said: learning AI to build, not just to interview;
-  // a basic app that matures each journey; hands-on technical training, not AI strategy.
-  story: [
-    "I wanted to learn AI properly. Not just enough to get through an AI interview, but enough to understand the tech, so I could build something myself without getting stuck the moment I hit something I didn't understand.",
-    "So I started with a very basic AI app: the one you build in Journey 1. Each journey takes the same app further, and the lab grows with it.",
-    "There's plenty out there on AI strategy, so this lab doesn't teach it. What PMs rarely get is hands-on, technical AI training. That's the gap it fills.",
-    "The goal: PMs who are AI fluent, who can get into AI product work and perform well once they're there.",
-  ],
+  // His words (2 Oct, second version). Keep them his: edit wording only with him.
+  story: {
+    opening: [
+      "I'm a product manager working on B2B SaaS and AI products. I built AI Tool Lab because I ran into a problem I couldn't solve by reading another AI strategy article.",
+      "I knew how to think about AI products. I could write PRDs, define use cases, work with engineers, and evaluate whether an AI feature made sense.",
+      "But I wanted to understand what was actually happening underneath.",
+    ],
+    questions: [
+      "What does an AI application really look like?",
+      "How does it call a model?",
+      "How do you give it your own data?",
+      "How do you measure whether it's actually working?",
+      "When should the model decide, and when absolutely shouldn't it?",
+    ],
+    middle: [
+      "So I started building.",
+      "The first thing I built was a very basic AI app: the same one you'll build in Journey 1. Then I kept taking that same app further.",
+      "That's what became AI Tool Lab.",
+      "There's plenty out there teaching PMs AI strategy, prompting and use cases. What I found much harder to find was hands-on technical training that helps a PM understand how AI products actually work.",
+      "That's the gap I'm trying to fill.",
+    ],
+    goal: {
+      lead: "The goal isn't to turn PMs into ML engineers. It's to make them technically fluent enough to:",
+      items: [
+        "understand what their engineers are building",
+        "make better AI product decisions",
+        "prototype ideas themselves",
+        "recognise what's technically difficult or easy",
+        "work confidently on AI products, rather than treating the technology as a black box",
+      ],
+    },
+  },
 
   future: {
-    lead: "Journey 1 is the basic app. Each journey matures it: next, when the model shouldn't decide; then measuring quality, using your own data, and letting AI act.",
-    ask: "What gets built depends on what PMs actually need. That's what the form below is for.",
+    lead: "Journey 1 starts with a basic AI application. Each journey takes that same application further:",
+    path: ["Build", "Add constraints", "Measure quality", "Use your own data", "Let AI take action"],
+    evolve: "The lab will evolve based on what PMs actually need.",
   },
 
   form: {
     title: "Tell me what you need",
+    invite: "If you're working on AI products, moving into AI product work, or simply curious about how AI applications really work, I'd love to know what you'd want to learn next.",
     privacy: "Goes to a private sheet only I read. Email is optional, and only used to reply to you.",
     roles: [
       { value: "shipping", label: "I'm a PM on a team shipping AI features" },
