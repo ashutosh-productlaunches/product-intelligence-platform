@@ -28,12 +28,17 @@ export function FeedbackForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...data, step: stepReached(), page: "/why" }),
+        signal: AbortSignal.timeout(25_000), // never sit on "Sending…" forever
       });
       const reply = await res.json().catch(() => null);
       if (reply?.ok) setState({ kind: "sent" });
       else setState({ kind: "error", message: reply?.error ?? "That didn't save. Please try again." });
-    } catch {
-      setState({ kind: "error", message: "No connection. Please try again." });
+    } catch (err) {
+      const slow = err instanceof DOMException && err.name === "TimeoutError";
+      setState({
+        kind: "error",
+        message: slow ? "This is taking too long. It may still have saved, so please wait a minute before sending again." : "No connection. Please try again.",
+      });
     }
   }
 
