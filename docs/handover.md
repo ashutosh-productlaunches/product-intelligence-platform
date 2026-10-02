@@ -73,7 +73,7 @@ An external "AI PM roadmap" was used as a coverage checklist, not as the lab's r
 
 ## Open items
 
-- **Feedback (`/why`), built 2 Oct, on the branch:** "Why I built this" page with story (DRAFT in `content/why.ts`, his words needed), where it's going, and a form (role, what to teach next, message, optional email; nothing pre-selected so the segment data stays clean). `app/api/feedback/route.ts` checks it with Zod (`lib/feedback.ts`) and posts one row to a Google Apps Script bound to the sheet "Build AI Lab – Feedback" in his Drive. Setup steps are at the top of `docs/feedback-apps-script.gs`; Vercel needs `FEEDBACK_URL` and `FEEDBACK_TOKEN`. Until then the form says "Feedback isn't connected yet."
+- **Feedback (`/why`), built 2 Oct, on the branch:** "Why I built this" page with story (his words, `content/why.ts`), where it's going, and a form (role, what to teach next, message, optional email; nothing pre-selected so the segment data stays clean). `app/api/feedback/route.ts` checks it with Zod (`lib/feedback.ts`) and posts one row to a Google Apps Script bound to the sheet "Build AI Lab – Feedback" in his Drive. Setup steps are at the top of `docs/feedback-apps-script.gs`; Vercel needs `FEEDBACK_URL` and `FEEDBACK_TOKEN`. Until then the form says "Feedback isn't connected yet."
 
 - Optional: remove `buildai.lab` in Vercel → Settings → Domains.
 - Validate first: real completion time (3 testers), whether testers use Copy context, which PM segment (interview prep vs team shipping AI).

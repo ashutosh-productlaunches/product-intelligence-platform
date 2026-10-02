@@ -1,21 +1,21 @@
 // The /why page: why the lab exists, where it's going, and what PMs want next.
 // Words only; the layout lives in app/why/page.tsx.
-//
-// DRAFT: `story` is a placeholder written by the assistant. Replace it with your
-// own words before this page goes live. It must be true and sound like you.
 
 export const why = {
   title: "Why I built this",
   intro: "Built by a product manager, for product managers.",
 
+  // In his words (2 Oct). Keep it true to what he said: learning AI to build, not just to interview;
+  // a basic app that matures each journey; hands-on technical training, not AI strategy.
   story: [
-    "AI features were landing on product roadmaps faster than most PMs could reason about them. I could use the words, but I couldn't always answer the questions that decide a launch: why the same input gives a different answer, what a bigger model actually buys, what should happen when the model is wrong.",
-    "Courses gave me vocabulary. Building gave me understanding. So I built an AI app myself, one layer at a time, and turned that path into this lab.",
-    "The goal isn't to turn PMs into engineers. It's to understand AI apps well enough to make better product calls, and to hold real conversations with the engineers who build them.",
+    "I wanted to learn AI properly. Not just enough to get through an AI interview, but enough to understand the tech, so I could build something myself without getting stuck the moment I hit something I didn't understand.",
+    "So I started with a very basic AI app: the one you build in Journey 1. Each journey takes the same app further, and the lab grows with it.",
+    "There's plenty out there on AI strategy, so this lab doesn't teach it. What PMs rarely get is hands-on, technical AI training. That's the gap it fills.",
+    "The goal: PMs who are AI fluent, who can get into AI product work and perform well once they're there.",
   ],
 
   future: {
-    lead: "Journey 1 is live. Next comes Journey 2: when the model shouldn't decide. After that, measuring quality, using your own data, and letting AI act, in that order.",
+    lead: "Journey 1 is the basic app. Each journey matures it: next, when the model shouldn't decide; then measuring quality, using your own data, and letting AI act.",
     ask: "What gets built depends on what PMs actually need. That's what the form below is for.",
   },
 
