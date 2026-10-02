@@ -466,6 +466,7 @@ const PAGES = [
   { label: "Live demo", href: "/demo" },
   { label: "System map", href: "/architecture" },
   { label: "What you'll learn", href: "/roadmap" },
+  { label: "Why I built this", href: "/why" },
 ];
 // Steps 1–2 only show the shape of an AI app; building starts at step 3.
 const FIRST_BUILD_STEP = 3;
@@ -836,6 +837,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                           <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Coming next</p>
                           <p className="mt-1 font-semibold">{j.next.title}</p>
                           <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{j.next.teaser}</p>
+                          <a href="/why#feedback" className="mt-2 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+                            Tell me what you&apos;d want next →
+                          </a>
                         </div>
                       </div>,
                     ]}
