@@ -3,6 +3,7 @@
 // A server component with no state. Words live in content/roadmap.ts.
 import type { Metadata } from "next";
 import { journeys, orderNote, topics, type Status } from "@/content/roadmap";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "What you'll learn · BuildAI Lab",
@@ -73,8 +74,8 @@ export default function RoadmapPage() {
                 </p>
                 <p className="mt-0.5 text-sm leading-snug text-zinc-600 dark:text-zinc-400">{j.adds}</p>
                 {j.status === "built" && (
-                  <a href="/#journey" className="mt-1 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
-                    Start or continue Journey 1 →
+                  <a href={`/journeys/${j.n}`} className="mt-1 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+                    Start or continue Journey {j.n} →
                   </a>
                 )}
               </div>
@@ -114,7 +115,7 @@ export default function RoadmapPage() {
                           {n.step && (
                             <>
                               {" "}
-                              <a href={`/#step-${n.step}`} className="whitespace-nowrap text-emerald-700 hover:underline dark:text-emerald-400">
+                              <a href={`/journeys/1/${n.step}`} className="whitespace-nowrap text-emerald-700 hover:underline dark:text-emerald-400">
                                 step {n.step}
                               </a>
                             </>
@@ -140,9 +141,9 @@ export default function RoadmapPage() {
       </section>
 
       <p className="mt-10 text-sm text-zinc-500">
-        <a href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <Link href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Back to Journey 1
-        </a>
+        </Link>
         {" · "}
         <a href="/demo" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Try the live demo

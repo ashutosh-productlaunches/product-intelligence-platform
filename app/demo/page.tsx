@@ -14,6 +14,7 @@ import { ResultPlaceholder, ResultView } from "@/components/app-preview";
 import { ToolIcon } from "@/components/tool-icons";
 import { TransmutationStage } from "@/components/transmutation-stage";
 import { getLook } from "@/content/looks";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Live demo · BuildAI Lab",
@@ -109,21 +110,21 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
             Live
           </span>
           <nav aria-label="Site" className={`${DISPLAY} ml-auto hidden gap-6 text-xs uppercase tracking-[0.22em] text-(--muted) lg:flex`}>
-            <a href="/" className="transition-colors hover:text-(--text)">Journey</a>
+            <Link href="/journeys/1" className="transition-colors hover:text-(--text)">Journey</Link>
             <a href="/architecture" className="transition-colors hover:text-(--text)">System map</a>
             <a href="/roadmap" className="transition-colors hover:text-(--text)">What you&apos;ll learn</a>
           </nav>
           <div className="ml-auto flex flex-col items-end lg:ml-6">
-            <a
-              href="/"
+            <Link
+              href="/journeys/1"
               className="rounded-full border border-(--border) px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:border-(--accent) hover:text-(--accent)"
             >
               <span className="sm:hidden">How it works →</span>
               <span className="hidden sm:inline">Learn how it&apos;s built →</span>
-            </a>
-            <a href="/#step-1" className="mt-0.5 hidden text-[11px] text-(--muted) hover:text-(--text) sm:block">
+            </Link>
+            <Link href="/journeys/1/1" className="mt-0.5 hidden text-[11px] text-(--muted) hover:text-(--text) sm:block">
               12 steps, one layer at a time
-            </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -325,19 +326,19 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
           Browser, Next.js, server, AI API, LLM, structured output, validation, deployment. The journey builds this app from an
           empty folder, one layer at a time, and explains each one.
         </p>
-        <a
-          href="/"
+        <Link
+          href="/journeys/1"
           className="mt-2 rounded-full bg-gradient-to-r from-(--accent) to-(--accent-2) px-6 py-3 text-sm font-semibold text-(--bg) transition-opacity hover:opacity-90"
         >
           Start the journey →
-        </a>
+        </Link>
       </section>
 
       <footer className="mx-auto max-w-7xl px-4 pb-10 text-[13px] text-(--muted) sm:px-6">
         Free tier · every run is a real model call · nothing you paste is stored ·{" "}
-        <a href="/" className="underline underline-offset-4 hover:text-(--text)">
+        <Link href="/journeys/1" className="underline underline-offset-4 hover:text-(--text)">
           see how it was built
-        </a>
+        </Link>
         {" · "}
         <a href="/architecture" className="underline underline-offset-4 hover:text-(--text)">
           how it works

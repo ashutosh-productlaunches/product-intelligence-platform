@@ -142,9 +142,33 @@ All wording in `content/`, the 5 parts and 12 steps, the pane order, Break it, t
 
 Each is its own commit, with desktop and phone screenshots before moving on.
 
+## Structure: journeys as pages, steps as scrolling pages (3 Oct, supersedes "tabs stay")
+
+Room for more journeys, and a layout that scales past six panes. Pattern taken from
+meet-polar-bear.com/skills (structure only, not its look): one long page, numbered sections
+whose number stays in the margin while you read, a side panel that stays on screen, and items
+as numbered rows with labelled pairs.
+
+- **Addresses:** `/` home (what the lab is, pick your app, every journey) · `/journeys/1`
+  overview (outcome, the route grouped by part, what's after) · `/journeys/1/6` one step ·
+  `/journeys/1/done` the finish. The learner's app travels in the query string on every link.
+  Old `/#step-6` links redirect.
+- **Adding a journey:** write its content like `content/journey-01.ts` (+ checks, experiments)
+  and add one entry to `content/journeys.ts`. Navigation, pages and saved progress read from it.
+  Unbuilt journeys come from `content/roadmap.ts`.
+- **Saved progress:** per journey (`buildailab:j1`); Journey 1 still reads the old key.
+- **Step page:** navy hero (breadcrumb, "Step 6 of 12 · concept", title, the problem), the
+  architecture bar, then numbered sections: Why · Do it · See it work · Break it · Understand ·
+  Check yourself. Install parts (3.1, 3.2 …) are stacked, not paged. Reveals stay only where the
+  reveal is the lesson: Break it (predict first), quiz answers, "Didn't work?", "In depth".
+- **Side panel:** step progress, "On this page" (highlights the section you're reading), and
+  the one way forward: Next. On phones it's hidden and the page ends with "Up next".
+- Tabs (`Panes`), the paged install parts (`Parts`), the single-page player and the left-rail
+  nav are removed.
+
 ## Decided 3 Oct
 
-- **Tabs stay.** Steps keep their panes (Why · Do it · …), restyled as `§6.1 Why`. Not one scrolling chapter.
+- ~~Tabs stay.~~ Replaced by scrolling step pages (see Structure, above).
 - **No dark mode in P0.**
 - **Real readouts on the live tool: yes.** Response time and token counts from `lib/run-demo.ts` may be passed to the page.
 

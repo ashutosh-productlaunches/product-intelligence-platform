@@ -3,6 +3,7 @@
 import type { Metadata } from "next";
 import { why } from "@/content/why";
 import { FeedbackForm } from "@/components/feedback-form";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Why I built this · BuildAI Lab",
@@ -95,9 +96,9 @@ export default function WhyPage() {
       </section>
 
       <p className="mt-12 text-sm text-zinc-500">
-        <a href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <Link href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Back to Journey 1
-        </a>
+        </Link>
         {" · "}
         <a href="/roadmap" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           What you&apos;ll learn

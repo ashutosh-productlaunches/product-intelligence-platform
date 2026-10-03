@@ -4,6 +4,7 @@
 import type { Metadata } from "next";
 import { flows, getFlow } from "@/content/architecture";
 import { SystemMap } from "@/components/system-map";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "System map · BuildAI Lab",
@@ -98,9 +99,9 @@ export default async function ArchitecturePage({ searchParams }: { searchParams:
       </section>
 
       <p className="mt-10 text-sm text-zinc-500">
-        <a href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <Link href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Back to Journey 1
-        </a>
+        </Link>
         {" · "}
         <a href="/demo" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Try the live demo

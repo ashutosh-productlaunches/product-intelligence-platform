@@ -1,18 +1,16 @@
 "use client";
 // The feedback form on /why. It posts to /api/feedback, which checks it and
 // writes one row to the sheet. It adds how far the visitor got in the journey
-// (saved in this browser by the journey player), so answers can be read in context.
+// (saved in this browser by the journey pages), so answers can be read in context.
 import { useState } from "react";
 import { why } from "@/content/why";
+import { savedStep } from "@/components/progress";
 
 type State = { kind: "idle" } | { kind: "sending" } | { kind: "sent" } | { kind: "error"; message: string };
 
 function stepReached(): string {
-  try {
-    return localStorage.getItem("buildailab:step") ?? "";
-  } catch {
-    return "";
-  }
+  const n = savedStep(1);
+  return n ? String(n) : "";
 }
 
 export function FeedbackForm() {

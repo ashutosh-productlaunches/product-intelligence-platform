@@ -94,9 +94,7 @@ body {
   .ticker-track { animation: none; }
 }
 
-/* ---- Journey player ---- */
-/* Steps and panes that aren't on screen. Shown again, stacked, when JavaScript is off (see app/page.tsx). */
-.jp-hide { display: none; }
+/* ---- Reveals ---- */
 @keyframes pane-in {
   from { opacity: 0; }
   to { opacity: 1; }
