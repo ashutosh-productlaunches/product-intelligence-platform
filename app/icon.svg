@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Build AI Lab: a sparkle (the common "AI" mark) in the site's emerald, on its near-black. -->
+  <rect width="32" height="32" rx="7" fill="#18181b"/>
+  <path d="M14 5c.9 6.2 3.3 8.6 9.5 9.5-6.2.9-8.6 3.3-9.5 9.5-.9-6.2-3.3-8.6-9.5-9.5C10.7 13.6 13.1 11.2 14 5z" fill="#34d399"/>
+  <path d="M24 19.5c.4 2.6 1.4 3.6 4 4-2.6.4-3.6 1.4-4 4-.4-2.6-1.4-3.6-4-4 2.6-.4 3.6-1.4 4-4z" fill="#34d399"/>
+</svg>
