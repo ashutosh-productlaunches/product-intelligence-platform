@@ -4,10 +4,11 @@
 import type { Metadata } from "next";
 import { flows, getFlow } from "@/content/architecture";
 import { SystemMap } from "@/components/system-map";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "System map · AI Tool Lab",
-  description: "Every part of the AI Tool Lab, what it does and why it exists.",
+  title: "System map · BuildAI Lab",
+  description: "Every part of BuildAI Lab, what it does and why it exists.",
 };
 
 type SearchParams = Record<string, string | string[] | undefined>;
@@ -36,7 +37,7 @@ export default async function ArchitecturePage({ searchParams }: { searchParams:
 
   return (
     <main className="mx-auto w-full max-w-[74rem] px-4 py-12 sm:px-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">AI Tool Lab for PMs · System map</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">BuildAI Lab · System map</p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">How every part fits together</h1>
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
         Hover over or tab to any box to see what it does and why it exists. Pick a flow to follow a request through the
@@ -98,9 +99,9 @@ export default async function ArchitecturePage({ searchParams }: { searchParams:
       </section>
 
       <p className="mt-10 text-sm text-zinc-500">
-        <a href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <Link href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Back to Journey 1
-        </a>
+        </Link>
         {" · "}
         <a href="/demo" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Try the live demo

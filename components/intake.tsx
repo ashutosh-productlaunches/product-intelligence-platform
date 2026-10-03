@@ -3,6 +3,7 @@
 // and the server renders the right state. That also makes every journey shareable.
 import { patterns, type Pattern } from "@/content/app-patterns";
 import { exampleHref, type Mvp } from "@/lib/build-mvp";
+import Link from "next/link";
 
 const box = "rounded-lg border-2 border-emerald-600/70 bg-white p-5 dark:bg-zinc-950";
 const label = "text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-400";
@@ -89,9 +90,9 @@ export function IntakeForm({
           <a href={exampleHref(pattern.id)} className="text-sm underline underline-offset-4">
             Use the example answers
           </a>
-          <a href="/#build" className="text-sm text-zinc-500 underline underline-offset-4">
+          <Link href="/#build" className="text-sm text-zinc-500 underline underline-offset-4">
             Choose a different app type
-          </a>
+          </Link>
         </div>
       </form>
     </section>
@@ -130,7 +131,7 @@ export function MvpCard({ mvp, changeHref }: { mvp: Mvp; changeHref: string }) {
       </p>
       <p className="mt-2 flex flex-wrap gap-4 text-sm">
         <a href={changeHref} className="underline underline-offset-4">Change answers</a>
-        <a href="/#build" className="text-zinc-500 underline underline-offset-4">Start over</a>
+        <Link href="/#build" className="text-zinc-500 underline underline-offset-4">Start over</Link>
       </p>
     </section>
   );

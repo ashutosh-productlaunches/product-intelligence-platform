@@ -9,121 +9,121 @@
 // in the journey and how to teach them (built by lib/tutor-context.ts).
 import { useState } from "react";
 import type { Experiment as ExperimentData } from "@/content/experiments-01";
+import { bench, benchLabel, button } from "@/components/style";
 
 function Code({ children }: { children: string }) {
   return (
-    <pre className="mt-3 overflow-x-auto rounded-lg bg-zinc-950 px-4 py-3 font-mono text-[13px] leading-relaxed text-zinc-100 ring-1 ring-zinc-800">
-      {children}
-    </pre>
+    <pre className="mt-3 overflow-x-auto rounded-[3px] bg-ink px-4 py-3 font-mono text-[13px] leading-relaxed text-paper">{children}</pre>
   );
 }
 
 const letters = ["A", "B", "C", "D"];
 
+// The bench: predict → break → observe, as one flat instrument panel (B).
 export function Experiment({ x, personalised }: { x: ExperimentData; personalised: boolean }) {
   const [guess, setGuess] = useState<number | null>(null);
   const [shown, setShown] = useState(false);
   const right = guess === x.predict.answer;
+  const row = "grid gap-3 border-t border-rule px-4 py-5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6 sm:px-6";
 
   return (
-    <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-5">
-      {/* 1 · Predict */}
-      <div className="rounded-lg border border-amber-500/50 bg-amber-50/60 p-4 dark:border-amber-400/30 dark:bg-amber-950/20">
-        <p className="text-xs font-semibold tracking-wider text-amber-800 uppercase dark:text-amber-300">
-          1 · Predict before you touch anything
-        </p>
-        <p className="mt-1.5 text-[15px] font-medium">{x.predict.q}</p>
-        <div className="mt-3 grid gap-1.5" role="radiogroup" aria-label="Your prediction">
-          {x.predict.options.map((o, i) => {
-            const picked = guess === i;
-            const reveal = shown && i === x.predict.answer;
-            return (
-              <button
-                key={o}
-                type="button"
-                role="radio"
-                aria-checked={picked}
-                disabled={guess !== null}
-                onClick={() => setGuess(i)}
-                className={`flex gap-2.5 rounded-md border px-3 py-2 text-left text-sm transition-colors ${
-                  reveal
-                    ? "border-emerald-600 bg-emerald-50 text-emerald-950 dark:border-emerald-500 dark:bg-emerald-950/50 dark:text-emerald-100"
-                    : picked
-                      ? "border-zinc-900 bg-white font-medium dark:border-zinc-100 dark:bg-zinc-900"
-                      : guess === null
-                        ? "border-zinc-200 bg-white hover:border-zinc-400 dark:border-zinc-800 dark:bg-zinc-950"
-                        : "border-zinc-200 bg-white opacity-60 dark:border-zinc-800 dark:bg-zinc-950"
-                }`}
-              >
-                <span className="font-mono text-xs leading-5 text-zinc-400">{letters[i]}</span>
-                <span>{o}</span>
-              </button>
-            );
-          })}
-        </div>
-        <p className="mt-2 text-xs text-zinc-500">
-          {guess === null ? "Pick one. You can't change it, so commit." : `Locked in: ${letters[guess]}. Now run the experiment.`}
-        </p>
+    <div className={`${bench} min-w-0`}>
+      <div className="flex flex-wrap items-baseline justify-between gap-2 px-4 py-3 sm:px-6">
+        <p className={benchLabel}>Bench · Break it</p>
+        <p className="font-label text-[13px]">{x.title}</p>
       </div>
 
-      {/* 2 · Break it */}
-      <div className={guess === null ? "opacity-50" : ""}>
-        <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">2 · Break it: {x.title.toLowerCase()}</p>
-        <p className="mt-1.5 text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200">{x.change}</p>
-        {x.code && <Code>{x.code}</Code>}
-        {personalised && x.ifYourApp && (
-          <p className="mt-2 rounded-md bg-zinc-100 px-3 py-2 text-sm text-zinc-700 dark:bg-zinc-900 dark:text-zinc-300">
-            <span className="font-semibold">Your app: </span>
-            {x.ifYourApp}
+      {/* 01 · Predict */}
+      <div className={row}>
+        <p className={benchLabel}>01 Predict</p>
+        <div className="min-w-0">
+          <p className="text-[18px] leading-snug font-medium">{x.predict.q}</p>
+          <div className="mt-3 grid gap-1.5" role="radiogroup" aria-label="Your prediction">
+            {x.predict.options.map((o, i) => {
+              const picked = guess === i;
+              const reveal = shown && i === x.predict.answer;
+              return (
+                <button
+                  key={o}
+                  type="button"
+                  role="radio"
+                  aria-checked={picked}
+                  disabled={guess !== null}
+                  onClick={() => setGuess(i)}
+                  className={`flex gap-3 rounded-[3px] border px-3 py-2 text-left text-[16px] leading-snug ${
+                    reveal
+                      ? "border-pass bg-paper ring-1 ring-pass"
+                      : picked
+                        ? "border-signal bg-paper ring-1 ring-signal"
+                        : guess === null
+                          ? "border-rule bg-paper hover:border-signal"
+                          : "border-rule bg-paper text-graphite"
+                  }`}
+                >
+                  <span className="font-label text-[13px] leading-6 text-graphite">{letters[i]}</span>
+                  <span className="flex-1">{o}</span>
+                  {reveal && <span className="font-label text-[11px] leading-6 text-pass">expected</span>}
+                </button>
+              );
+            })}
+          </div>
+          <p className="mt-2 font-label text-[13px] text-graphite">
+            {guess === null ? "Pick one. You can't change it, so commit." : `Locked in: ${letters[guess]}. Now run the experiment.`}
           </p>
-        )}
+        </div>
       </div>
 
-      {/* 3 · Compare */}
-      <div>
-        <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">3 · Compare</p>
-        {!shown ? (
-          <button
-            type="button"
-            disabled={guess === null}
-            onClick={() => setShown(true)}
-            className="mt-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-40 dark:bg-zinc-100 dark:text-zinc-900"
-          >
-            {guess === null ? "Predict first" : "I ran it: what should I see?"}
-          </button>
-        ) : (
-          <div className="pane-in mt-2 grid gap-3">
-            <p
-              className={`rounded-md px-3 py-2 text-sm font-semibold ${
-                right
-                  ? "bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
-                  : "bg-rose-50 text-rose-900 dark:bg-rose-950/50 dark:text-rose-200"
-              }`}
-            >
-              {right ? "Your prediction was right." : `You predicted ${letters[guess!]}; the answer is ${letters[x.predict.answer]}. That gap is the lesson.`}
+      {/* 02 · Break it */}
+      <div className={`${row} ${guess === null ? "opacity-50" : ""}`}>
+        <p className={benchLabel}>02 Break</p>
+        <div className="min-w-0">
+          <p className="text-[17px] leading-relaxed">{x.change}</p>
+          {x.code && <Code>{x.code}</Code>}
+          {personalised && x.ifYourApp && (
+            <p className="mt-3 rounded-[3px] bg-signal-soft px-3 py-2 text-[16px]">
+              <span className="font-label text-[13px] font-bold">Your app </span>
+              {x.ifYourApp}
             </p>
-            <p className="text-[15px] leading-relaxed">
-              <span className="font-semibold">What you should see: </span>
-              {x.observe}
-            </p>
-            <div className="grid gap-px overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200 sm:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-800">
-              <div className="bg-zinc-50 px-4 py-3 dark:bg-zinc-900">
-                <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">Why</p>
-                <p className="mt-1 text-sm leading-relaxed text-zinc-700 dark:text-zinc-300">{x.why}</p>
-              </div>
-              <div className="bg-zinc-900 px-4 py-3 dark:bg-zinc-950">
-                <p className="text-xs font-semibold tracking-wider text-sky-300 uppercase">PM lens</p>
-                <p className="mt-1 text-sm leading-relaxed text-zinc-100">{x.pmLens}</p>
+          )}
+        </div>
+      </div>
+
+      {/* 03 · Observe */}
+      <div className={row}>
+        <p className={benchLabel}>03 Observe</p>
+        <div className="min-w-0">
+          {!shown ? (
+            <button type="button" disabled={guess === null} onClick={() => setShown(true)} className={button}>
+              {guess === null ? "Predict first" : "I ran it: what should I see?"}
+            </button>
+          ) : (
+            <div className="pane-in grid gap-4">
+              <p className={`font-label text-[13px] font-medium ${right ? "text-pass" : "text-fail"}`}>
+                {right
+                  ? "Prediction matched."
+                  : `Predicted ${letters[guess!]}, observed ${letters[x.predict.answer]}. That gap is the lesson.`}
+              </p>
+              <p className="text-[17px] leading-relaxed">
+                <span className="font-medium">What you should see: </span>
+                {x.observe}
+              </p>
+              <p className="text-[17px] leading-relaxed text-graphite">
+                <span className="font-medium text-ink">Why: </span>
+                {x.why}
+              </p>
+              <div className="border-l-4 border-signal pl-4">
+                <p className="font-label text-[13px] font-bold text-signal">PM lens</p>
+                <p className="mt-1 text-[18px] leading-snug font-medium">{x.pmLens}</p>
               </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      <p className="border-t border-zinc-100 pt-3 text-sm text-zinc-600 dark:border-zinc-900 dark:text-zinc-400">
-        <span className="font-semibold text-zinc-900 dark:text-zinc-100">Put it back: </span>
-        {x.undo}
-      </p>
+      <div className={row}>
+        <p className={benchLabel}>Reset</p>
+        <p className="text-[16px] leading-relaxed text-graphite">{x.undo}</p>
+      </div>
     </div>
   );
 }
@@ -141,28 +141,28 @@ export function CopyHelp({ prompt }: { prompt: string }) {
   }
 
   return (
-    <div className="mt-4 rounded-md border border-zinc-200 bg-zinc-50 px-3 py-3 dark:border-zinc-800 dark:bg-zinc-900">
-      <p className="font-semibold text-zinc-900 dark:text-zinc-100">Still stuck? Ask your AI, with context.</p>
-      <p className="mt-1 text-xs leading-relaxed text-zinc-500">
+    <div className="mt-5 border-t border-rule pt-4">
+      <p className="font-medium">Still stuck? Ask your AI, with context.</p>
+      <p className="mt-1 text-[15px] leading-relaxed text-graphite">
         Copies a prompt that tells ChatGPT, Claude or Gemini which step you&apos;re on, what you&apos;ve built, what should have
         happened and how to teach you. Paste it, then add your error or a screenshot.
       </p>
-      <div className="mt-2.5 flex flex-wrap items-center gap-3">
+      <div className="mt-3 flex flex-wrap items-center gap-4">
         <button
           type="button"
           onClick={copy}
-          className="rounded-md bg-zinc-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900"
+          className="rounded-full border border-rule bg-paper px-4 py-1.5 text-[14px] font-semibold hover:bg-paper-2"
         >
-          {state === "copied" ? "Copied ✓" : "Copy context for your AI"}
+          {state === "copied" ? "Copied" : "Copy context for your AI"}
         </button>
-        {state === "failed" && <span className="text-xs text-rose-700 dark:text-rose-400">Couldn&apos;t copy. Select the text below instead.</span>}
+        {state === "failed" && <span className="font-label text-[13px] text-fail">Couldn&apos;t copy. Select the text below instead.</span>}
+        <details className="basis-full" open={state === "failed"}>
+          <summary className="cursor-pointer font-label text-[13px] text-graphite hover:text-ink">See what gets copied</summary>
+          <pre className="mt-2 max-h-64 overflow-auto rounded-[3px] border border-rule bg-paper-2 px-3 py-2 font-mono text-[12px] leading-relaxed whitespace-pre-wrap">
+            {prompt}
+          </pre>
+        </details>
       </div>
-      <details className="mt-2" open={state === "failed"}>
-        <summary className="cursor-pointer text-xs text-zinc-500 hover:text-zinc-800 dark:hover:text-zinc-200">See what gets copied</summary>
-        <pre className="mt-2 max-h-64 overflow-auto rounded-md border border-zinc-200 bg-white px-3 py-2 font-mono text-[12px] leading-relaxed whitespace-pre-wrap text-zinc-700 dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-300">
-          {prompt}
-        </pre>
-      </details>
     </div>
   );
 }

@@ -14,9 +14,10 @@ import { ResultPlaceholder, ResultView } from "@/components/app-preview";
 import { ToolIcon } from "@/components/tool-icons";
 import { TransmutationStage } from "@/components/transmutation-stage";
 import { getLook } from "@/content/looks";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Live demo · AI Tool Lab",
+  title: "Live demo · BuildAI Lab",
   description: "Five small AI tools you can use right now. Paste text, press Run.",
 };
 
@@ -95,13 +96,13 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
     <div className="flex-1 bg-(--bg) font-[family-name:var(--font-tm-body)] text-(--text) antialiased" style={TOKENS}>
       <header className="sticky top-0 z-30 border-b border-(--border) bg-(--bg)/75 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
-          <a href="/demo" className="flex items-center gap-3" aria-label="Tool Lab demo">
+          <a href="/demo" className="flex items-center gap-3" aria-label="BuildAI Lab demo">
             <svg viewBox="0 0 26 26" width="26" height="26" fill="none" stroke="var(--accent-2)" strokeWidth="1.2" aria-hidden>
               <path d="M2 13h6.5" />
               <circle cx="13" cy="13" r="4.5" />
               <path d="M17.5 9.5h6.5M17.5 13h6.5M17.5 16.5h6.5" />
             </svg>
-            <span className={`${DISPLAY} text-[15px] font-light whitespace-nowrap uppercase tracking-[0.32em]`}>Tool Lab</span>
+            <span className={`${DISPLAY} text-[15px] font-light whitespace-nowrap uppercase tracking-[0.32em]`}>BuildAI Lab</span>
           </a>
           <span className="hidden h-4 w-px bg-(--border) md:block" />
           <span className="hidden truncate text-sm text-(--muted) md:block">{mvp.name}</span>
@@ -109,21 +110,21 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
             Live
           </span>
           <nav aria-label="Site" className={`${DISPLAY} ml-auto hidden gap-6 text-xs uppercase tracking-[0.22em] text-(--muted) lg:flex`}>
-            <a href="/" className="transition-colors hover:text-(--text)">Journey</a>
+            <Link href="/journeys/1" className="transition-colors hover:text-(--text)">Journey</Link>
             <a href="/architecture" className="transition-colors hover:text-(--text)">System map</a>
             <a href="/roadmap" className="transition-colors hover:text-(--text)">What you&apos;ll learn</a>
           </nav>
           <div className="ml-auto flex flex-col items-end lg:ml-6">
-            <a
-              href="/"
+            <Link
+              href="/journeys/1"
               className="rounded-full border border-(--border) px-4 py-1.5 text-sm font-medium whitespace-nowrap transition-colors hover:border-(--accent) hover:text-(--accent)"
             >
               <span className="sm:hidden">How it works →</span>
               <span className="hidden sm:inline">Learn how it&apos;s built →</span>
-            </a>
-            <a href="/#step-1" className="mt-0.5 hidden text-[11px] text-(--muted) hover:text-(--text) sm:block">
+            </Link>
+            <Link href="/journeys/1/1" className="mt-0.5 hidden text-[11px] text-(--muted) hover:text-(--text) sm:block">
               12 steps, one layer at a time
-            </a>
+            </Link>
           </div>
         </div>
       </header>
@@ -325,19 +326,19 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
           Browser, Next.js, server, AI API, LLM, structured output, validation, deployment. The journey builds this app from an
           empty folder, one layer at a time, and explains each one.
         </p>
-        <a
-          href="/"
+        <Link
+          href="/journeys/1"
           className="mt-2 rounded-full bg-gradient-to-r from-(--accent) to-(--accent-2) px-6 py-3 text-sm font-semibold text-(--bg) transition-opacity hover:opacity-90"
         >
           Start the journey →
-        </a>
+        </Link>
       </section>
 
       <footer className="mx-auto max-w-7xl px-4 pb-10 text-[13px] text-(--muted) sm:px-6">
         Free tier · every run is a real model call · nothing you paste is stored ·{" "}
-        <a href="/" className="underline underline-offset-4 hover:text-(--text)">
+        <Link href="/journeys/1" className="underline underline-offset-4 hover:text-(--text)">
           see how it was built
-        </a>
+        </Link>
         {" · "}
         <a href="/architecture" className="underline underline-offset-4 hover:text-(--text)">
           how it works

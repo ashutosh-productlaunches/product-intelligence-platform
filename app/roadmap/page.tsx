@@ -3,9 +3,10 @@
 // A server component with no state. Words live in content/roadmap.ts.
 import type { Metadata } from "next";
 import { journeys, orderNote, topics, type Status } from "@/content/roadmap";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "What you'll learn · AI Tool Lab",
+  title: "What you'll learn · BuildAI Lab",
   description: "What the lab teaches today, what it covers partly, and what comes next.",
 };
 
@@ -38,7 +39,7 @@ export default function RoadmapPage() {
 
   return (
     <main className="mx-auto w-full max-w-[60rem] px-4 py-12 sm:px-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">AI Tool Lab for PMs · What you&apos;ll learn</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">BuildAI Lab · What you&apos;ll learn</p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">What the lab teaches, and what it doesn&apos;t yet</h1>
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
         One app, built further in each journey. Here&apos;s what&apos;s included today and what&apos;s coming, so you know what you&apos;ll
@@ -73,8 +74,8 @@ export default function RoadmapPage() {
                 </p>
                 <p className="mt-0.5 text-sm leading-snug text-zinc-600 dark:text-zinc-400">{j.adds}</p>
                 {j.status === "built" && (
-                  <a href="/#journey" className="mt-1 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
-                    Start or continue Journey 1 →
+                  <a href={`/journeys/${j.n}`} className="mt-1 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
+                    Start or continue Journey {j.n} →
                   </a>
                 )}
               </div>
@@ -114,7 +115,7 @@ export default function RoadmapPage() {
                           {n.step && (
                             <>
                               {" "}
-                              <a href={`/#step-${n.step}`} className="whitespace-nowrap text-emerald-700 hover:underline dark:text-emerald-400">
+                              <a href={`/journeys/1/${n.step}`} className="whitespace-nowrap text-emerald-700 hover:underline dark:text-emerald-400">
                                 step {n.step}
                               </a>
                             </>
@@ -140,9 +141,9 @@ export default function RoadmapPage() {
       </section>
 
       <p className="mt-10 text-sm text-zinc-500">
-        <a href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <Link href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Back to Journey 1
-        </a>
+        </Link>
         {" · "}
         <a href="/demo" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Try the live demo

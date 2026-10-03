@@ -3,10 +3,11 @@
 import type { Metadata } from "next";
 import { why } from "@/content/why";
 import { FeedbackForm } from "@/components/feedback-form";
+import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Why I built this · AI Tool Lab",
-  description: "Why AI Tool Lab exists, where it's going, and how to tell me what you want next.",
+  title: "Why I built this · BuildAI Lab",
+  description: "Why BuildAI Lab exists, where it's going, and how to tell me what you want next.",
 };
 
 export default function WhyPage() {
@@ -15,7 +16,7 @@ export default function WhyPage() {
 
   return (
     <main className="mx-auto w-full max-w-[42rem] px-4 py-12 sm:px-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">AI Tool Lab for PMs · {why.title}</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">BuildAI Lab · {why.title}</p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">{why.title}</h1>
       {why.linkedin && (
         <a
@@ -95,9 +96,9 @@ export default function WhyPage() {
       </section>
 
       <p className="mt-12 text-sm text-zinc-500">
-        <a href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
+        <Link href="/" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           Back to Journey 1
-        </a>
+        </Link>
         {" · "}
         <a href="/roadmap" className="underline underline-offset-4 hover:text-zinc-800 dark:hover:text-zinc-200">
           What you&apos;ll learn

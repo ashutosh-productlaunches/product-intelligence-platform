@@ -94,7 +94,7 @@ export function SystemMap({ flow }: { flow?: Flow }) {
           viewBox={`0 0 ${CANVAS.width} ${CANVAS.height}`}
           className="absolute inset-0"
           role="img"
-          aria-label="System map of the AI Tool Lab: browser pages, the Next.js app on Vercel, Gemini, and the build, test and ship loop."
+          aria-label="System map of BuildAI Lab: browser pages, the Next.js app on Vercel, Gemini, and the build, test and ship loop."
         >
           <defs>
             <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
