@@ -74,7 +74,7 @@ export function Experiment({ x, personalised }: { x: ExperimentData; personalise
       </div>
 
       {/* 02 · Break it */}
-      <div className={`${row} ${guess === null ? "opacity-50" : ""}`}>
+      <div className={row}>
         <p className={benchLabel}>02 Break</p>
         <div className="min-w-0">
           <p className="text-[17px] leading-relaxed">{x.change}</p>

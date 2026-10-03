@@ -29,6 +29,11 @@
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
+/* In-page links (the side panel, "see step 7") glide instead of jumping. Not for people who ask for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
 body {
   background: var(--color-paper);
   color: var(--color-ink);

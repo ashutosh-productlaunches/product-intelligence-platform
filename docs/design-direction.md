@@ -159,8 +159,9 @@ as numbered rows with labelled pairs.
 - **Saved progress:** per journey (`buildailab:j1`); Journey 1 still reads the old key.
 - **Step page:** navy hero (breadcrumb, "Step 6 of 12 · concept", title, the problem), the
   architecture bar, then numbered sections: Why · Do it · See it work · Break it · Understand ·
-  Check yourself. Install parts (3.1, 3.2 …) are stacked, not paged. Reveals stay only where the
-  reveal is the lesson: Break it (predict first), quiz answers, "Didn't work?", "In depth".
+  Check yourself. Install parts (3.1, 3.2 …) are stacked, not paged. Nothing is collapsed
+  except where hiding is the lesson: Break it's answer (until you predict) and quiz explanations
+  (until you pick). "Didn't work?", "In depth" and the look options are always open.
 - **Side panel:** step progress, "On this page" (highlights the section you're reading), and
   the one way forward: Next. On phones it's hidden and the page ends with "Up next".
 - Tabs (`Panes`), the paged install parts (`Parts`), the single-page player and the left-rail
