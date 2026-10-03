@@ -16,7 +16,7 @@ import { TransmutationStage } from "@/components/transmutation-stage";
 import { getLook } from "@/content/looks";
 
 export const metadata: Metadata = {
-  title: "Live demo · AI Tool Lab",
+  title: "Live demo · BuildAI Lab",
   description: "Five small AI tools you can use right now. Paste text, press Run.",
 };
 
@@ -95,13 +95,13 @@ export default async function DemoPage({ searchParams }: { searchParams: Promise
     <div className="flex-1 bg-(--bg) font-[family-name:var(--font-tm-body)] text-(--text) antialiased" style={TOKENS}>
       <header className="sticky top-0 z-30 border-b border-(--border) bg-(--bg)/75 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4 sm:px-6">
-          <a href="/demo" className="flex items-center gap-3" aria-label="Tool Lab demo">
+          <a href="/demo" className="flex items-center gap-3" aria-label="BuildAI Lab demo">
             <svg viewBox="0 0 26 26" width="26" height="26" fill="none" stroke="var(--accent-2)" strokeWidth="1.2" aria-hidden>
               <path d="M2 13h6.5" />
               <circle cx="13" cy="13" r="4.5" />
               <path d="M17.5 9.5h6.5M17.5 13h6.5M17.5 16.5h6.5" />
             </svg>
-            <span className={`${DISPLAY} text-[15px] font-light whitespace-nowrap uppercase tracking-[0.32em]`}>Tool Lab</span>
+            <span className={`${DISPLAY} text-[15px] font-light whitespace-nowrap uppercase tracking-[0.32em]`}>BuildAI Lab</span>
           </a>
           <span className="hidden h-4 w-px bg-(--border) md:block" />
           <span className="hidden truncate text-sm text-(--muted) md:block">{mvp.name}</span>

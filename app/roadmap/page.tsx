@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import { journeys, orderNote, topics, type Status } from "@/content/roadmap";
 
 export const metadata: Metadata = {
-  title: "What you'll learn · AI Tool Lab",
+  title: "What you'll learn · BuildAI Lab",
   description: "What the lab teaches today, what it covers partly, and what comes next.",
 };
 
@@ -38,7 +38,7 @@ export default function RoadmapPage() {
 
   return (
     <main className="mx-auto w-full max-w-[60rem] px-4 py-12 sm:px-6">
-      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">AI Tool Lab for PMs · What you&apos;ll learn</p>
+      <p className="text-xs font-semibold uppercase tracking-widest text-zinc-500">BuildAI Lab · What you&apos;ll learn</p>
       <h1 className="mt-3 text-3xl font-bold tracking-tight text-balance sm:text-4xl">What the lab teaches, and what it doesn&apos;t yet</h1>
       <p className="mt-4 max-w-2xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
         One app, built further in each journey. Here&apos;s what&apos;s included today and what&apos;s coming, so you know what you&apos;ll

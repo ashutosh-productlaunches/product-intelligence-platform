@@ -1,6 +1,6 @@
 # BuildAI Lab — design direction
 
-Status: agreed direction, P0 spec. No UI code written against it yet.
+Status: agreed direction, P0 spec. Build steps 1–2 done (foundation; journey step and navigation).
 Chosen 3 Oct 2026: **A "The Annotated Manual" + B "The Bench" are P0. C "Descent" comes later.**
 
 ## The one rule
@@ -31,14 +31,14 @@ They share one paper, one ink, one accent and one grid, so the site reads as one
 | `ink` | `#1B1A17` | text, lines |
 | `graphite` | `#5E5A52` | secondary text, margin notes |
 | `rule` | `#CFC9BC` | hairlines |
-| `signal` | `#C8431E` | **one meaning: "look here / this is live / this step"**. Annotations (A) and signal (B). |
+| `signal` | `#B33C17` | **one meaning: "look here / this is live / this step"**. Annotations (A) and signal (B). |
 | `pass` | `#2F6F4A` | only a check that passed |
 | `fail` | `#A3271D` | only a check that failed |
 
 - Retire emerald, sky, amber, rose and zinc as semantic colours.
 - Corners: 0. (2px max on form inputs.) No shadows. No gradients. No backdrop blur.
-- Contrast is to be checked against WCAG AA when tokens land; the values above are a starting point, not verified.
-- Dark mode: open question (see below).
+- Contrast checked for small text (WCAG AA): ink 15.3:1, graphite 6.0:1, signal 5.2:1, pass 5.3:1, fail 6.4:1 on paper; all ≥ 4.6:1 on paper-2. The first signal value (`#C8431E`) failed at 4.3:1 and was darkened. `rule` is for lines only.
+- **Light only for P0.** Dark mode is P1. Existing `dark:` classes are inert until then (`@custom-variant dark` in `app/globals.css`).
 
 ## Type
 
@@ -127,6 +127,12 @@ All wording in `content/`, the 5 parts and 12 steps, the pane order, Break it, t
 5. /roadmap, /why.
 
 Each is its own commit, with desktop and phone screenshots before moving on.
+
+## Decided 3 Oct
+
+- **Tabs stay.** Steps keep their panes (Why · Do it · …), restyled as `§6.1 Why`. Not one scrolling chapter.
+- **No dark mode in P0.**
+- **Real readouts on the live tool: yes.** Response time and token counts from `lib/run-demo.ts` may be passed to the page.
 
 ## Reopens earlier decisions
 
