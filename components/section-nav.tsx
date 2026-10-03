@@ -2,6 +2,7 @@
 // The home page's one navigation: the whole route, always visible.
 //   Desktop: a table of contents fixed in a left rail. Sections, then every
 //            journey step grouped by stage: ✓ done, highlighted = on screen in the player.
+//            Each stage folds open and shut; the stage you're in opens by itself.
 //   Phone:   a "Step 6 of 12 · Contents" button at the bottom that opens the same list.
 //
 // Every entry is a plain link. Step links change the address (#step-6), and the
@@ -74,6 +75,14 @@ function Contents({
   step: number;
   onPick?: () => void;
 }) {
+  // Which stages are open. A stage you haven't touched is open only while it holds
+  // the current step, so moving into a new stage opens it. Clicking a header
+  // opens or closes that stage, and that choice sticks.
+  const current = stages.findIndex((st) => st.steps.some((s) => s.n === step));
+  const [toggled, setToggled] = useState<Record<number, boolean>>({});
+  const isOpen = (i: number) => toggled[i] ?? i === current;
+  const toggle = (i: number) => setToggled((t) => ({ ...t, [i]: !(t[i] ?? i === current) }));
+
   const item = (on: boolean) =>
     `block rounded-md px-2 py-1 text-sm transition-colors ${
       on
@@ -104,11 +113,42 @@ function Contents({
         >
           Journey · {stages.reduce((a, s) => a + s.steps.length, 0)} steps
         </a>
-        <ol className="mt-2 grid gap-3">
-          {stages.map((st) => (
+        <ol className="mt-2 grid gap-1">
+          {stages.map((st, i) => {
+            const open = isOpen(i);
+            const first = st.steps[0].n;
+            const last = st.steps[st.steps.length - 1].n;
+            const done = st.steps.filter((s) => s.n < step).length;
+            const here = st.steps.some((s) => s.n === step);
+            return (
             <li key={st.title}>
-              <p className="px-2 text-[11px] text-zinc-400">{st.title}</p>
-              <ol className="mt-0.5 grid">
+              <button
+                type="button"
+                onClick={() => toggle(i)}
+                aria-expanded={open}
+                className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900 ${
+                  here ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-600 dark:text-zinc-400"
+                }`}
+              >
+                <span aria-hidden className={`text-zinc-400 transition-transform ${open ? "rotate-90" : ""}`}>›</span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[13px] font-semibold leading-snug">
+                    {i + 1} · {st.title}
+                  </span>
+                  <span className="block text-[11px] text-zinc-500">
+                    {first === last ? `Step ${first}` : `Steps ${first}–${last}`}
+                  </span>
+                </span>
+                <span
+                  className={`shrink-0 font-mono text-[11px] ${
+                    done === st.steps.length ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-400"
+                  }`}
+                >
+                  {done === st.steps.length ? "✓" : `${done}/${st.steps.length}`}
+                </span>
+              </button>
+              {open && (
+              <ol className="mt-0.5 mb-1 ml-3 grid border-l border-zinc-200 pl-1 dark:border-zinc-800">
                 {st.steps.map((s) => {
                   const done = s.n < step;
                   const now = s.n === step;
@@ -140,8 +180,10 @@ function Contents({
                   );
                 })}
               </ol>
+              )}
             </li>
-          ))}
+            );
+          })}
         </ol>
       </div>
 
@@ -177,10 +219,10 @@ export function SectionNav({
   return (
     <>
       {/* Desktop: the rail */}
-      <aside className="hidden lg:block">
+      <aside className="hidden border-r border-zinc-200 bg-zinc-50 lg:block dark:border-zinc-800 dark:bg-zinc-900/40">
         <nav
           aria-label="Contents"
-          className="sticky top-0 max-h-screen overflow-y-auto py-8 pr-2 [scrollbar-width:thin]"
+          className="sticky top-0 max-h-screen overflow-y-auto px-4 py-8 [scrollbar-width:thin]"
         >
           <a href="#overview" className="block px-2 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
             {brand}

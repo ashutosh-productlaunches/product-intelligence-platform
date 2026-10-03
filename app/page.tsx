@@ -506,10 +506,10 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   const c = j.closing;
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 sm:px-6 lg:grid lg:grid-cols-[15rem_minmax(0,48rem)] lg:justify-center lg:gap-12">
+    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-[17rem_minmax(0,1fr)]">
       <SectionNav brand="AI Tool Lab for PMs" sections={SECTIONS} stages={navStages} links={PAGES} />
 
-    <main className="min-w-0 pt-6 pb-24 lg:pt-8">
+    <main className="mx-auto w-full max-w-[60rem] min-w-0 px-4 pt-6 pb-24 sm:px-6 lg:px-10 lg:pt-8 2xl:max-w-[72rem]">
       <noscript>
         <style>{".jp-hide{display:block!important}"}</style>
       </noscript>
@@ -536,7 +536,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             </span>
             <span className="sr-only">{site.ticker.join(", ")}</span>
           </p>
-          <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{site.promise}</p>
+          <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{site.promise}</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
             <a
               href="#build"
