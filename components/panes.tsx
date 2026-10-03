@@ -2,16 +2,30 @@
 // A step split into short panes you click through: Why → Do it → See it work → …
 // One pane on screen at a time, so there's never a wall of text.
 // "Continue" moves to the next pane; after the last one, `after` is shown
-// (usually a link to the next step). Without JavaScript every pane shows, stacked.
+// (usually a link to the next step), so there is only ever one way forward.
+// Without JavaScript every pane shows, stacked.
 import { useState, type ReactNode } from "react";
+import { button } from "@/components/style";
 
-export function Panes({ labels, panes, after }: { labels: string[]; panes: ReactNode[]; after?: ReactNode }) {
+export function Panes({
+  labels,
+  panes,
+  after,
+  section,
+}: {
+  labels: string[];
+  panes: ReactNode[];
+  after?: ReactNode;
+  // The step number, so panes read §6.1, §6.2 … Leave out for panes outside a step.
+  section?: number;
+}) {
   const [i, setI] = useState(0);
   const last = i === panes.length - 1;
+  const num = (k: number) => (section ? `§${section}.${k + 1}` : String(k + 1).padStart(2, "0"));
 
   return (
     <div>
-      <div role="tablist" className="flex gap-1 overflow-x-auto rounded-lg bg-zinc-100 p-1 dark:bg-zinc-900">
+      <div role="tablist" className="flex gap-x-6 overflow-x-auto border-b border-rule [scrollbar-width:none]">
         {labels.map((label, k) => (
           <button
             key={label}
@@ -19,23 +33,17 @@ export function Panes({ labels, panes, after }: { labels: string[]; panes: React
             role="tab"
             aria-selected={k === i}
             onClick={() => setI(k)}
-            className={`flex shrink-0 items-center gap-1.5 rounded-md px-3 py-1.5 text-sm whitespace-nowrap transition-colors ${
-              k === i
-                ? "bg-white font-semibold text-zinc-900 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-                : k < i
-                  ? "text-emerald-700 hover:text-emerald-900 dark:text-emerald-400"
-                  : "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
+            className={`-mb-px flex shrink-0 items-baseline gap-1.5 border-b-2 pt-1 pb-2 font-mono text-[13px] whitespace-nowrap ${
+              k === i ? "border-signal text-ink" : k < i ? "border-transparent text-ink hover:border-rule" : "border-transparent text-graphite hover:text-ink"
             }`}
           >
-            <span aria-hidden className="font-mono text-[11px] opacity-60">
-              {k < i ? "✓" : k + 1}
-            </span>
+            <span className={`text-[11px] ${k === i ? "text-signal" : ""}`}>{num(k)}</span>
             {label}
           </button>
         ))}
       </div>
 
-      <div className="mt-5">
+      <div className="mt-8">
         {panes.map((pane, k) => (
           <div key={k} role="tabpanel" className={k === i ? "pane-in" : "jp-hide"}>
             {pane}
@@ -43,11 +51,11 @@ export function Panes({ labels, panes, after }: { labels: string[]; panes: React
         ))}
       </div>
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-zinc-100 pt-4 dark:border-zinc-900">
+      <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-rule pt-5">
         <button
           type="button"
           onClick={() => setI(i - 1)}
-          className={`text-sm text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 ${i === 0 ? "invisible" : ""}`}
+          className={`font-mono text-[13px] text-graphite hover:text-ink ${i === 0 ? "invisible" : ""}`}
         >
           ← {labels[i - 1] ?? ""}
         </button>
@@ -57,9 +65,9 @@ export function Panes({ labels, panes, after }: { labels: string[]; panes: React
           <button
             type="button"
             onClick={() => setI(i + 1)}
-            className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800"
+            className={button}
           >
-            Continue: {labels[i + 1]} →
+            Continue: {labels[i + 1]}
           </button>
         )}
       </div>

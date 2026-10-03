@@ -18,13 +18,42 @@ import { Parts } from "@/components/parts";
 import { Experiment, CopyHelp } from "@/components/lab";
 import { experiments01, type Experiment as ExperimentData } from "@/content/experiments-01";
 import { helpPrompt } from "@/lib/tutor-context";
+import { bench, benchLabel, button } from "@/components/style";
+import type { ReactNode } from "react";
 
 
-function Pre({ children }: { children: string }) {
+const pad = (n: number) => String(n).padStart(2, "0");
+
+// Two columns on wide screens: the reading column, and a margin for notes (the manual, A).
+// The reading column keeps the same width whether or not there's a note, so the measure never jumps.
+function Spread({ children, note }: { children: ReactNode; note?: ReactNode }) {
   return (
-    <pre className="mt-2 overflow-x-auto rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 font-mono text-[13px] leading-relaxed text-zinc-800 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200">
-      {children}
-    </pre>
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-14">
+      <div className="min-w-0">{children}</div>
+      <aside className="min-w-0">{note}</aside>
+    </div>
+  );
+}
+
+// A margin note: a short signal rule, a mono label, graphite text.
+function Note({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="border-t-2 border-signal pt-2 text-[16px] leading-relaxed text-graphite">
+      <p className="font-mono text-xs text-signal">{label}</p>
+      <div className="mt-1.5">{children}</div>
+    </div>
+  );
+}
+
+// A plain-text diagram, set as a numbered figure.
+function Figure({ children, n, caption }: { children: string; n: number; caption: string }) {
+  return (
+    <figure className="mt-6">
+      <pre className="overflow-x-auto border-y border-ink py-4 font-mono text-[13px] leading-relaxed">{children}</pre>
+      <figcaption className="mt-2 text-[15px] text-graphite italic">
+        <span className="font-mono text-xs not-italic">Fig. {n}</span> — {caption}
+      </figcaption>
+    </figure>
   );
 }
 
@@ -66,13 +95,9 @@ function Chain({ items, dark = false }: { items: string[]; dark?: boolean }) {
   );
 }
 
-// Code the learner types or runs: dark, like the editor they'll paste it into.
+// Code the learner types or runs: dark, like the terminal or editor they'll paste it into.
 function Code({ children }: { children: string }) {
-  return (
-    <pre className="mt-3 overflow-x-auto rounded-lg bg-zinc-950 px-4 py-3 font-mono text-[13px] leading-relaxed text-zinc-100 ring-1 ring-zinc-800">
-      {children}
-    </pre>
-  );
+  return <pre className="mt-3 overflow-x-auto bg-ink px-4 py-3 font-mono text-[13px] leading-relaxed text-paper">{children}</pre>;
 }
 
 // Five questions after each step. Each answer opens to say why it's right or why it's wrong.
@@ -89,43 +114,40 @@ function placed<T extends { correct?: true }>(answers: T[], step: number, qi: nu
 function CheckUnderstanding({ questions, step }: { questions: Question[]; step: number }) {
   const letters = ["A", "B", "C", "D"];
   return (
-    <ol className="grid gap-5">
-      {questions.map((qn, qi) => (
-        <li key={qn.q}>
-          <p className="text-[15px] font-medium">
-            <span className="mr-2 font-mono text-xs text-zinc-400">
-              {step}.{qi + 1}
-            </span>
-            {qn.q}
-          </p>
-          <div className="mt-2 grid gap-1.5">
-            {placed(qn.answers, step, qi).map((a, ai) => (
-              <details key={a.text} className="group/ans rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-                <summary className="flex cursor-pointer list-none gap-2.5 px-3 py-2 text-sm hover:bg-zinc-50 dark:hover:bg-zinc-900">
-                  <span className="font-mono text-xs leading-5 text-zinc-400">{letters[ai]}</span>
-                  <span>{a.text}</span>
-                </summary>
-                <p
-                  className={`border-t px-3 py-2 text-sm leading-relaxed ${
-                    a.correct
-                      ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
-                      : "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200"
-                  }`}
-                >
-                  <span className="font-semibold">{a.correct ? "Correct. " : "Not quite. "}</span>
-                  {a.why}
-                </p>
-              </details>
-            ))}
-          </div>
-        </li>
-      ))}
-    </ol>
+    <Spread>
+      <p className="text-2xl italic">Questions for review</p>
+      <ol className="mt-6 grid gap-9">
+        {questions.map((qn, qi) => (
+          <li key={qn.q}>
+            <p className="text-[18px] leading-snug font-medium">
+              <span className="mr-2 font-mono text-xs font-normal text-graphite">
+                {step}.{qi + 1}
+              </span>
+              {qn.q}
+            </p>
+            <div className="mt-3 border-t border-rule">
+              {placed(qn.answers, step, qi).map((a, ai) => (
+                <details key={a.text} className="border-b border-rule">
+                  <summary className="flex cursor-pointer list-none gap-3 py-2.5 text-[16px] leading-snug hover:text-signal">
+                    <span className="font-mono text-xs leading-6 text-graphite">{letters[ai]}</span>
+                    <span>{a.text}</span>
+                  </summary>
+                  <p className={`mb-3 ml-6 border-l-2 pl-3 text-[16px] leading-relaxed ${a.correct ? "border-pass" : "border-fail"}`}>
+                    <span className={`font-mono text-xs ${a.correct ? "text-pass" : "text-fail"}`}>{a.correct ? "Correct. " : "Not quite. "}</span>
+                    {a.why}
+                  </p>
+                </details>
+              ))}
+            </div>
+          </li>
+        ))}
+      </ol>
+    </Spread>
   );
 }
 
-// The app's architecture as a picture, at the top of every step.
-// Filled: what this step builds. Outlined: what earlier steps already built. Dashed: still to come.
+// The app's architecture as a small schematic at the top of every step (the bench, B).
+// Signal: what this step builds. Ink outline: what earlier steps built. Dashed: still to come.
 const ARCH: { id: Layer; label: string; short: string; note: string }[] = [
   { id: "computer", label: "Your computer", short: "Laptop", note: "VS Code · Node" },
   { id: "page", label: "Page", short: "Page", note: "what people see" },
@@ -137,38 +159,44 @@ const ARCH: { id: Layer; label: string; short: string; note: string }[] = [
 function ArchitectureBar({ current, built }: { current: Layer[]; built: Layer[] }) {
   const box = (id: Layer) =>
     current.includes(id)
-      ? "border-emerald-700 bg-emerald-700 text-white dark:border-emerald-500 dark:bg-emerald-500 dark:text-zinc-950"
+      ? "border-signal bg-signal text-paper"
       : built.includes(id)
-        ? "border-emerald-600/50 bg-emerald-50 text-emerald-900 dark:border-emerald-400/40 dark:bg-emerald-950/40 dark:text-emerald-200"
-        : "border-dashed border-zinc-300 text-zinc-400 dark:border-zinc-700 dark:text-zinc-600";
+        ? "border-ink bg-paper text-ink"
+        : "border-dashed border-graphite/60 text-graphite";
   const cell = (l: (typeof ARCH)[number]) => (
-    <div className={`min-w-0 flex-1 rounded-lg border px-1 py-2 text-center transition-colors sm:px-2 ${box(l.id)}`}>
-      <p className="truncate text-[11px] leading-tight font-semibold sm:text-[13px]">
+    <div className={`min-w-0 flex-1 border px-1.5 py-2 sm:px-2.5 ${box(l.id)}`}>
+      <p className="truncate font-mono text-[11px] leading-tight font-medium sm:text-[12px]">
         <span className="sm:hidden">{l.short}</span>
         <span className="hidden sm:inline">{l.label}</span>
       </p>
-      <p className="hidden truncate text-[11px] leading-tight opacity-75 sm:block">{l.note}</p>
+      <p className="mt-0.5 hidden truncate text-[13px] leading-tight italic opacity-80 sm:block">{l.note}</p>
     </div>
   );
+  const wire = <span aria-hidden className="self-center font-mono text-xs text-graphite">→</span>;
+  const gap = <span aria-hidden className="w-px self-stretch bg-rule" />;
   const [computer, page, server, model, internet] = ARCH;
   return (
-    <div aria-label={`This step works on: ${current.join(", ")}`}>
+    <figure className={`${bench} px-3 py-3 sm:px-4`} aria-label={`This step works on: ${current.join(", ")}`}>
+      <figcaption className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <span className={benchLabel}>Where this step works</span>
+        <span className="flex gap-4 font-mono text-[11px] text-graphite">
+          <span><span className="mr-1.5 inline-block h-2 w-2 bg-signal align-middle" />this step</span>
+          <span><span className="mr-1.5 inline-block h-2 w-2 border border-ink align-middle" />built</span>
+          <span className="hidden sm:inline"><span className="mr-1.5 inline-block h-2 w-2 border border-dashed border-graphite align-middle" />to come</span>
+        </span>
+      </figcaption>
       <div className="flex items-stretch gap-1 sm:gap-2">
         {cell(computer)}
-        <span aria-hidden className="self-center text-zinc-300 dark:text-zinc-700">|</span>
+        {gap}
         {cell(page)}
-        <span aria-hidden className="self-center text-zinc-400">→</span>
+        {wire}
         {cell(server)}
-        <span aria-hidden className="self-center text-zinc-400">→</span>
+        {wire}
         {cell(model)}
-        <span aria-hidden className="self-center text-zinc-300 dark:text-zinc-700">|</span>
+        {gap}
         {cell(internet)}
       </div>
-      <p className="mt-1.5 flex gap-4 text-[11px] text-zinc-400">
-        <span><span className="mr-1 inline-block h-2 w-2 rounded-sm bg-emerald-700 align-middle dark:bg-emerald-500" />this step</span>
-        <span><span className="mr-1 inline-block h-2 w-2 rounded-sm border border-emerald-600/50 bg-emerald-50 align-middle dark:bg-emerald-950" />built earlier</span>
-      </p>
-    </div>
+    </figure>
   );
 }
 
@@ -177,6 +205,7 @@ function StepCard({
   index,
   total,
   phase,
+  part,
   next,
   personalised,
   check,
@@ -188,6 +217,7 @@ function StepCard({
   index: number;
   total: number;
   phase: string;
+  part: number;
   next?: { index: number; title: string };
   personalised: boolean;
   check?: Question[];
@@ -195,34 +225,55 @@ function StepCard({
   help: string;
   built: Layer[];
 }) {
+  const n = index + 1;
+  const osLabel = "font-mono text-xs text-graphite";
+
   const why = (
-    <div key="why" className="text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">
-      {step.idea}
-      {step.diagram && <Pre>{step.diagram}</Pre>}
-    </div>
+    <Spread key="why">
+      <div className="text-[19px] leading-[1.6]">{step.idea}</div>
+      {step.diagram && <Figure n={n} caption={step.concept}>{step.diagram}</Figure>}
+    </Spread>
   );
 
   const doIt = (
-    <div key="do" className="min-w-0 text-[15px] leading-relaxed text-zinc-800 dark:text-zinc-200">
-      {step.action}
+    <Spread
+      key="do"
+      note={
+        step.inPractice && (
+          <Note label="Decided earlier, applied here">
+            <ul className="grid gap-3">
+              {step.inPractice.map((d) => (
+                <li key={d.q}>
+                  <a href={`#step-${d.from}`} className="prose-link text-ink">
+                    §{pad(d.from)} · {d.q}
+                  </a>
+                  <span className="mt-0.5 block">{d.here}</span>
+                </li>
+              ))}
+            </ul>
+          </Note>
+        )
+      }
+    >
+      <div className="text-[19px] leading-[1.6]">{step.action}</div>
       {step.install ? (
         <Parts
-          step={index + 1}
+          step={n}
           labels={[...step.install.map((t) => t.name), ...(step.assistants ? ["AI assistant (optional)"] : []), "Check"]}
           parts={[
             ...step.install.map((t) => (
-              <div key={t.name} className="rounded-md border border-zinc-200 bg-white p-4 text-sm leading-relaxed dark:border-zinc-800 dark:bg-zinc-950">
-                <p className="font-semibold text-zinc-900 dark:text-zinc-100">{t.name}</p>
-                <p className="text-zinc-600 dark:text-zinc-400">{t.what}</p>
-                <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">Download from: </span>
+              <div key={t.name} className="border-t border-ink pt-4 text-[17px] leading-relaxed">
+                <p className="text-2xl font-medium">{t.name}</p>
+                <p className="text-graphite">{t.what}</p>
+                <p className="mt-3">
+                  <span className={osLabel}>Download from </span>
                   {t.from}
                 </p>
-                <div className="mt-3 grid gap-4 md:grid-cols-2">
+                <div className="mt-5 grid gap-6 md:grid-cols-2">
                   {([["Windows", t.windows], ["Mac", t.mac]] as const).map(([os, list]) => (
                     <div key={os} className="min-w-0">
-                      <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">{os}</p>
-                      <ol className="mt-1.5 grid list-decimal gap-1.5 pl-5">
+                      <p className={osLabel}>{os}</p>
+                      <ol className="mt-1.5 grid list-decimal gap-1.5 pl-5 marker:font-mono marker:text-xs marker:text-graphite">
                         {list.map((line) => (
                           <li key={line}>{line}</li>
                         ))}
@@ -230,34 +281,34 @@ function StepCard({
                     </div>
                   ))}
                 </div>
-                <p className="mt-4 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Or install from the command line</p>
+                <p className={`${osLabel} mt-6`}>Or install from the command line</p>
                 <Code>{`# Windows (winget is built in)\n${t.cli.windows}\n\n# Mac (needs Homebrew: brew.sh)\n${t.cli.mac}`}</Code>
-                <p className="mt-3 text-zinc-600 dark:text-zinc-400">
-                  <span className="font-semibold text-zinc-900 dark:text-zinc-100">Updating later: </span>
+                <p className="mt-4">
+                  <span className={osLabel}>Updating later </span>
                   {t.update}
                 </p>
               </div>
             )),
             ...(step.assistants
               ? [
-                  <div key="assistants" className="text-sm leading-relaxed">
+                  <div key="assistants" className="border-t border-ink pt-4 text-[17px] leading-relaxed">
                     <p>{step.assistants.intro}</p>
-                    <div className="mt-3 grid gap-3 md:grid-cols-2">
+                    <div className="mt-4 grid gap-x-8 md:grid-cols-2">
                       {step.assistants.tools.map((a) => (
-                        <div key={a.name} className="min-w-0 rounded-md border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
-                          <p className="font-semibold text-zinc-900 dark:text-zinc-100">{a.name}</p>
-                          <p className="text-zinc-600 dark:text-zinc-400">{a.cost}</p>
+                        <div key={a.name} className="min-w-0 border-t border-rule py-4">
+                          <p className="text-xl font-medium">{a.name}</p>
+                          <p className={osLabel}>{a.cost}</p>
                           {a.install && <Code>{`${a.install}\n\n# then start it\n${a.start}`}</Code>}
-                          {a.steps && <p className="mt-2 text-zinc-700 dark:text-zinc-300">{a.steps}</p>}
-                          <p className="mt-2 text-zinc-700 dark:text-zinc-300">{a.signIn}</p>
-                          {a.note && <p className="mt-1 text-zinc-500">{a.note}</p>}
+                          {a.steps && <p className="mt-2">{a.steps}</p>}
+                          <p className="mt-2">{a.signIn}</p>
+                          {a.note && <p className="mt-1 text-graphite">{a.note}</p>}
                         </div>
                       ))}
                     </div>
                   </div>,
                 ]
               : []),
-            <div key="check">
+            <div key="check" className="border-t border-ink pt-4 text-[17px] leading-relaxed">
               {step.thenCheck && <p>{step.thenCheck}</p>}
               {step.code && <Code>{step.code}</Code>}
             </div>,
@@ -265,134 +316,116 @@ function StepCard({
         />
       ) : (
         <>
-          {step.thenCheck && <p className="mt-4">{step.thenCheck}</p>}
+          {step.thenCheck && <p className="mt-5 text-[19px] leading-[1.6]">{step.thenCheck}</p>}
           {step.code && <Code>{step.code}</Code>}
         </>
       )}
       {step.choices && (
-        <div className="mt-3 grid min-w-0 gap-2">
+        <div className="mt-6 border-t border-rule">
           {step.choices.map((c, i) => (
-            <details key={c.name} open={i === 0} className="group min-w-0 overflow-hidden rounded-md border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-              <summary className="flex cursor-pointer list-none items-center gap-4 p-3">
+            <details key={c.name} open={i === 0} className="group min-w-0 border-b border-rule">
+              <summary className="flex cursor-pointer list-none items-center gap-4 py-3">
                 <LookSwatch look={c.look} />
                 <span className="min-w-0 flex-1">
-                  <span className="block font-semibold text-zinc-900 dark:text-zinc-100">{c.name}</span>
-                  <span className="block text-sm text-zinc-600 dark:text-zinc-400">{c.mood}</span>
+                  <span className="block text-xl font-medium">{c.name}</span>
+                  <span className="block text-[16px] text-graphite italic">{c.mood}</span>
                 </span>
-                <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
+                <span aria-hidden className="font-mono text-xs text-graphite group-open:hidden">Show code</span>
+                <span aria-hidden className="hidden font-mono text-xs text-graphite group-open:inline">Hide</span>
               </summary>
-              <div className="border-t border-zinc-200 px-3 pb-3 dark:border-zinc-800">
+              <div className="pb-4">
                 <Code>{c.code}</Code>
               </div>
             </details>
           ))}
         </div>
       )}
-      {step.inPractice && (
-        <div className="mt-4 rounded-lg border border-sky-600/30 bg-sky-50/60 px-4 py-3 dark:border-sky-400/30 dark:bg-sky-950/20">
-          <p className="text-xs font-semibold tracking-wider text-sky-700 uppercase dark:text-sky-300">Decisions in practice</p>
-          <ul className="mt-2 grid gap-2.5 text-sm leading-snug">
-            {step.inPractice.map((d) => (
-              <li key={d.q}>
-                <a href={`#step-${d.from}`} className="font-semibold text-zinc-900 hover:underline dark:text-zinc-100">
-                  ↩ Step {d.from} · {d.q}
-                </a>
-                <span className="mt-0.5 block text-zinc-700 dark:text-zinc-300">{d.here}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+    </Spread>
   );
 
   const see = (
-    <div key="see" className="grid gap-4">
-      <div className="flex gap-3 rounded-lg border border-emerald-600/40 bg-emerald-50/50 p-4 text-[15px] leading-relaxed dark:border-emerald-500/30 dark:bg-emerald-950/20">
-        <span aria-hidden className="text-emerald-600 dark:text-emerald-400">✓</span>
-        <div>
+    <Spread key="see" note={step.snag && <Note label="Where people get stuck">{step.snag}</Note>}>
+      <div className={`${bench} px-4 py-4 sm:px-6`}>
+        <p className={`${benchLabel} text-pass`}>Expected result</p>
+        <div className="mt-2 text-[18px] leading-relaxed">
           {step.result}
           {step.link && (
-            <p className="mt-1">
-              <a href={step.link.href} className="font-medium text-emerald-700 underline underline-offset-4 dark:text-emerald-400">
-                {step.link.label} →
+            <p className="mt-2">
+              <a href={step.link.href} className="prose-link">
+                {step.link.label}
               </a>
             </p>
           )}
         </div>
       </div>
-      {step.snag && (
-        <div className="rounded-md border-l-4 border-amber-500 bg-amber-50 px-4 py-3 text-sm leading-relaxed text-amber-950 dark:bg-amber-950/40 dark:text-amber-100">
-          <span className="font-semibold">Where people get stuck: </span>
-          {step.snag}
-        </div>
-      )}
       {step.fails && (
-        <details className="group rounded-md border border-zinc-200 dark:border-zinc-800">
-          <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm">
-            <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
-            <span className="font-semibold">Didn&apos;t work?</span>
-            <span className="text-zinc-500">· {step.fails.causes.length} likely causes</span>
+        <details className="group mt-6 border-y border-rule">
+          <summary className="flex cursor-pointer list-none items-baseline gap-3 py-3">
+            <span aria-hidden className="inline-block font-mono text-xs text-graphite transition-transform group-open:rotate-90">▸</span>
+            <span className="text-[18px] font-medium">Didn&apos;t work?</span>
+            <span className="font-mono text-xs text-graphite">{step.fails.causes.length} likely causes</span>
           </summary>
-          <div className="border-t border-zinc-200 px-4 py-3 text-sm leading-relaxed text-zinc-700 dark:border-zinc-800 dark:text-zinc-300">
-            <ol className="grid list-decimal gap-1.5 pl-5">
+          <div className="pb-5 text-[17px] leading-relaxed">
+            <ol className="grid list-decimal gap-1.5 pl-5 marker:font-mono marker:text-xs marker:text-graphite">
               {step.fails.causes.map((c) => (
                 <li key={c}>{c}</li>
               ))}
             </ol>
             <p className="mt-3">
-              <span className="font-semibold text-zinc-900 dark:text-zinc-100">Most likely fix: </span>
+              <span className="font-medium">Most likely fix: </span>
               {step.fails.fix}
             </p>
             <CopyHelp prompt={help} />
           </div>
         </details>
       )}
-    </div>
+    </Spread>
   );
 
   const understand = (
-    <div key="understand" className="grid gap-px overflow-hidden rounded-lg border border-zinc-200 bg-zinc-200 sm:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-800">
-      <div className="bg-zinc-50 px-4 py-3.5 dark:bg-zinc-900">
-        <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Technically, what happened</p>
-        <p className="mt-1 text-[15px] leading-relaxed text-zinc-700 dark:text-zinc-300">{step.understand}</p>
-      </div>
-      <div className="bg-zinc-900 px-4 py-3.5 dark:bg-zinc-950">
-        <p className="text-xs font-semibold uppercase tracking-wider text-sky-300">PM lens · why you should care</p>
-        <p className="mt-1 text-[15px] leading-relaxed text-zinc-100">{step.pmLens}</p>
-      </div>
+    <div key="understand">
+      <Spread>
+        <p className="font-mono text-xs text-graphite">Technically, what happened</p>
+        <p className="mt-2 text-[19px] leading-[1.6]">{step.understand}</p>
+        <div className="mt-10 border-l-2 border-signal pl-5">
+          <p className="font-mono text-xs text-signal">PM lens · why you should care</p>
+          <p className="mt-2 text-[24px] leading-snug sm:text-[26px]">{step.pmLens}</p>
+        </div>
+      </Spread>
       {step.pmDetail && (
-        <details className="group bg-white sm:col-span-2 dark:bg-zinc-950">
-          <summary className="flex cursor-pointer list-none items-center gap-2 px-4 py-3 text-sm">
-            <span aria-hidden className="text-zinc-400 transition-transform group-open:rotate-90">›</span>
-            <span className="font-semibold">In depth: cost, speed and safety, and what you decide</span>
+        <details className="group mt-10 border-y border-rule">
+          <summary className="flex cursor-pointer list-none items-baseline gap-3 py-3">
+            <span aria-hidden className="inline-block font-mono text-xs text-graphite transition-transform group-open:rotate-90">▸</span>
+            <span className="text-[18px] font-medium">In depth: cost, speed and safety, and what you decide</span>
           </summary>
-          <div className="border-t border-zinc-200 px-4 py-4 dark:border-zinc-800">
-            <div className="grid gap-3 md:grid-cols-3">
-              {step.pmDetail.boxes.map((b) => (
-                <div key={b.name} className="rounded-md border border-zinc-200 p-3 dark:border-zinc-800">
-                  <p className="text-sm font-semibold">{b.name}</p>
-                  <dl className="mt-2 grid gap-2 text-sm leading-snug">
-                    {(["cost", "speed", "safety"] as const).map((k) => (
-                      <div key={k}>
-                        <dt className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">{k}</dt>
-                        <dd className="text-zinc-700 dark:text-zinc-300">{b[k]}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              ))}
+          <div className="pb-6">
+            <div className="hidden grid-cols-[10rem_repeat(3,minmax(0,1fr))] gap-6 border-b border-ink pb-2 font-mono text-xs text-graphite md:grid">
+              <span />
+              <span>Cost</span>
+              <span>Speed</span>
+              <span>Safety</span>
             </div>
-            <p className="mt-5 text-xs font-semibold tracking-wider text-sky-700 uppercase dark:text-sky-300">Decisions you own</p>
-            <ul className="mt-2 grid gap-2.5">
+            {step.pmDetail.boxes.map((b) => (
+              <div key={b.name} className="grid gap-2 border-b border-rule py-3 text-[16px] leading-snug md:grid-cols-[10rem_repeat(3,minmax(0,1fr))] md:gap-6">
+                <p className="font-medium">{b.name}</p>
+                {(["cost", "speed", "safety"] as const).map((k) => (
+                  <p key={k}>
+                    <span className="font-mono text-xs text-graphite md:hidden">{cap(k)} </span>
+                    {b[k]}
+                  </p>
+                ))}
+              </div>
+            ))}
+            <p className="mt-8 font-mono text-xs text-signal">Decisions you own</p>
+            <ul className="mt-2 grid lg:w-[64%]">
               {step.pmDetail.decisions.map((d) => (
-                <li key={d.q} className="text-sm leading-snug">
-                  <span className="font-semibold">{d.q}</span>{" "}
-                  <span className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">{d.trades}</span>
-                  <span className="mt-0.5 block text-zinc-600 dark:text-zinc-400">Start with: {d.start}</span>
+                <li key={d.q} className="border-t border-rule py-3 text-[16px] leading-snug">
+                  <p className="text-[18px] font-medium">{d.q}</p>
+                  <p className="mt-0.5 font-mono text-xs text-graphite">Trades {d.trades}</p>
+                  <p className="mt-1">Start with: {d.start}</p>
                   {d.step && (
-                    <a href={`#step-${d.step}`} className="mt-0.5 inline-block text-xs font-medium text-sky-700 hover:underline dark:text-sky-300">
-                      Applied in step {d.step} →
+                    <a href={`#step-${d.step}`} className="prose-link mt-1 inline-block font-mono text-xs">
+                      Applied in §{pad(d.step)}
                     </a>
                   )}
                 </li>
@@ -414,42 +447,41 @@ function StepCard({
   panes.push(understand);
   if (check) {
     labels.push("Quiz");
-    panes.push(<CheckUnderstanding key="quiz" questions={check} step={index + 1} />);
+    panes.push(<CheckUnderstanding key="quiz" questions={check} step={n} />);
   }
 
   return (
-    <article className="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6 dark:border-zinc-800 dark:bg-zinc-950">
-      <p className="font-mono text-xs text-zinc-500">
-        Step {index + 1} of {total} · {phase}
-      </p>
-      <div className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-        <h3 className="text-xl font-semibold tracking-tight">{step.title}</h3>
-        <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+    <article>
+      <header>
+        <p className="font-mono text-xs text-graphite">
+          §{pad(n)} of {total} · Part {part}, {phase}
+        </p>
+        <h3 className="mt-3 text-[2.5rem] leading-[1.05] font-medium tracking-tight text-balance sm:text-[3.25rem]">{step.title}</h3>
+        <p className="mt-3 font-mono text-xs">
+          <span className="text-graphite">Concept </span>
           {step.concept}
-        </span>
-        {personalised && (
-          <span className="rounded-full border border-emerald-600 px-2.5 py-0.5 text-xs font-medium text-emerald-700 dark:text-emerald-400">
-            Your app
-          </span>
-        )}
-      </div>
+          {personalised && <span className="text-signal"> · uses your app</span>}
+        </p>
+      </header>
 
-      <div className="mt-4">
+      <div className="mt-8">
         <ArchitectureBar current={step.layers} built={built} />
       </div>
 
-      <p className="mt-4 text-lg leading-snug font-medium text-balance">{step.problem}</p>
+      <div className="mt-8">
+        <Spread>
+          <p className="text-[24px] leading-snug text-balance sm:text-[28px]">{step.problem}</p>
+        </Spread>
+      </div>
 
-      <div className="mt-5">
+      <div className="mt-10">
         <Panes
+          section={n}
           labels={labels}
           panes={panes}
           after={
-            <a
-              href={next ? `#step-${next.index + 1}` : "#done"}
-              className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900"
-            >
-              {next ? `Next step: ${next.title} →` : "Finish: see what you built →"}
+            <a href={next ? `#step-${next.index + 1}` : "#done"} className={button}>
+              {next ? `Next: §${pad(next.index + 1)} ${next.title}` : "Finish: see what you built"}
             </a>
           }
         />
@@ -457,6 +489,7 @@ function StepCard({
     </article>
   );
 }
+
 
 const SECTIONS = [
   { id: "overview", label: "Overview" },
@@ -507,9 +540,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   const c = j.closing;
 
   return (
-    <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className="w-full">
       <SectionNav
-        brand="AI Tool Lab for PMs"
+        brand="BuildAI Lab"
         sections={SECTIONS}
         journey={{ n: j.number, title: j.name }}
         upcoming={journeys
@@ -519,17 +552,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         links={PAGES}
       />
 
-    <main className="mx-auto w-full max-w-[60rem] min-w-0 px-4 pt-6 pb-24 sm:px-6 lg:px-10 lg:pt-8 2xl:max-w-[72rem]">
+    <main className="mx-auto w-full max-w-[76rem] min-w-0 px-4 pt-10 pb-32 sm:px-6 lg:px-10">
       <noscript>
         <style>{".jp-hide{display:block!important}"}</style>
       </noscript>
-      <p className={`${eyebrow} text-zinc-500 lg:hidden`}>
-        AI Tool Lab for PMs
-        {parsed?.ok && ` · building ${mvp.name}`}
-      </p>
 
       {/* Overview: who it's for, what you'll learn, how it differs */}
-      <section id="overview" className="scroll-mt-6 pt-6 lg:pt-2">
+      <section id="overview" className="scroll-mt-16 pt-6 lg:pt-2">
         <header>
           <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>{site.eyebrow}</p>
           <h1 className="mt-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.6rem]">{site.headline}</h1>
@@ -629,13 +658,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       </section>
 
       {/* Your app: choose it and see what's underneath, in one place */}
-      <section id="build" className="mt-12 scroll-mt-6 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+      <section id="build" className="mt-12 scroll-mt-16 border-t border-zinc-200 pt-10 dark:border-zinc-800">
         <p className={`${eyebrow} text-zinc-500`}>Your app</p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight">Pick an app. See what&apos;s underneath it.</h2>
 
         <div className="mt-5">{chooser}</div>
 
-        <div id="underneath" className="scroll-mt-6 pt-6">
+        <div id="underneath" className="scroll-mt-16 pt-6">
         <div className="reveal grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] dark:border-zinc-800 dark:bg-zinc-800">
           <div className="bg-white p-4 dark:bg-zinc-950">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">What you see · {mvp.name}</p>
@@ -662,35 +691,38 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       </section>
 
       {/* Journey 1 */}
-      <section id="journey" className="mt-12 scroll-mt-6 border-t border-zinc-200 pt-10 dark:border-zinc-800">
-        <p className={`${eyebrow} text-zinc-500`}>Journey {j.number}</p>
-        <h2 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{j.name}</h2>
-        <p className="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">{j.promise}</p>
-        <p className="mt-3 text-xs text-zinc-500">{site.providerNote}</p>
+      <section id="journey" className="mt-24 scroll-mt-16 border-t border-ink pt-10">
+        <p className="font-mono text-xs text-graphite">Journey {j.number}</p>
+        <h2 className="mt-2 text-[2.5rem] leading-[1.05] font-medium tracking-tight text-balance sm:text-[3.5rem]">{j.name}</h2>
+        <div className="mt-5">
+          <Spread note={<Note label="About the model">{site.providerNote}</Note>}>
+            <p className="text-[21px] leading-relaxed">{j.promise}</p>
+          </Spread>
+        </div>
 
-        <div className="mt-6 grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-[3fr_2fr] dark:border-zinc-800 dark:bg-zinc-800">
-          <div className="bg-white px-4 py-3.5 dark:bg-zinc-950">
-            <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">Before you start</p>
-            <ul className="mt-2 grid gap-1.5 text-sm">
-              {site.before.need.map((n) => (
-                <li key={n} className="flex gap-2">
-                  <span aria-hidden className="text-emerald-600 dark:text-emerald-400">·</span>
-                  {n}
+        <div className="mt-10 grid gap-8 border-t border-rule pt-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-14">
+          <div>
+            <p className="font-mono text-xs text-graphite">Before you start</p>
+            <ul className="mt-2 grid gap-1.5 text-[17px] leading-snug">
+              {site.before.need.map((need) => (
+                <li key={need} className="flex gap-3">
+                  <span aria-hidden className="font-mono text-xs leading-6 text-graphite">–</span>
+                  {need}
                 </li>
               ))}
             </ul>
           </div>
-          <div className="bg-zinc-50 px-4 py-3.5 dark:bg-zinc-900">
-            <p className="text-xs font-semibold tracking-wider text-zinc-500 uppercase">Time</p>
-            <p className="mt-2 text-sm leading-relaxed">{site.before.time}</p>
-            <p className="mt-2 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-              From step 5, each step has a <span className="font-semibold text-zinc-900 dark:text-zinc-100">Break it</span> experiment:
-              predict, break one thing on purpose, see what happens.
+          <div className="text-[17px] leading-relaxed">
+            <p className="font-mono text-xs text-graphite">Time</p>
+            <p className="mt-2">{site.before.time}</p>
+            <p className="mt-2 text-graphite">
+              From step 5, each step has a <span className="text-ink italic">Break it</span> experiment: predict, break one thing on
+              purpose, see what happens.
             </p>
           </div>
         </div>
 
-        <div className="mt-8">
+        <div className="mt-16">
           <JourneyPlayer
             meta={steps.map((st, i) => ({ n: i + 1, title: st.title, stage: phaseOf(i).title }))}
             stages={j.phases.map((ph) => ({ title: ph.title, from: ph.steps[0], to: ph.steps[1] }))}
@@ -701,6 +733,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                 index={i}
                 total={steps.length}
                 phase={phaseOf(i).title}
+                part={j.phases.indexOf(phaseOf(i)) + 1}
                 next={steps[i + 1] ? { index: i + 1, title: steps[i + 1].title } : undefined}
                 personalised={s.personalised}
                 check={checks01[i]}
@@ -710,152 +743,151 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
               />
             ))}
             finish={
-              <section className="rounded-2xl border-2 border-zinc-900 bg-white p-6 sm:p-8 dark:border-zinc-200 dark:bg-zinc-950">
-                <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>Journey {j.number} complete</p>
-                <h2 className="mt-2 text-2xl font-bold tracking-tight text-balance sm:text-3xl">
+              <section>
+                <p className="font-mono text-xs text-signal">Journey {j.number} complete</p>
+                <h2 className="mt-3 text-[2.5rem] leading-[1.05] font-medium tracking-tight text-balance sm:text-[3.25rem]">
                   {parsed?.ok ? `You built ${mvp.name}. More importantly, you understand it.` : "You built an AI app. More importantly, you understand it."}
                 </h2>
-                <p className="mt-3 leading-relaxed text-zinc-600 dark:text-zinc-400">{c.intro}</p>
                 <div className="mt-6">
+                  <Spread>
+                    <p className="text-[21px] leading-relaxed">{c.intro}</p>
+                  </Spread>
+                </div>
+                <div className="mt-10">
                   <Panes
                     labels={["What you built", "The anatomy", "Reuse the pattern", "Questions", "What's next"]}
                     panes={[
-                      <div key="built">
-          <ul className="mt-3 grid gap-2 sm:grid-cols-2">
-            {c.built.map((b) => (
-              <li key={b.text} className="reveal flex gap-2.5 text-[15px] leading-snug">
-                <span aria-hidden className="mt-0.5 text-emerald-600 dark:text-emerald-400">✓</span>
-                <span>
-                  {b.text}{" "}
-                  <a href={`#step-${b.step}`} className="font-mono text-xs whitespace-nowrap text-zinc-400 hover:text-emerald-700">
-                    step {b.step}
-                  </a>
-                </span>
-              </li>
-            ))}
-          </ul>
-
-                      </div>,
+                      <ul key="built" className="grid gap-x-12 border-b border-rule sm:grid-cols-2">
+                        {c.built.map((b) => (
+                          <li key={b.text} className="flex items-baseline gap-4 border-t border-rule py-3 text-[17px] leading-snug">
+                            <span className="flex-1">{b.text}</span>
+                            <a href={`#step-${b.step}`} className="prose-link shrink-0 font-mono text-xs text-graphite">
+                              §{pad(b.step)}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>,
                       <div key="anatomy">
-          <ol className="mt-3 flex flex-wrap items-stretch gap-x-2 gap-y-3">
-            {c.flow.map((f, i) => (
-              <li key={i} className="flex items-center gap-2">
-                <span className="rounded-lg border border-zinc-200 px-3 py-2 dark:border-zinc-800">
-                  <span className="block text-sm font-semibold">{f.label}</span>
-                  <span className="block text-xs text-zinc-500">{f.note}</span>
-                </span>
-                {i < c.flow.length - 1 && <span aria-hidden className="text-zinc-400">→</span>}
-              </li>
-            ))}
-          </ol>
-          <p className="mt-3 text-sm text-zinc-500">
-            Around it sits the development lifecycle: <span className="font-medium text-zinc-700 dark:text-zinc-300">Git</span> records
-            versions, <span className="font-medium text-zinc-700 dark:text-zinc-300">GitHub</span> shares them, and{" "}
-            <span className="font-medium text-zinc-700 dark:text-zinc-300">Vercel</span> turns a push into a live URL.
-          </p>
-
+                        <figure className={`${bench} px-3 py-4 sm:px-5`}>
+                          <figcaption className={`${benchLabel} mb-3`}>The anatomy of your app</figcaption>
+                          <ol className="flex flex-wrap items-stretch gap-x-2 gap-y-3">
+                            {c.flow.map((f, i) => (
+                              <li key={i} className="flex items-center gap-2">
+                                <span className="border border-ink bg-paper px-3 py-2">
+                                  <span className="block font-mono text-[13px] font-medium">{f.label}</span>
+                                  <span className="block text-[14px] text-graphite italic">{f.note}</span>
+                                </span>
+                                {i < c.flow.length - 1 && <span aria-hidden className="font-mono text-xs text-graphite">→</span>}
+                              </li>
+                            ))}
+                          </ol>
+                        </figure>
+                        <div className="mt-6">
+                          <Spread>
+                            <p className="text-[19px] leading-[1.6]">
+                              Around it sits the development lifecycle: <span className="italic">Git</span> records versions,{" "}
+                              <span className="italic">GitHub</span> shares them, and <span className="italic">Vercel</span> turns a push into a
+                              live URL.
+                            </p>
+                          </Spread>
+                        </div>
                       </div>,
                       <div key="pattern">
-            <p className="mt-2 leading-relaxed text-zinc-600 dark:text-zinc-400">
-              Only the prompt and the schema change. Once you can see this anatomy, you can reason about almost any AI feature an
-              engineer describes to you.
-            </p>
-            <p className="mt-4 flex flex-wrap items-center gap-2 text-sm">
-              {c.pattern.stages.map((st, i) => (
-                <span key={st} className="flex items-center gap-2">
-                  <span className="rounded-md bg-zinc-900 px-2.5 py-1 font-medium text-white dark:bg-zinc-100 dark:text-zinc-900">{st}</span>
-                  {i < c.pattern.stages.length - 1 && <span aria-hidden className="text-zinc-400">→</span>}
-                </span>
-              ))}
-            </p>
-            <div className="mt-5 overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-800">
-              <table className="w-full min-w-[34rem] text-left text-sm">
-                <thead className="bg-zinc-50 text-xs text-zinc-500 dark:bg-zinc-900">
-                  <tr>
-                    <th className="px-3 py-2 font-semibold">What you could build next</th>
-                    <th className="px-3 py-2 font-semibold">Input</th>
-                    <th className="px-3 py-2 font-semibold">Output shape (your schema)</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-                  {c.pattern.examples.map((e) => (
-                    <tr key={e.name} className="align-top">
-                      <td className="px-3 py-2.5 font-medium">
-                        {e.name}
-                        {e.note && <span className="mt-1 block text-xs font-normal text-amber-700 dark:text-amber-400">{e.note}</span>}
-                      </td>
-                      <td className="px-3 py-2.5 text-zinc-600 dark:text-zinc-400">{e.input}</td>
-                      <td className="px-3 py-2.5 font-mono text-xs text-zinc-700 dark:text-zinc-300">{e.output}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <a href="/architecture" className="mt-4 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
-              Explore every layer on the system map →
-            </a>
+                        <Spread>
+                          <p className="text-[19px] leading-[1.6]">
+                            Only the prompt and the schema change. Once you can see this anatomy, you can reason about almost any AI feature
+                            an engineer describes to you.
+                          </p>
+                        </Spread>
+                        <ol className="mt-6 flex flex-wrap items-center gap-2">
+                          {c.pattern.stages.map((st, i) => (
+                            <li key={st} className="flex items-center gap-2">
+                              <span className="bg-ink px-2.5 py-1 font-mono text-[13px] text-paper">{st}</span>
+                              {i < c.pattern.stages.length - 1 && <span aria-hidden className="font-mono text-xs text-graphite">→</span>}
+                            </li>
+                          ))}
+                        </ol>
+                        <div className="mt-8">
+                          <div className="hidden grid-cols-[minmax(0,4fr)_minmax(0,4fr)_minmax(0,5fr)] gap-6 border-b border-ink pb-2 font-mono text-xs text-graphite md:grid">
+                            <span>What you could build next</span>
+                            <span>Input</span>
+                            <span>Output shape (your schema)</span>
+                          </div>
+                          {c.pattern.examples.map((e) => (
+                            <div
+                              key={e.name}
+                              className="grid gap-1 border-b border-rule py-3 text-[16px] leading-snug md:grid-cols-[minmax(0,4fr)_minmax(0,4fr)_minmax(0,5fr)] md:gap-6"
+                            >
+                              <p className="font-medium">
+                                {e.name}
+                                {e.note && <span className="mt-1 block text-[14px] font-normal text-signal italic">{e.note}</span>}
+                              </p>
+                              <p className="text-graphite">{e.input}</p>
+                              <p className="font-mono text-xs leading-relaxed">{e.output}</p>
+                            </div>
+                          ))}
+                        </div>
+                        <a href="/architecture" className="prose-link mt-5 inline-block text-[17px]">
+                          Explore every layer on the system map
+                        </a>
                       </div>,
-                      <div key="questions">
-          <ol className="mt-3 grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
-            {c.questions.map((q, i) => (
-              <li key={q.q} className="flex gap-2 text-sm leading-snug">
-                <span className="w-5 shrink-0 font-mono text-xs text-zinc-400">{i + 1}</span>
-                <span>
-                  {q.q}{" "}
-                  {q.step ? (
-                    <a href={`#step-${q.step}`} className="font-mono text-xs whitespace-nowrap text-zinc-400 hover:text-emerald-700">
-                      step {q.step}
-                    </a>
-                  ) : (
-                    <span className="font-mono text-xs whitespace-nowrap text-zinc-400">see “Reuse the pattern”</span>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ol>
-
-                      </div>,
+                      <ol key="questions" className="grid gap-x-12 border-b border-rule sm:grid-cols-2">
+                        {c.questions.map((q, i) => (
+                          <li key={q.q} className="flex gap-3 border-t border-rule py-3 text-[17px] leading-snug">
+                            <span className="w-5 shrink-0 font-mono text-xs leading-6 text-graphite">{i + 1}</span>
+                            <span className="flex-1">{q.q}</span>
+                            {q.step ? (
+                              <a href={`#step-${q.step}`} className="prose-link shrink-0 font-mono text-xs leading-6 text-graphite">
+                                §{pad(q.step)}
+                              </a>
+                            ) : (
+                              <span className="shrink-0 font-mono text-xs leading-6 text-graphite">Reuse the pattern</span>
+                            )}
+                          </li>
+                        ))}
+                      </ol>,
                       <div key="next">
-          <div className="grid gap-6 sm:grid-cols-2">
-            <div>
-              <p className="text-sm font-semibold">What it can&apos;t do yet</p>
-              <ul className="mt-2 grid gap-2 text-sm text-zinc-600 dark:text-zinc-400">
-                {c.notYet.map((item) => (
-                  <li key={item} className="flex gap-2">
-                    <span aria-hidden className="text-zinc-400">·</span>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div>
-              <p className="text-sm font-semibold">Things to try before you stop</p>
-              <ol className="mt-2 grid gap-3">
-                {c.tryNext.map((item, i) => (
-                  <li key={item.title} className="text-sm">
-                    <p className="font-medium">
-                      <span className="mr-2 font-mono text-xs text-zinc-400">{i + 1}</span>
-                      {item.title}
-                    </p>
-                    <p className="mt-0.5 text-zinc-600 dark:text-zinc-400">{item.text}</p>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          </div>
-                        <div className="mt-6 rounded-lg border border-dashed border-zinc-300 p-4 dark:border-zinc-700">
-                          <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">Coming next</p>
-                          <p className="mt-1 font-semibold">{j.next.title}</p>
-                          <p className="mt-1 text-sm text-zinc-600 dark:text-zinc-400">{j.next.teaser}</p>
-                          <a href="/why#feedback" className="mt-2 inline-block text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
-                            Tell me what you&apos;d want next →
-                          </a>
+                        <div className="grid gap-10 sm:grid-cols-2">
+                          <div>
+                            <p className="font-mono text-xs text-graphite">What it can&apos;t do yet</p>
+                            <ul className="mt-2 grid gap-2 text-[17px] leading-snug">
+                              {c.notYet.map((item) => (
+                                <li key={item} className="flex gap-3">
+                                  <span aria-hidden className="font-mono text-xs leading-6 text-graphite">–</span>
+                                  {item}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <div>
+                            <p className="font-mono text-xs text-graphite">Things to try before you stop</p>
+                            <ol className="mt-2 grid gap-4">
+                              {c.tryNext.map((item, i) => (
+                                <li key={item.title} className="text-[17px] leading-snug">
+                                  <p className="font-medium">
+                                    <span className="mr-2 font-mono text-xs font-normal text-graphite">{i + 1}</span>
+                                    {item.title}
+                                  </p>
+                                  <p className="mt-0.5 text-graphite">{item.text}</p>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        </div>
+                        <div className="mt-10 lg:w-[64%]">
+                          <Note label="Coming next">
+                            <p className="text-[19px] font-medium text-ink">{j.next.title}</p>
+                            <p className="mt-1">{j.next.teaser}</p>
+                            <a href="/why#feedback" className="prose-link mt-2 inline-block text-ink">
+                              Tell me what you&apos;d want next
+                            </a>
+                          </Note>
                         </div>
                       </div>,
                     ]}
                     after={
-                      <a href="/demo" className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-semibold text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900">
-                        Open the live demo →
+                      <a href="/demo" className={button}>
+                        Open the live demo
                       </a>
                     }
                   />

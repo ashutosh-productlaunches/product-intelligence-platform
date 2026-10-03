@@ -1,11 +1,10 @@
 "use client";
-// The home page's one navigation: the whole route, always visible.
-//   Desktop: a table of contents fixed in a left rail. Sections, then every
-//            journey step grouped by stage: ✓ done, highlighted = on screen in the player.
-//            Journey → stage → step, each level folding open and shut. The live
-//            journey and the stage you're in open by themselves. Journeys not built
-//            yet are listed below it, dimmed, so the route ahead is visible.
-//   Phone:   a "Step 6 of 12 · Contents" button at the bottom that opens the same list.
+// The home page's one navigation: a thin bar fixed at the top, and the table of
+// contents behind it (docs/design-direction.md).
+//   The bar:      BuildAI Lab │ where you are (§06/12 · step title) │ Contents
+//   Contents:     the journey as a book's contents — parts, § numbers, dot leaders,
+//                 done and current marks — plus the journeys still to come and the
+//                 other pages. Same sheet on desktop and phone.
 //
 // Every entry is a plain link. Step links change the address (#step-6), and the
 // journey player shows that step.
@@ -18,8 +17,9 @@ type PageLink = { label: string; href: string };
 type JourneyInfo = { n: number; title: string };
 type Upcoming = { n: number; title: string; status: string };
 
-// A section counts as "current" once its top has scrolled past this line.
+// A section counts as "current" once its top has scrolled past this line (just under the bar).
 const LINE = 120;
+const pad = (n: number) => String(n).padStart(2, "0");
 
 function useScrollSpy(sections: Section[], total: number) {
   const [active, setActive] = useState(sections[0].id);
@@ -70,7 +70,6 @@ function Contents({
   upcoming,
   stages,
   links,
-  active,
   step,
   onPick,
 }: {
@@ -79,99 +78,23 @@ function Contents({
   upcoming: Upcoming[];
   stages: Stage[];
   links: PageLink[];
-  active: string;
   step: number;
-  onPick?: () => void;
+  onPick: () => void;
 }) {
-  const [journeyOpen, setJourneyOpen] = useState(true);
   const total = stages.reduce((a, s) => a + s.steps.length, 0);
-  const doneAll = Math.min(Math.max(step - 1, 0), total);
-  // Which stages are open. A stage you haven't touched is open only while it holds
-  // the current step, so moving into a new stage opens it. Clicking a header
-  // opens or closes that stage, and that choice sticks.
-  const current = stages.findIndex((st) => st.steps.some((s) => s.n === step));
-  const [toggled, setToggled] = useState<Record<number, boolean>>({});
-  const isOpen = (i: number) => toggled[i] ?? i === current;
-  const toggle = (i: number) => setToggled((t) => ({ ...t, [i]: !(t[i] ?? i === current) }));
-
-  const item = (on: boolean) =>
-    `block rounded-md px-2 py-1 text-sm transition-colors ${
-      on
-        ? "bg-emerald-50 font-semibold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300"
-        : "text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-100"
-    }`;
   return (
-    <div className="grid gap-4">
-      <ul className="grid gap-0.5">
-        {sections
-          .filter((s) => s.id !== "journey")
-          .map((s) => (
-            <li key={s.id}>
-              <a href={`#${s.id}`} onClick={onPick} className={item(active === s.id)}>
-                {s.label}
-              </a>
-            </li>
-          ))}
-      </ul>
-
+    <div className="grid gap-10 md:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] md:gap-16">
       <div>
-        <p className="px-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Journeys</p>
-        <button
-          type="button"
-          onClick={() => setJourneyOpen((o) => !o)}
-          aria-expanded={journeyOpen}
-          className={`mt-2 flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900 ${
-            active === "journey" ? "text-emerald-800 dark:text-emerald-300" : "text-zinc-900 dark:text-zinc-100"
-          }`}
-        >
-          <span aria-hidden className={`text-zinc-400 transition-transform ${journeyOpen ? "rotate-90" : ""}`}>›</span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-[11px] font-semibold tracking-wider text-emerald-700 uppercase dark:text-emerald-400">
-              Journey {journey.n} · {total} steps
-            </span>
-            <span className="block text-sm font-semibold leading-snug">{journey.title}</span>
-          </span>
-          <span className="shrink-0 font-mono text-[11px] text-zinc-400">
-            {doneAll}/{total}
-          </span>
-        </button>
-        {journeyOpen && (
-        <ol className="mt-1 ml-3 grid gap-1 border-l border-zinc-200 pl-1 dark:border-zinc-800">
-          {stages.map((st, i) => {
-            const open = isOpen(i);
-            const first = st.steps[0].n;
-            const last = st.steps[st.steps.length - 1].n;
-            const done = st.steps.filter((s) => s.n < step).length;
-            const here = st.steps.some((s) => s.n === step);
-            return (
+        <p className="font-mono text-xs text-graphite">
+          Journey {journey.n} · {total} steps
+        </p>
+        <p className="mt-1 text-2xl leading-tight font-medium">{journey.title}</p>
+        <ol className="mt-6 grid gap-6">
+          {stages.map((st, i) => (
             <li key={st.title}>
-              <button
-                type="button"
-                onClick={() => toggle(i)}
-                aria-expanded={open}
-                className={`flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900 ${
-                  here ? "text-zinc-900 dark:text-zinc-100" : "text-zinc-600 dark:text-zinc-400"
-                }`}
-              >
-                <span aria-hidden className={`text-zinc-400 transition-transform ${open ? "rotate-90" : ""}`}>›</span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[13px] font-semibold leading-snug">
-                    {i + 1} · {st.title}
-                  </span>
-                  <span className="block text-[11px] text-zinc-500">
-                    {first === last ? `Step ${first}` : `Steps ${first}–${last}`}
-                  </span>
-                </span>
-                <span
-                  className={`shrink-0 font-mono text-[11px] ${
-                    done === st.steps.length ? "text-emerald-600 dark:text-emerald-400" : "text-zinc-400"
-                  }`}
-                >
-                  {done === st.steps.length ? "✓" : `${done}/${st.steps.length}`}
-                </span>
-              </button>
-              {open && (
-              <ol className="mt-0.5 mb-1 ml-3 grid border-l border-zinc-200 pl-1 dark:border-zinc-800">
+              <p className="font-mono text-xs text-graphite">Part {i + 1}</p>
+              <p className="text-lg leading-snug font-medium italic">{st.title}</p>
+              <ol className="mt-1.5 grid">
                 {st.steps.map((s) => {
                   const done = s.n < step;
                   const now = s.n === step;
@@ -181,64 +104,68 @@ function Contents({
                         href={`#step-${s.n}`}
                         onClick={onPick}
                         aria-current={now ? "step" : undefined}
-                        className={`flex items-baseline gap-2 rounded-md px-2 py-1 text-[13px] leading-snug transition-colors ${
-                          now
-                            ? "bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900"
-                            : done
-                              ? "text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100"
-                              : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-900"
-                        }`}
+                        className={`group flex items-baseline gap-3 py-1 text-[17px] leading-snug ${now ? "text-signal" : ""}`}
                       >
-                        <span
-                          aria-hidden
-                          className={`w-4 shrink-0 text-right font-mono text-[11px] ${
-                            done ? "text-emerald-600 dark:text-emerald-400" : now ? "" : "text-zinc-400"
-                          }`}
-                        >
-                          {done ? "✓" : s.n}
+                        <span className="w-8 shrink-0 font-mono text-xs text-graphite">§{pad(s.n)}</span>
+                        <span className="group-hover:underline group-hover:underline-offset-4">{s.title}</span>
+                        <span aria-hidden className="leader" />
+                        <span className={`shrink-0 font-mono text-xs ${now ? "text-signal" : "text-graphite"}`}>
+                          {now ? "you are here" : done ? "done" : ""}
                         </span>
-                        {s.title}
                       </a>
                     </li>
                   );
                 })}
               </ol>
-              )}
             </li>
-            );
-          })}
+          ))}
         </ol>
-        )}
-        {upcoming.length > 0 && (
-          <a
-            href="/roadmap"
-            className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
-          >
-            <span aria-hidden className="w-2" />
-            <span className="min-w-0 flex-1">
-              <span className="block text-[11px] font-semibold tracking-wider uppercase">
-                Journey {upcoming[0].n} · {upcoming[0].status}
-              </span>
-              <span className="block text-sm leading-snug">{upcoming[0].title}</span>
-              {upcoming.length > 1 && (
-                <span className="mt-0.5 block text-[11px]">
-                  Journeys {upcoming[1].n}–{upcoming[upcoming.length - 1].n} on the roadmap →
-                </span>
-              )}
-            </span>
-          </a>
-        )}
       </div>
 
-      <ul className="grid gap-0.5 border-t border-zinc-200 pt-3 dark:border-zinc-800">
-        {links.map((l) => (
-          <li key={l.href}>
-            <a href={l.href} className={item(false)}>
-              {l.label} <span aria-hidden className="text-zinc-400">→</span>
+      <div className="grid content-start gap-8 border-t border-rule pt-6 md:border-t-0 md:border-l md:pt-0 md:pl-8">
+        <div>
+          <p className="font-mono text-xs text-graphite">On this page</p>
+          <ul className="mt-2 grid gap-1 text-[17px]">
+            {sections.map((s) => (
+              <li key={s.id}>
+                <a href={`#${s.id}`} onClick={onPick} className="prose-link">
+                  {s.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div>
+          <p className="font-mono text-xs text-graphite">Elsewhere</p>
+          <ul className="mt-2 grid gap-1 text-[17px]">
+            {links.map((l) => (
+              <li key={l.href}>
+                <a href={l.href} className="prose-link">
+                  {l.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {upcoming.length > 0 && (
+          <div>
+            <p className="font-mono text-xs text-graphite">Still to come</p>
+            <ul className="mt-2 grid gap-2">
+              {upcoming.map((u) => (
+                <li key={u.n} className="text-graphite">
+                  <span className="block font-mono text-xs">
+                    Journey {u.n} · {u.status}
+                  </span>
+                  <span className="block leading-snug">{u.title}</span>
+                </li>
+              ))}
+            </ul>
+            <a href="/roadmap" className="prose-link mt-2 inline-block text-[15px]">
+              The full roadmap
             </a>
-          </li>
-        ))}
-      </ul>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -261,66 +188,64 @@ export function SectionNav({
   const total = stages.reduce((a, s) => a + s.steps.length, 0);
   const { active, step } = useScrollSpy(sections, total);
   const [open, setOpen] = useState(false);
-  const inJourney = active === "journey" && step > 0 && step <= total;
+  const inJourney = active === "journey" && step > 0;
+  const title = stages.flatMap((s) => s.steps).find((s) => s.n === step)?.title;
+  const where = inJourney
+    ? step > total
+      ? `Journey ${journey.n} · complete`
+      : `Journey ${journey.n} · §${pad(step)}/${total}`
+    : sections.find((s) => s.id === active)?.label;
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open]);
 
   return (
-    <>
-      {/* Desktop: the rail */}
-      <aside className="hidden border-r border-zinc-200 bg-zinc-50 lg:block dark:border-zinc-800 dark:bg-zinc-900/40">
-        <nav
-          aria-label="Contents"
-          className="sticky top-0 max-h-screen overflow-y-auto px-4 py-8 [scrollbar-width:thin]"
+    <header className="sticky top-0 z-50 border-b border-rule bg-paper">
+      <div className="mx-auto flex h-12 w-full max-w-[76rem] items-center gap-4 px-4 sm:px-6 lg:px-10">
+        <a href="#overview" className="shrink-0 text-lg font-semibold tracking-tight">
+          {brand}
+        </a>
+        <p className="min-w-0 flex-1 truncate border-l border-rule pl-4 font-mono text-xs text-graphite">
+          {where}
+          {inJourney && step <= total && title && <span className="hidden text-ink sm:inline"> · {title}</span>}
+        </p>
+        <button
+          type="button"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-controls="contents"
+          className="shrink-0 border-l border-rule pl-4 font-mono text-xs font-medium hover:text-signal"
         >
-          <a href="#overview" className="block px-2 text-xs font-semibold tracking-widest text-zinc-500 uppercase">
-            {brand}
-          </a>
-          <div className="mt-6">
-            <Contents sections={sections} journey={journey} upcoming={upcoming} stages={stages} links={links} active={active} step={step} />
-          </div>
-        </nav>
-      </aside>
+          {open ? "Close" : "Contents"}
+        </button>
+      </div>
 
-      {/* Phone: one button at the bottom, opening the same list */}
-      <div className="lg:hidden">
-        {open && (
-          <div className="fixed inset-0 z-40 bg-zinc-900/30" onClick={() => setOpen(false)} aria-hidden />
-        )}
-        <div className="fixed inset-x-3 bottom-3 z-50">
-          {open && (
-            <nav
-              aria-label="Contents"
-              className="mb-2 max-h-[70vh] overflow-y-auto rounded-2xl border border-zinc-200 bg-white p-4 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950"
-            >
+      {open && (
+        <>
+          <div className="fixed inset-0 top-12 bg-ink/20" onClick={() => setOpen(false)} aria-hidden />
+          <nav
+            id="contents"
+            aria-label="Contents"
+            className="absolute inset-x-0 top-full max-h-[calc(100vh-3rem)] overflow-y-auto border-b border-ink bg-paper"
+          >
+            <div className="mx-auto w-full max-w-[76rem] px-4 py-8 sm:px-6 lg:px-10">
               <Contents
                 sections={sections}
                 journey={journey}
                 upcoming={upcoming}
                 stages={stages}
                 links={links}
-                active={active}
                 step={step}
                 onPick={() => setOpen(false)}
               />
-            </nav>
-          )}
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-expanded={open}
-            className="mx-auto flex items-center gap-3 rounded-full bg-zinc-900 px-4 py-2.5 text-sm text-white shadow-xl dark:bg-zinc-100 dark:text-zinc-900"
-          >
-            {inJourney ? (
-              <span>
-                <span className="font-semibold">Step {step} of {total}</span>
-                <span className="opacity-70"> · {total - step} left</span>
-              </span>
-            ) : (
-              <span className="font-semibold">{brand}</span>
-            )}
-            <span className="border-l border-white/20 pl-3 opacity-80 dark:border-zinc-900/20">{open ? "Close" : "Contents"}</span>
-          </button>
-        </div>
-      </div>
-    </>
+            </div>
+          </nav>
+        </>
+      )}
+    </header>
   );
 }
