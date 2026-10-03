@@ -11,6 +11,7 @@ import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
 import { patterns } from "@/content/app-patterns";
 import type { Look } from "@/content/looks";
 import { SectionNav } from "@/components/section-nav";
+import { journeys } from "@/content/roadmap";
 import { JourneyPlayer } from "@/components/journey-player";
 import { Panes } from "@/components/panes";
 import { Parts } from "@/components/parts";
@@ -507,7 +508,16 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
 
   return (
     <div className="w-full lg:grid lg:min-h-screen lg:grid-cols-[17rem_minmax(0,1fr)]">
-      <SectionNav brand="AI Tool Lab for PMs" sections={SECTIONS} stages={navStages} links={PAGES} />
+      <SectionNav
+        brand="AI Tool Lab for PMs"
+        sections={SECTIONS}
+        journey={{ n: j.number, title: j.name }}
+        upcoming={journeys
+          .filter((x) => x.status !== "built")
+          .map((x) => ({ n: x.n, title: x.title, status: x.status === "planned" ? "Planned" : "Upcoming" }))}
+        stages={navStages}
+        links={PAGES}
+      />
 
     <main className="mx-auto w-full max-w-[60rem] min-w-0 px-4 pt-6 pb-24 sm:px-6 lg:px-10 lg:pt-8 2xl:max-w-[72rem]">
       <noscript>

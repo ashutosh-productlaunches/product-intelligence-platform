@@ -2,7 +2,9 @@
 // The home page's one navigation: the whole route, always visible.
 //   Desktop: a table of contents fixed in a left rail. Sections, then every
 //            journey step grouped by stage: ✓ done, highlighted = on screen in the player.
-//            Each stage folds open and shut; the stage you're in opens by itself.
+//            Journey → stage → step, each level folding open and shut. The live
+//            journey and the stage you're in open by themselves. Journeys not built
+//            yet are listed below it, dimmed, so the route ahead is visible.
 //   Phone:   a "Step 6 of 12 · Contents" button at the bottom that opens the same list.
 //
 // Every entry is a plain link. Step links change the address (#step-6), and the
@@ -13,6 +15,8 @@ import { stepFromHash } from "@/components/journey-player";
 type Section = { id: string; label: string };
 type Stage = { title: string; steps: { n: number; title: string }[] };
 type PageLink = { label: string; href: string };
+type JourneyInfo = { n: number; title: string };
+type Upcoming = { n: number; title: string; status: string };
 
 // A section counts as "current" once its top has scrolled past this line.
 const LINE = 120;
@@ -62,6 +66,8 @@ function useScrollSpy(sections: Section[], total: number) {
 
 function Contents({
   sections,
+  journey,
+  upcoming,
   stages,
   links,
   active,
@@ -69,12 +75,17 @@ function Contents({
   onPick,
 }: {
   sections: Section[];
+  journey: JourneyInfo;
+  upcoming: Upcoming[];
   stages: Stage[];
   links: PageLink[];
   active: string;
   step: number;
   onPick?: () => void;
 }) {
+  const [journeyOpen, setJourneyOpen] = useState(true);
+  const total = stages.reduce((a, s) => a + s.steps.length, 0);
+  const doneAll = Math.min(Math.max(step - 1, 0), total);
   // Which stages are open. A stage you haven't touched is open only while it holds
   // the current step, so moving into a new stage opens it. Clicking a header
   // opens or closes that stage, and that choice sticks.
@@ -104,16 +115,28 @@ function Contents({
       </ul>
 
       <div>
-        <a
-          href="#journey"
-          onClick={onPick}
-          className={`px-2 text-xs font-semibold tracking-wider uppercase ${
-            active === "journey" ? "text-emerald-700 dark:text-emerald-400" : "text-zinc-500"
+        <p className="px-2 text-xs font-semibold tracking-wider text-zinc-500 uppercase">Journeys</p>
+        <button
+          type="button"
+          onClick={() => setJourneyOpen((o) => !o)}
+          aria-expanded={journeyOpen}
+          className={`mt-2 flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900 ${
+            active === "journey" ? "text-emerald-800 dark:text-emerald-300" : "text-zinc-900 dark:text-zinc-100"
           }`}
         >
-          Journey · {stages.reduce((a, s) => a + s.steps.length, 0)} steps
-        </a>
-        <ol className="mt-2 grid gap-1">
+          <span aria-hidden className={`text-zinc-400 transition-transform ${journeyOpen ? "rotate-90" : ""}`}>›</span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[11px] font-semibold tracking-wider text-emerald-700 uppercase dark:text-emerald-400">
+              Journey {journey.n} · {total} steps
+            </span>
+            <span className="block text-sm font-semibold leading-snug">{journey.title}</span>
+          </span>
+          <span className="shrink-0 font-mono text-[11px] text-zinc-400">
+            {doneAll}/{total}
+          </span>
+        </button>
+        {journeyOpen && (
+        <ol className="mt-1 ml-3 grid gap-1 border-l border-zinc-200 pl-1 dark:border-zinc-800">
           {stages.map((st, i) => {
             const open = isOpen(i);
             const first = st.steps[0].n;
@@ -185,6 +208,26 @@ function Contents({
             );
           })}
         </ol>
+        )}
+        {upcoming.length > 0 && (
+          <a
+            href="/roadmap"
+            className="mt-1 flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-900 dark:hover:text-zinc-200"
+          >
+            <span aria-hidden className="w-2" />
+            <span className="min-w-0 flex-1">
+              <span className="block text-[11px] font-semibold tracking-wider uppercase">
+                Journey {upcoming[0].n} · {upcoming[0].status}
+              </span>
+              <span className="block text-sm leading-snug">{upcoming[0].title}</span>
+              {upcoming.length > 1 && (
+                <span className="mt-0.5 block text-[11px]">
+                  Journeys {upcoming[1].n}–{upcoming[upcoming.length - 1].n} on the roadmap →
+                </span>
+              )}
+            </span>
+          </a>
+        )}
       </div>
 
       <ul className="grid gap-0.5 border-t border-zinc-200 pt-3 dark:border-zinc-800">
@@ -203,11 +246,15 @@ function Contents({
 export function SectionNav({
   brand,
   sections,
+  journey,
+  upcoming,
   stages,
   links,
 }: {
   brand: string;
   sections: Section[];
+  journey: JourneyInfo;
+  upcoming: Upcoming[];
   stages: Stage[];
   links: PageLink[];
 }) {
@@ -228,7 +275,7 @@ export function SectionNav({
             {brand}
           </a>
           <div className="mt-6">
-            <Contents sections={sections} stages={stages} links={links} active={active} step={step} />
+            <Contents sections={sections} journey={journey} upcoming={upcoming} stages={stages} links={links} active={active} step={step} />
           </div>
         </nav>
       </aside>
@@ -246,6 +293,8 @@ export function SectionNav({
             >
               <Contents
                 sections={sections}
+                journey={journey}
+                upcoming={upcoming}
                 stages={stages}
                 links={links}
                 active={active}
