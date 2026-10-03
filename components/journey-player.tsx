@@ -69,9 +69,9 @@ export function JourneyPlayer({
   const pad = (n: number) => String(n).padStart(2, "0");
 
   return (
-    <div id="player" className="scroll-mt-16">
+    <div id="player" className="scroll-mt-20">
       {resume > 0 && (
-        <p className="mb-6 border-y border-rule py-3 text-[17px]">
+        <p className="mb-6 rounded-[3px] bg-signal-soft px-4 py-3 text-[17px]">
           <span className="font-medium">Welcome back.</span>{" "}
           {resume > total ? "You finished the journey. " : `You were on §${pad(resume)}, ${meta[resume - 1]?.title}. `}
           <a href={hrefFor(resume)} className="prose-link">
@@ -95,11 +95,11 @@ export function JourneyPlayer({
                       title={`§${pad(m.n)} · ${m.title}`}
                       aria-label={`Step ${m.n}: ${m.title}`}
                       aria-current={now ? "step" : undefined}
-                      className={`block border-t-2 pt-1 font-mono text-[11px] tabular-nums ${
+                      className={`block border-t-[3px] pt-1 font-label text-[12px] tabular-nums ${
                         now
-                          ? "border-signal font-semibold text-signal"
+                          ? "border-signal font-bold text-signal"
                           : done
-                            ? "border-ink text-ink"
+                            ? "border-signal/45 text-ink"
                             : "border-rule text-graphite hover:border-graphite"
                       }`}
                     >
@@ -109,7 +109,7 @@ export function JourneyPlayer({
                 );
               })}
             </ol>
-            <p className="mt-1 hidden truncate font-mono text-[11px] text-graphite md:block">{st.title}</p>
+            <p className="mt-1 hidden truncate font-label text-[11px] text-graphite md:block">{st.title}</p>
           </li>
         ))}
       </ol>

@@ -13,7 +13,7 @@ import { bench, benchLabel, button } from "@/components/style";
 
 function Code({ children }: { children: string }) {
   return (
-    <pre className="mt-3 overflow-x-auto bg-ink px-4 py-3 font-mono text-[13px] leading-relaxed text-paper">{children}</pre>
+    <pre className="mt-3 overflow-x-auto rounded-[3px] bg-ink px-4 py-3 font-mono text-[13px] leading-relaxed text-paper">{children}</pre>
   );
 }
 
@@ -24,13 +24,13 @@ export function Experiment({ x, personalised }: { x: ExperimentData; personalise
   const [guess, setGuess] = useState<number | null>(null);
   const [shown, setShown] = useState(false);
   const right = guess === x.predict.answer;
-  const row = "grid gap-3 border-t border-ink/30 px-4 py-5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6 sm:px-6";
+  const row = "grid gap-3 border-t border-rule px-4 py-5 sm:grid-cols-[7rem_minmax(0,1fr)] sm:gap-6 sm:px-6";
 
   return (
     <div className={`${bench} min-w-0`}>
       <div className="flex flex-wrap items-baseline justify-between gap-2 px-4 py-3 sm:px-6">
         <p className={benchLabel}>Bench · Break it</p>
-        <p className="font-mono text-[13px]">{x.title}</p>
+        <p className="font-label text-[13px]">{x.title}</p>
       </div>
 
       {/* 01 · Predict */}
@@ -50,24 +50,24 @@ export function Experiment({ x, personalised }: { x: ExperimentData; personalise
                   aria-checked={picked}
                   disabled={guess !== null}
                   onClick={() => setGuess(i)}
-                  className={`flex gap-3 border px-3 py-2 text-left text-[16px] leading-snug ${
+                  className={`flex gap-3 rounded-[3px] border px-3 py-2 text-left text-[16px] leading-snug ${
                     reveal
                       ? "border-pass bg-paper ring-1 ring-pass"
                       : picked
-                        ? "border-ink bg-paper ring-1 ring-ink"
+                        ? "border-signal bg-paper ring-1 ring-signal"
                         : guess === null
-                          ? "border-ink/30 bg-paper hover:border-ink"
-                          : "border-ink/20 bg-paper text-graphite"
+                          ? "border-rule bg-paper hover:border-signal"
+                          : "border-rule bg-paper text-graphite"
                   }`}
                 >
-                  <span className="font-mono text-xs leading-6 text-graphite">{letters[i]}</span>
+                  <span className="font-label text-[13px] leading-6 text-graphite">{letters[i]}</span>
                   <span className="flex-1">{o}</span>
-                  {reveal && <span className="font-mono text-[11px] leading-6 text-pass">expected</span>}
+                  {reveal && <span className="font-label text-[11px] leading-6 text-pass">expected</span>}
                 </button>
               );
             })}
           </div>
-          <p className="mt-2 font-mono text-xs text-graphite">
+          <p className="mt-2 font-label text-[13px] text-graphite">
             {guess === null ? "Pick one. You can't change it, so commit." : `Locked in: ${letters[guess]}. Now run the experiment.`}
           </p>
         </div>
@@ -80,8 +80,8 @@ export function Experiment({ x, personalised }: { x: ExperimentData; personalise
           <p className="text-[17px] leading-relaxed">{x.change}</p>
           {x.code && <Code>{x.code}</Code>}
           {personalised && x.ifYourApp && (
-            <p className="mt-3 border-l-2 border-signal pl-3 text-[16px]">
-              <span className="font-mono text-xs text-signal">Your app </span>
+            <p className="mt-3 rounded-[3px] bg-signal-soft px-3 py-2 text-[16px]">
+              <span className="font-label text-[13px] font-bold">Your app </span>
               {x.ifYourApp}
             </p>
           )}
@@ -98,7 +98,7 @@ export function Experiment({ x, personalised }: { x: ExperimentData; personalise
             </button>
           ) : (
             <div className="pane-in grid gap-4">
-              <p className={`font-mono text-[13px] font-medium ${right ? "text-pass" : "text-fail"}`}>
+              <p className={`font-label text-[13px] font-medium ${right ? "text-pass" : "text-fail"}`}>
                 {right
                   ? "Prediction matched."
                   : `Predicted ${letters[guess!]}, observed ${letters[x.predict.answer]}. That gap is the lesson.`}
@@ -111,9 +111,9 @@ export function Experiment({ x, personalised }: { x: ExperimentData; personalise
                 <span className="font-medium text-ink">Why: </span>
                 {x.why}
               </p>
-              <div className="border-l-2 border-signal pl-4">
-                <p className="font-mono text-xs text-signal">PM lens</p>
-                <p className="mt-1 text-[19px] leading-snug">{x.pmLens}</p>
+              <div className="border-l-4 border-signal pl-4">
+                <p className="font-label text-[13px] font-bold text-signal">PM lens</p>
+                <p className="mt-1 text-[18px] leading-snug font-medium">{x.pmLens}</p>
               </div>
             </div>
           )}
@@ -151,14 +151,14 @@ export function CopyHelp({ prompt }: { prompt: string }) {
         <button
           type="button"
           onClick={copy}
-          className="border border-ink px-3 py-1.5 font-mono text-[13px] hover:bg-ink hover:text-paper"
+          className="rounded-full border border-rule bg-paper px-4 py-1.5 text-[14px] font-semibold hover:bg-paper-2"
         >
           {state === "copied" ? "Copied" : "Copy context for your AI"}
         </button>
-        {state === "failed" && <span className="font-mono text-xs text-fail">Couldn&apos;t copy. Select the text below instead.</span>}
+        {state === "failed" && <span className="font-label text-[13px] text-fail">Couldn&apos;t copy. Select the text below instead.</span>}
         <details className="basis-full" open={state === "failed"}>
-          <summary className="cursor-pointer font-mono text-xs text-graphite hover:text-ink">See what gets copied</summary>
-          <pre className="mt-2 max-h-64 overflow-auto border border-rule bg-paper-2 px-3 py-2 font-mono text-[12px] leading-relaxed whitespace-pre-wrap">
+          <summary className="cursor-pointer font-label text-[13px] text-graphite hover:text-ink">See what gets copied</summary>
+          <pre className="mt-2 max-h-64 overflow-auto rounded-[3px] border border-rule bg-paper-2 px-3 py-2 font-mono text-[12px] leading-relaxed whitespace-pre-wrap">
             {prompt}
           </pre>
         </details>

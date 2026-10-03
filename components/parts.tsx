@@ -11,7 +11,7 @@ export function Parts({ step, labels, parts }: { step: number; labels: string[];
 
   return (
     <div className="mt-6">
-      <ol className="flex flex-wrap gap-x-5 gap-y-1 font-mono text-[13px]">
+      <ol className="flex flex-wrap gap-x-5 gap-y-1 text-[15px] font-medium">
         {labels.map((label, k) => (
           <li key={label} className="shrink-0">
             <button
@@ -37,12 +37,12 @@ export function Parts({ step, labels, parts }: { step: number; labels: string[];
         ))}
       </div>
 
-      <div className="mt-5 flex items-center justify-between gap-3 font-mono text-[13px]">
+      <div className="mt-5 flex items-center justify-between gap-3 text-[15px]">
         <button type="button" onClick={() => go(i - 1)} className={`text-graphite hover:text-ink ${i === 0 ? "invisible" : ""}`}>
           ← {step}.{i} {labels[i - 1] ?? ""}
         </button>
         {i < parts.length - 1 && (
-          <button type="button" onClick={() => go(i + 1)} className="border-b border-ink hover:border-signal hover:text-signal">
+          <button type="button" onClick={() => go(i + 1)} className="font-semibold text-signal hover:underline">
             Next part: {step}.{i + 2} {labels[i + 1]} →
           </button>
         )}

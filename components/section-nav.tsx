@@ -85,15 +85,15 @@ function Contents({
   return (
     <div className="grid gap-10 md:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] md:gap-16">
       <div>
-        <p className="font-mono text-xs text-graphite">
+        <p className="font-label text-[13px] text-graphite">
           Journey {journey.n} · {total} steps
         </p>
-        <p className="mt-1 text-2xl leading-tight font-medium">{journey.title}</p>
+        <p className="mt-1 text-2xl leading-tight font-semibold">{journey.title}</p>
         <ol className="mt-6 grid gap-6">
           {stages.map((st, i) => (
             <li key={st.title}>
-              <p className="font-mono text-xs text-graphite">Part {i + 1}</p>
-              <p className="text-lg leading-snug font-medium italic">{st.title}</p>
+              <p className="font-label text-[13px] text-graphite">Part {i + 1}</p>
+              <p className="text-lg leading-snug font-semibold">{st.title}</p>
               <ol className="mt-1.5 grid">
                 {st.steps.map((s) => {
                   const done = s.n < step;
@@ -106,10 +106,10 @@ function Contents({
                         aria-current={now ? "step" : undefined}
                         className={`group flex items-baseline gap-3 py-1 text-[17px] leading-snug ${now ? "text-signal" : ""}`}
                       >
-                        <span className="w-8 shrink-0 font-mono text-xs text-graphite">§{pad(s.n)}</span>
+                        <span className="w-8 shrink-0 font-label text-[13px] text-graphite">§{pad(s.n)}</span>
                         <span className="group-hover:underline group-hover:underline-offset-4">{s.title}</span>
                         <span aria-hidden className="leader" />
-                        <span className={`shrink-0 font-mono text-xs ${now ? "text-signal" : "text-graphite"}`}>
+                        <span className={`shrink-0 font-label text-[13px] ${now ? "text-signal" : "text-graphite"}`}>
                           {now ? "you are here" : done ? "done" : ""}
                         </span>
                       </a>
@@ -124,7 +124,7 @@ function Contents({
 
       <div className="grid content-start gap-8 border-t border-rule pt-6 md:border-t-0 md:border-l md:pt-0 md:pl-8">
         <div>
-          <p className="font-mono text-xs text-graphite">On this page</p>
+          <p className="font-label text-[13px] text-graphite">On this page</p>
           <ul className="mt-2 grid gap-1 text-[17px]">
             {sections.map((s) => (
               <li key={s.id}>
@@ -136,7 +136,7 @@ function Contents({
           </ul>
         </div>
         <div>
-          <p className="font-mono text-xs text-graphite">Elsewhere</p>
+          <p className="font-label text-[13px] text-graphite">Elsewhere</p>
           <ul className="mt-2 grid gap-1 text-[17px]">
             {links.map((l) => (
               <li key={l.href}>
@@ -149,11 +149,11 @@ function Contents({
         </div>
         {upcoming.length > 0 && (
           <div>
-            <p className="font-mono text-xs text-graphite">Still to come</p>
+            <p className="font-label text-[13px] text-graphite">Still to come</p>
             <ul className="mt-2 grid gap-2">
               {upcoming.map((u) => (
                 <li key={u.n} className="text-graphite">
-                  <span className="block font-mono text-xs">
+                  <span className="block font-label text-[13px]">
                     Journey {u.n} · {u.status}
                   </span>
                   <span className="block leading-snug">{u.title}</span>
@@ -205,11 +205,11 @@ export function SectionNav({
 
   return (
     <header className="sticky top-0 z-50 border-b border-rule bg-paper">
-      <div className="mx-auto flex h-12 w-full max-w-[76rem] items-center gap-4 px-4 sm:px-6 lg:px-10">
-        <a href="#overview" className="shrink-0 text-lg font-semibold tracking-tight">
+      <div className="mx-auto flex h-14 w-full max-w-[76rem] items-center gap-4 px-4 sm:px-6 lg:px-10">
+        <a href="#overview" className="shrink-0 text-[19px] font-bold tracking-[-0.01em]">
           {brand}
         </a>
-        <p className="min-w-0 flex-1 truncate border-l border-rule pl-4 font-mono text-xs text-graphite">
+        <p className="min-w-0 flex-1 truncate border-l border-rule pl-4 font-label text-[13px] text-graphite">
           {where}
           {inJourney && step <= total && title && <span className="hidden text-ink sm:inline"> · {title}</span>}
         </p>
@@ -218,7 +218,7 @@ export function SectionNav({
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-controls="contents"
-          className="shrink-0 border-l border-rule pl-4 font-mono text-xs font-medium hover:text-signal"
+          className="shrink-0 rounded-[3px] px-3 py-1.5 text-[14px] font-semibold hover:bg-paper-2"
         >
           {open ? "Close" : "Contents"}
         </button>
@@ -226,11 +226,11 @@ export function SectionNav({
 
       {open && (
         <>
-          <div className="fixed inset-0 top-12 bg-ink/20" onClick={() => setOpen(false)} aria-hidden />
+          <div className="fixed inset-0 top-14 bg-ink/30" onClick={() => setOpen(false)} aria-hidden />
           <nav
             id="contents"
             aria-label="Contents"
-            className="absolute inset-x-0 top-full max-h-[calc(100vh-3rem)] overflow-y-auto border-b border-ink bg-paper"
+            className="absolute inset-x-0 top-full max-h-[calc(100vh-3.5rem)] overflow-y-auto border-b border-rule bg-paper shadow-xl shadow-ink/10"
           >
             <div className="mx-auto w-full max-w-[76rem] px-4 py-8 sm:px-6 lg:px-10">
               <Contents

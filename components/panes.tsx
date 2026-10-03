@@ -25,7 +25,7 @@ export function Panes({
 
   return (
     <div>
-      <div role="tablist" className="flex gap-x-6 overflow-x-auto border-b border-rule [scrollbar-width:none]">
+      <div role="tablist" className="flex gap-x-6 overflow-x-auto border-b-2 border-rule [scrollbar-width:none]">
         {labels.map((label, k) => (
           <button
             key={label}
@@ -33,11 +33,11 @@ export function Panes({
             role="tab"
             aria-selected={k === i}
             onClick={() => setI(k)}
-            className={`-mb-px flex shrink-0 items-baseline gap-1.5 border-b-2 pt-1 pb-2 font-mono text-[13px] whitespace-nowrap ${
-              k === i ? "border-signal text-ink" : k < i ? "border-transparent text-ink hover:border-rule" : "border-transparent text-graphite hover:text-ink"
+            className={`-mb-0.5 flex shrink-0 items-baseline gap-1.5 border-b-2 pt-1 pb-2.5 text-[15px] font-medium whitespace-nowrap ${
+              k === i ? "border-signal text-signal" : k < i ? "border-transparent text-ink hover:border-rule" : "border-transparent text-graphite hover:text-ink"
             }`}
           >
-            <span className={`text-[11px] ${k === i ? "text-signal" : ""}`}>{num(k)}</span>
+            <span className="text-[12px] opacity-70">{num(k)}</span>
             {label}
           </button>
         ))}
@@ -55,7 +55,7 @@ export function Panes({
         <button
           type="button"
           onClick={() => setI(i - 1)}
-          className={`font-mono text-[13px] text-graphite hover:text-ink ${i === 0 ? "invisible" : ""}`}
+          className={`text-[15px] font-medium text-graphite hover:text-ink ${i === 0 ? "invisible" : ""}`}
         >
           ← {labels[i - 1] ?? ""}
         </button>

@@ -3,6 +3,18 @@
 Status: agreed direction, P0 spec. Build steps 1–2 done (foundation; journey step and navigation).
 Chosen 3 Oct 2026: **A "The Annotated Manual" + B "The Bench" are P0. C "Descent" comes later.**
 
+**Visual style changed 3 Oct 2026: in the style of the Atlassian website.** The cream paper, serif and
+orange-red accent were rejected ("typical Claude colour"). The *structure* of A + B stays (reading column
+and margin notes, panels for anything that runs, one navigation, one advance control). The *look* is now:
+white canvas, navy text, one cobalt blue, a single friendly sans, 3px corners, a pill only for the primary
+action. Where this file still says serif, paper, ink, mono labels or "corners 0", the Tokens and Type
+sections below win.
+
+Not Atlassian: no Atlassian name, logo or Charlie typeface (it's proprietary). Figtree stands in for it.
+Reference values come from third-party breakdowns of atlassian.com (the site itself couldn't be reached
+from the build environment): cobalt `#1868DB`, navy `#172B4D`, subtle text `#44546F`, grey surface `#F7F8F9`,
+pill primary button, 3px elsewhere.
+
 ## The one rule
 
 **Read like a manual. Test like a bench.**
@@ -26,29 +38,31 @@ They share one paper, one ink, one accent and one grid, so the site reads as one
 
 | Token | Light | Use |
 |---|---|---|
-| `paper` | `#F3F0E8` | page background |
-| `paper-2` | `#E7E3DA` | bench panels (B) |
-| `ink` | `#1B1A17` | text, lines |
-| `graphite` | `#5E5A52` | secondary text, margin notes |
-| `rule` | `#CFC9BC` | hairlines |
-| `signal` | `#B33C17` | **one meaning: "look here / this is live / this step"**. Annotations (A) and signal (B). |
-| `pass` | `#2F6F4A` | only a check that passed |
-| `fail` | `#A3271D` | only a check that failed |
+| `paper` | `#FFFFFF` | page background |
+| `paper-2` | `#F7F8F9` | panels (B) |
+| `ink` | `#172B4D` | text (navy) |
+| `graphite` | `#44546F` | secondary text |
+| `rule` | `#DCDFE4` | hairlines, borders |
+| `signal` | `#1868DB` | **one meaning: the action, or "this step / this is live"** |
+| `signal-hover` | `#1558BC` | hover on blue |
+| `signal-soft` | `#E9F2FE` | margin notes, "your app" callouts, lozenges |
+| `pass` | `#216E4E` | only a check that passed |
+| `fail` | `#C9372C` | only a check that failed |
 
 - Retire emerald, sky, amber, rose and zinc as semantic colours.
-- Corners: 0. (2px max on form inputs.) No shadows. No gradients. No backdrop blur.
-- Contrast checked for small text (WCAG AA): ink 15.3:1, graphite 6.0:1, signal 5.2:1, pass 5.3:1, fail 6.4:1 on paper; all ≥ 4.6:1 on paper-2. The first signal value (`#C8431E`) failed at 4.3:1 and was darkened. `rule` is for lines only.
+- Corners: 3px on panels, boxes, inputs and code. The primary button is a pill; secondary buttons are pill outlines. Shadows only on overlays (the Contents sheet). No gradients. No backdrop blur.
+- Contrast checked for small text (WCAG AA): on white, ink 14.1:1, graphite 7.7:1, signal 5.2:1, pass 6.2:1, fail 5.2:1; on paper-2 all ≥ 4.8:1. White on signal 5.2:1. Pass started at `#1F845A` and failed on paper-2 (4.4:1), so it was darkened. `rule` is for lines only.
 - **Light only for P0.** Dark mode is P1. Existing `dark:` classes are inert until then (`@custom-variant dark` in `app/globals.css`).
 
 ## Type
 
 | Role | Face | Notes |
 |---|---|---|
-| Headings, body prose | **Newsreader** (variable, optical size) | body ~19px / 1.6; h1 clamp(2.75rem, 6vw, 4.75rem) |
-| Code, readouts, labels, step numbers, nav, buttons | **IBM Plex Mono** | 13–14px; tabular figures |
+| Everything you read: headings, body, labels, nav, buttons | **Figtree** | headings semibold, tracking −0.02em; body 18px / 1.6; labels 13px (`font-label` token) |
+| Code and readouts only | **IBM Plex Mono** | 13px |
 
 - Two families only. No Geist, Inter or system sans.
-- Uppercase letter-spaced labels are allowed **only on bench panels** (B), e.g. `B · SERVER ROUTE`. Everywhere else, labels are sentence case.
+- Uppercase letter-spaced labels are allowed **only on panel headers**, e.g. `WHERE THIS STEP WORKS`. Everywhere else, labels are sentence case.
 - No decorative ✓ / → / ›. Arrows only where something actually flows (diagrams, the request path).
 
 ## Layout

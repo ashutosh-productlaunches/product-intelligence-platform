@@ -38,8 +38,8 @@ function Spread({ children, note }: { children: ReactNode; note?: ReactNode }) {
 // A margin note: a short signal rule, a mono label, graphite text.
 function Note({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <div className="border-t-2 border-signal pt-2 text-[16px] leading-relaxed text-graphite">
-      <p className="font-mono text-xs text-signal">{label}</p>
+    <div className="rounded-[3px] bg-signal-soft px-4 py-3 text-[16px] leading-relaxed text-ink">
+      <p className="font-label text-[13px] font-bold">{label}</p>
       <div className="mt-1.5">{children}</div>
     </div>
   );
@@ -49,9 +49,9 @@ function Note({ label, children }: { label: string; children: ReactNode }) {
 function Figure({ children, n, caption }: { children: string; n: number; caption: string }) {
   return (
     <figure className="mt-6">
-      <pre className="overflow-x-auto border-y border-ink py-4 font-mono text-[13px] leading-relaxed">{children}</pre>
-      <figcaption className="mt-2 text-[15px] text-graphite italic">
-        <span className="font-mono text-xs not-italic">Fig. {n}</span> — {caption}
+      <pre className="overflow-x-auto rounded-[3px] border border-rule bg-paper-2 px-4 py-4 font-mono text-[13px] leading-relaxed">{children}</pre>
+      <figcaption className="mt-2 text-[15px] text-graphite">
+        <span className="font-label text-[13px]">Fig. {n}</span> — {caption}
       </figcaption>
     </figure>
   );
@@ -97,7 +97,7 @@ function Chain({ items, dark = false }: { items: string[]; dark?: boolean }) {
 
 // Code the learner types or runs: dark, like the terminal or editor they'll paste it into.
 function Code({ children }: { children: string }) {
-  return <pre className="mt-3 overflow-x-auto bg-ink px-4 py-3 font-mono text-[13px] leading-relaxed text-paper">{children}</pre>;
+  return <pre className="mt-3 overflow-x-auto rounded-[3px] bg-ink px-4 py-3 font-mono text-[13px] leading-relaxed text-paper">{children}</pre>;
 }
 
 // Five questions after each step. Each answer opens to say why it's right or why it's wrong.
@@ -115,12 +115,12 @@ function CheckUnderstanding({ questions, step }: { questions: Question[]; step: 
   const letters = ["A", "B", "C", "D"];
   return (
     <Spread>
-      <p className="text-2xl italic">Questions for review</p>
+      <p className="text-2xl font-semibold">Questions for review</p>
       <ol className="mt-6 grid gap-9">
         {questions.map((qn, qi) => (
           <li key={qn.q}>
             <p className="text-[18px] leading-snug font-medium">
-              <span className="mr-2 font-mono text-xs font-normal text-graphite">
+              <span className="mr-2 font-label text-[13px] font-normal text-graphite">
                 {step}.{qi + 1}
               </span>
               {qn.q}
@@ -129,11 +129,11 @@ function CheckUnderstanding({ questions, step }: { questions: Question[]; step: 
               {placed(qn.answers, step, qi).map((a, ai) => (
                 <details key={a.text} className="border-b border-rule">
                   <summary className="flex cursor-pointer list-none gap-3 py-2.5 text-[16px] leading-snug hover:text-signal">
-                    <span className="font-mono text-xs leading-6 text-graphite">{letters[ai]}</span>
+                    <span className="font-label text-[13px] leading-6 text-graphite">{letters[ai]}</span>
                     <span>{a.text}</span>
                   </summary>
                   <p className={`mb-3 ml-6 border-l-2 pl-3 text-[16px] leading-relaxed ${a.correct ? "border-pass" : "border-fail"}`}>
-                    <span className={`font-mono text-xs ${a.correct ? "text-pass" : "text-fail"}`}>{a.correct ? "Correct. " : "Not quite. "}</span>
+                    <span className={`font-label text-[13px] ${a.correct ? "text-pass" : "text-fail"}`}>{a.correct ? "Correct. " : "Not quite. "}</span>
                     {a.why}
                   </p>
                 </details>
@@ -159,30 +159,30 @@ const ARCH: { id: Layer; label: string; short: string; note: string }[] = [
 function ArchitectureBar({ current, built }: { current: Layer[]; built: Layer[] }) {
   const box = (id: Layer) =>
     current.includes(id)
-      ? "border-signal bg-signal text-paper"
+      ? "border-signal bg-signal text-white"
       : built.includes(id)
-        ? "border-ink bg-paper text-ink"
+        ? "border-graphite/60 bg-paper text-ink"
         : "border-dashed border-graphite/60 text-graphite";
   const cell = (l: (typeof ARCH)[number]) => (
-    <div className={`min-w-0 flex-1 border px-1.5 py-2 sm:px-2.5 ${box(l.id)}`}>
-      <p className="truncate font-mono text-[11px] leading-tight font-medium sm:text-[12px]">
+    <div className={`min-w-0 flex-1 rounded-[3px] border px-1.5 py-2 sm:px-2.5 ${box(l.id)}`}>
+      <p className="truncate font-label text-[11px] leading-tight font-medium sm:text-[12px]">
         <span className="sm:hidden">{l.short}</span>
         <span className="hidden sm:inline">{l.label}</span>
       </p>
-      <p className="mt-0.5 hidden truncate text-[13px] leading-tight italic opacity-80 sm:block">{l.note}</p>
+      <p className="mt-0.5 hidden truncate text-[13px] leading-tight opacity-80 sm:block">{l.note}</p>
     </div>
   );
-  const wire = <span aria-hidden className="self-center font-mono text-xs text-graphite">→</span>;
+  const wire = <span aria-hidden className="self-center font-label text-[13px] text-graphite">→</span>;
   const gap = <span aria-hidden className="w-px self-stretch bg-rule" />;
   const [computer, page, server, model, internet] = ARCH;
   return (
     <figure className={`${bench} px-3 py-3 sm:px-4`} aria-label={`This step works on: ${current.join(", ")}`}>
       <figcaption className="mb-2.5 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
         <span className={benchLabel}>Where this step works</span>
-        <span className="flex gap-4 font-mono text-[11px] text-graphite">
-          <span><span className="mr-1.5 inline-block h-2 w-2 bg-signal align-middle" />this step</span>
-          <span><span className="mr-1.5 inline-block h-2 w-2 border border-ink align-middle" />built</span>
-          <span className="hidden sm:inline"><span className="mr-1.5 inline-block h-2 w-2 border border-dashed border-graphite align-middle" />to come</span>
+        <span className="flex gap-4 font-label text-[11px] text-graphite">
+          <span><span className="mr-1.5 inline-block h-2 w-2 rounded-[2px] bg-signal align-middle" />this step</span>
+          <span><span className="mr-1.5 inline-block h-2 w-2 rounded-[2px] border border-graphite align-middle" />built</span>
+          <span className="hidden sm:inline"><span className="mr-1.5 inline-block h-2 w-2 rounded-[2px] border border-dashed border-graphite align-middle" />to come</span>
         </span>
       </figcaption>
       <div className="flex items-stretch gap-1 sm:gap-2">
@@ -226,11 +226,11 @@ function StepCard({
   built: Layer[];
 }) {
   const n = index + 1;
-  const osLabel = "font-mono text-xs text-graphite";
+  const osLabel = "font-label text-[13px] text-graphite";
 
   const why = (
     <Spread key="why">
-      <div className="text-[19px] leading-[1.6]">{step.idea}</div>
+      <div className="text-[18px] leading-[1.6]">{step.idea}</div>
       {step.diagram && <Figure n={n} caption={step.concept}>{step.diagram}</Figure>}
     </Spread>
   );
@@ -255,14 +255,14 @@ function StepCard({
         )
       }
     >
-      <div className="text-[19px] leading-[1.6]">{step.action}</div>
+      <div className="text-[18px] leading-[1.6]">{step.action}</div>
       {step.install ? (
         <Parts
           step={n}
           labels={[...step.install.map((t) => t.name), ...(step.assistants ? ["AI assistant (optional)"] : []), "Check"]}
           parts={[
             ...step.install.map((t) => (
-              <div key={t.name} className="border-t border-ink pt-4 text-[17px] leading-relaxed">
+              <div key={t.name} className="border-t border-rule pt-4 text-[17px] leading-relaxed">
                 <p className="text-2xl font-medium">{t.name}</p>
                 <p className="text-graphite">{t.what}</p>
                 <p className="mt-3">
@@ -273,7 +273,7 @@ function StepCard({
                   {([["Windows", t.windows], ["Mac", t.mac]] as const).map(([os, list]) => (
                     <div key={os} className="min-w-0">
                       <p className={osLabel}>{os}</p>
-                      <ol className="mt-1.5 grid list-decimal gap-1.5 pl-5 marker:font-mono marker:text-xs marker:text-graphite">
+                      <ol className="mt-1.5 grid list-decimal gap-1.5 pl-5 marker:font-label marker:text-xs marker:text-graphite">
                         {list.map((line) => (
                           <li key={line}>{line}</li>
                         ))}
@@ -291,7 +291,7 @@ function StepCard({
             )),
             ...(step.assistants
               ? [
-                  <div key="assistants" className="border-t border-ink pt-4 text-[17px] leading-relaxed">
+                  <div key="assistants" className="border-t border-rule pt-4 text-[17px] leading-relaxed">
                     <p>{step.assistants.intro}</p>
                     <div className="mt-4 grid gap-x-8 md:grid-cols-2">
                       {step.assistants.tools.map((a) => (
@@ -308,7 +308,7 @@ function StepCard({
                   </div>,
                 ]
               : []),
-            <div key="check" className="border-t border-ink pt-4 text-[17px] leading-relaxed">
+            <div key="check" className="border-t border-rule pt-4 text-[17px] leading-relaxed">
               {step.thenCheck && <p>{step.thenCheck}</p>}
               {step.code && <Code>{step.code}</Code>}
             </div>,
@@ -316,7 +316,7 @@ function StepCard({
         />
       ) : (
         <>
-          {step.thenCheck && <p className="mt-5 text-[19px] leading-[1.6]">{step.thenCheck}</p>}
+          {step.thenCheck && <p className="mt-5 text-[18px] leading-[1.6]">{step.thenCheck}</p>}
           {step.code && <Code>{step.code}</Code>}
         </>
       )}
@@ -328,10 +328,10 @@ function StepCard({
                 <LookSwatch look={c.look} />
                 <span className="min-w-0 flex-1">
                   <span className="block text-xl font-medium">{c.name}</span>
-                  <span className="block text-[16px] text-graphite italic">{c.mood}</span>
+                  <span className="block text-[16px] text-graphite">{c.mood}</span>
                 </span>
-                <span aria-hidden className="font-mono text-xs text-graphite group-open:hidden">Show code</span>
-                <span aria-hidden className="hidden font-mono text-xs text-graphite group-open:inline">Hide</span>
+                <span aria-hidden className="font-label text-[13px] text-graphite group-open:hidden">Show code</span>
+                <span aria-hidden className="hidden font-label text-[13px] text-graphite group-open:inline">Hide</span>
               </summary>
               <div className="pb-4">
                 <Code>{c.code}</Code>
@@ -361,12 +361,12 @@ function StepCard({
       {step.fails && (
         <details className="group mt-6 border-y border-rule">
           <summary className="flex cursor-pointer list-none items-baseline gap-3 py-3">
-            <span aria-hidden className="inline-block font-mono text-xs text-graphite transition-transform group-open:rotate-90">▸</span>
+            <span aria-hidden className="inline-block font-label text-[13px] text-graphite transition-transform group-open:rotate-90">▸</span>
             <span className="text-[18px] font-medium">Didn&apos;t work?</span>
-            <span className="font-mono text-xs text-graphite">{step.fails.causes.length} likely causes</span>
+            <span className="font-label text-[13px] text-graphite">{step.fails.causes.length} likely causes</span>
           </summary>
           <div className="pb-5 text-[17px] leading-relaxed">
-            <ol className="grid list-decimal gap-1.5 pl-5 marker:font-mono marker:text-xs marker:text-graphite">
+            <ol className="grid list-decimal gap-1.5 pl-5 marker:font-label marker:text-xs marker:text-graphite">
               {step.fails.causes.map((c) => (
                 <li key={c}>{c}</li>
               ))}
@@ -385,21 +385,21 @@ function StepCard({
   const understand = (
     <div key="understand">
       <Spread>
-        <p className="font-mono text-xs text-graphite">Technically, what happened</p>
-        <p className="mt-2 text-[19px] leading-[1.6]">{step.understand}</p>
-        <div className="mt-10 border-l-2 border-signal pl-5">
-          <p className="font-mono text-xs text-signal">PM lens · why you should care</p>
-          <p className="mt-2 text-[24px] leading-snug sm:text-[26px]">{step.pmLens}</p>
+        <p className="font-label text-[13px] text-graphite">Technically, what happened</p>
+        <p className="mt-2 text-[18px] leading-[1.6]">{step.understand}</p>
+        <div className="mt-10 border-l-4 border-signal pl-5">
+          <p className="font-label text-[13px] font-bold text-signal">PM lens · why you should care</p>
+          <p className="mt-2 text-[24px] leading-snug font-medium sm:text-[26px]">{step.pmLens}</p>
         </div>
       </Spread>
       {step.pmDetail && (
         <details className="group mt-10 border-y border-rule">
           <summary className="flex cursor-pointer list-none items-baseline gap-3 py-3">
-            <span aria-hidden className="inline-block font-mono text-xs text-graphite transition-transform group-open:rotate-90">▸</span>
+            <span aria-hidden className="inline-block font-label text-[13px] text-graphite transition-transform group-open:rotate-90">▸</span>
             <span className="text-[18px] font-medium">In depth: cost, speed and safety, and what you decide</span>
           </summary>
           <div className="pb-6">
-            <div className="hidden grid-cols-[10rem_repeat(3,minmax(0,1fr))] gap-6 border-b border-ink pb-2 font-mono text-xs text-graphite md:grid">
+            <div className="hidden grid-cols-[10rem_repeat(3,minmax(0,1fr))] gap-6 border-b-2 border-rule pb-2 font-label text-[13px] font-semibold text-graphite md:grid">
               <span />
               <span>Cost</span>
               <span>Speed</span>
@@ -410,21 +410,21 @@ function StepCard({
                 <p className="font-medium">{b.name}</p>
                 {(["cost", "speed", "safety"] as const).map((k) => (
                   <p key={k}>
-                    <span className="font-mono text-xs text-graphite md:hidden">{cap(k)} </span>
+                    <span className="font-label text-[13px] text-graphite md:hidden">{cap(k)} </span>
                     {b[k]}
                   </p>
                 ))}
               </div>
             ))}
-            <p className="mt-8 font-mono text-xs text-signal">Decisions you own</p>
+            <p className="mt-8 font-label text-[13px] text-signal">Decisions you own</p>
             <ul className="mt-2 grid lg:w-[64%]">
               {step.pmDetail.decisions.map((d) => (
                 <li key={d.q} className="border-t border-rule py-3 text-[16px] leading-snug">
                   <p className="text-[18px] font-medium">{d.q}</p>
-                  <p className="mt-0.5 font-mono text-xs text-graphite">Trades {d.trades}</p>
+                  <p className="mt-0.5 font-label text-[13px] text-graphite">Trades {d.trades}</p>
                   <p className="mt-1">Start with: {d.start}</p>
                   {d.step && (
-                    <a href={`#step-${d.step}`} className="prose-link mt-1 inline-block font-mono text-xs">
+                    <a href={`#step-${d.step}`} className="prose-link mt-1 inline-block font-label text-[13px]">
                       Applied in §{pad(d.step)}
                     </a>
                   )}
@@ -453,11 +453,11 @@ function StepCard({
   return (
     <article>
       <header>
-        <p className="font-mono text-xs text-graphite">
+        <p className="font-label text-[13px] text-graphite">
           §{pad(n)} of {total} · Part {part}, {phase}
         </p>
-        <h3 className="mt-3 text-[2.5rem] leading-[1.05] font-medium tracking-tight text-balance sm:text-[3.25rem]">{step.title}</h3>
-        <p className="mt-3 font-mono text-xs">
+        <h3 className="mt-3 text-[2.5rem] leading-[1.08] font-semibold tracking-[-0.02em] text-balance sm:text-[3.25rem]">{step.title}</h3>
+        <p className="mt-3 font-label text-[13px]">
           <span className="text-graphite">Concept </span>
           {step.concept}
           {personalised && <span className="text-signal"> · uses your app</span>}
@@ -470,7 +470,7 @@ function StepCard({
 
       <div className="mt-8">
         <Spread>
-          <p className="text-[24px] leading-snug text-balance sm:text-[28px]">{step.problem}</p>
+          <p className="text-[24px] leading-snug font-medium text-balance sm:text-[28px]">{step.problem}</p>
         </Spread>
       </div>
 
@@ -558,7 +558,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       </noscript>
 
       {/* Overview: who it's for, what you'll learn, how it differs */}
-      <section id="overview" className="scroll-mt-16 pt-6 lg:pt-2">
+      <section id="overview" className="scroll-mt-20 pt-6 lg:pt-2">
         <header>
           <p className={`${eyebrow} text-emerald-700 dark:text-emerald-400`}>{site.eyebrow}</p>
           <h1 className="mt-3 text-3xl leading-tight font-bold tracking-tight text-balance sm:text-[2.6rem]">{site.headline}</h1>
@@ -658,13 +658,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       </section>
 
       {/* Your app: choose it and see what's underneath, in one place */}
-      <section id="build" className="mt-12 scroll-mt-16 border-t border-zinc-200 pt-10 dark:border-zinc-800">
+      <section id="build" className="mt-12 scroll-mt-20 border-t border-zinc-200 pt-10 dark:border-zinc-800">
         <p className={`${eyebrow} text-zinc-500`}>Your app</p>
         <h2 className="mt-2 text-2xl font-bold tracking-tight">Pick an app. See what&apos;s underneath it.</h2>
 
         <div className="mt-5">{chooser}</div>
 
-        <div id="underneath" className="scroll-mt-16 pt-6">
+        <div id="underneath" className="scroll-mt-20 pt-6">
         <div className="reveal grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] dark:border-zinc-800 dark:bg-zinc-800">
           <div className="bg-white p-4 dark:bg-zinc-950">
             <p className="text-xs font-semibold uppercase tracking-wider text-zinc-500">What you see · {mvp.name}</p>
@@ -691,9 +691,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       </section>
 
       {/* Journey 1 */}
-      <section id="journey" className="mt-24 scroll-mt-16 border-t border-ink pt-10">
-        <p className="font-mono text-xs text-graphite">Journey {j.number}</p>
-        <h2 className="mt-2 text-[2.5rem] leading-[1.05] font-medium tracking-tight text-balance sm:text-[3.5rem]">{j.name}</h2>
+      <section id="journey" className="mt-24 scroll-mt-20 border-t border-rule pt-12">
+        <p className="font-label text-[13px] text-graphite">Journey {j.number}</p>
+        <h2 className="mt-2 text-[2.5rem] leading-[1.08] font-semibold tracking-[-0.02em] text-balance sm:text-[3.5rem]">{j.name}</h2>
         <div className="mt-5">
           <Spread note={<Note label="About the model">{site.providerNote}</Note>}>
             <p className="text-[21px] leading-relaxed">{j.promise}</p>
@@ -702,21 +702,21 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
 
         <div className="mt-10 grid gap-8 border-t border-rule pt-6 lg:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] lg:gap-14">
           <div>
-            <p className="font-mono text-xs text-graphite">Before you start</p>
+            <p className="font-label text-[13px] text-graphite">Before you start</p>
             <ul className="mt-2 grid gap-1.5 text-[17px] leading-snug">
               {site.before.need.map((need) => (
                 <li key={need} className="flex gap-3">
-                  <span aria-hidden className="font-mono text-xs leading-6 text-graphite">–</span>
+                  <span aria-hidden className="font-label text-[13px] leading-6 text-graphite">–</span>
                   {need}
                 </li>
               ))}
             </ul>
           </div>
           <div className="text-[17px] leading-relaxed">
-            <p className="font-mono text-xs text-graphite">Time</p>
+            <p className="font-label text-[13px] text-graphite">Time</p>
             <p className="mt-2">{site.before.time}</p>
             <p className="mt-2 text-graphite">
-              From step 5, each step has a <span className="text-ink italic">Break it</span> experiment: predict, break one thing on
+              From step 5, each step has a <span className="font-semibold text-ink">Break it</span> experiment: predict, break one thing on
               purpose, see what happens.
             </p>
           </div>
@@ -744,8 +744,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             ))}
             finish={
               <section>
-                <p className="font-mono text-xs text-signal">Journey {j.number} complete</p>
-                <h2 className="mt-3 text-[2.5rem] leading-[1.05] font-medium tracking-tight text-balance sm:text-[3.25rem]">
+                <p className="font-label text-[13px] text-signal">Journey {j.number} complete</p>
+                <h2 className="mt-3 text-[2.5rem] leading-[1.08] font-semibold tracking-[-0.02em] text-balance sm:text-[3.25rem]">
                   {parsed?.ok ? `You built ${mvp.name}. More importantly, you understand it.` : "You built an AI app. More importantly, you understand it."}
                 </h2>
                 <div className="mt-6">
@@ -761,7 +761,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                         {c.built.map((b) => (
                           <li key={b.text} className="flex items-baseline gap-4 border-t border-rule py-3 text-[17px] leading-snug">
                             <span className="flex-1">{b.text}</span>
-                            <a href={`#step-${b.step}`} className="prose-link shrink-0 font-mono text-xs text-graphite">
+                            <a href={`#step-${b.step}`} className="prose-link shrink-0 font-label text-[13px] text-graphite">
                               §{pad(b.step)}
                             </a>
                           </li>
@@ -773,20 +773,20 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                           <ol className="flex flex-wrap items-stretch gap-x-2 gap-y-3">
                             {c.flow.map((f, i) => (
                               <li key={i} className="flex items-center gap-2">
-                                <span className="border border-ink bg-paper px-3 py-2">
-                                  <span className="block font-mono text-[13px] font-medium">{f.label}</span>
-                                  <span className="block text-[14px] text-graphite italic">{f.note}</span>
+                                <span className="rounded-[3px] border border-rule bg-paper px-3 py-2">
+                                  <span className="block font-label text-[13px] font-medium">{f.label}</span>
+                                  <span className="block text-[14px] text-graphite">{f.note}</span>
                                 </span>
-                                {i < c.flow.length - 1 && <span aria-hidden className="font-mono text-xs text-graphite">→</span>}
+                                {i < c.flow.length - 1 && <span aria-hidden className="font-label text-[13px] text-graphite">→</span>}
                               </li>
                             ))}
                           </ol>
                         </figure>
                         <div className="mt-6">
                           <Spread>
-                            <p className="text-[19px] leading-[1.6]">
-                              Around it sits the development lifecycle: <span className="italic">Git</span> records versions,{" "}
-                              <span className="italic">GitHub</span> shares them, and <span className="italic">Vercel</span> turns a push into a
+                            <p className="text-[18px] leading-[1.6]">
+                              Around it sits the development lifecycle: <span className="font-semibold">Git</span> records versions,{" "}
+                              <span className="font-semibold">GitHub</span> shares them, and <span className="font-semibold">Vercel</span> turns a push into a
                               live URL.
                             </p>
                           </Spread>
@@ -794,7 +794,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                       </div>,
                       <div key="pattern">
                         <Spread>
-                          <p className="text-[19px] leading-[1.6]">
+                          <p className="text-[18px] leading-[1.6]">
                             Only the prompt and the schema change. Once you can see this anatomy, you can reason about almost any AI feature
                             an engineer describes to you.
                           </p>
@@ -802,13 +802,13 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                         <ol className="mt-6 flex flex-wrap items-center gap-2">
                           {c.pattern.stages.map((st, i) => (
                             <li key={st} className="flex items-center gap-2">
-                              <span className="bg-ink px-2.5 py-1 font-mono text-[13px] text-paper">{st}</span>
-                              {i < c.pattern.stages.length - 1 && <span aria-hidden className="font-mono text-xs text-graphite">→</span>}
+                              <span className="rounded-[3px] bg-signal-soft px-2.5 py-1 text-[14px] font-semibold">{st}</span>
+                              {i < c.pattern.stages.length - 1 && <span aria-hidden className="font-label text-[13px] text-graphite">→</span>}
                             </li>
                           ))}
                         </ol>
                         <div className="mt-8">
-                          <div className="hidden grid-cols-[minmax(0,4fr)_minmax(0,4fr)_minmax(0,5fr)] gap-6 border-b border-ink pb-2 font-mono text-xs text-graphite md:grid">
+                          <div className="hidden grid-cols-[minmax(0,4fr)_minmax(0,4fr)_minmax(0,5fr)] gap-6 border-b-2 border-rule pb-2 font-label text-[13px] font-semibold text-graphite md:grid">
                             <span>What you could build next</span>
                             <span>Input</span>
                             <span>Output shape (your schema)</span>
@@ -820,7 +820,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                             >
                               <p className="font-medium">
                                 {e.name}
-                                {e.note && <span className="mt-1 block text-[14px] font-normal text-signal italic">{e.note}</span>}
+                                {e.note && <span className="mt-1 block text-[14px] font-normal text-signal">{e.note}</span>}
                               </p>
                               <p className="text-graphite">{e.input}</p>
                               <p className="font-mono text-xs leading-relaxed">{e.output}</p>
@@ -834,14 +834,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                       <ol key="questions" className="grid gap-x-12 border-b border-rule sm:grid-cols-2">
                         {c.questions.map((q, i) => (
                           <li key={q.q} className="flex gap-3 border-t border-rule py-3 text-[17px] leading-snug">
-                            <span className="w-5 shrink-0 font-mono text-xs leading-6 text-graphite">{i + 1}</span>
+                            <span className="w-5 shrink-0 font-label text-[13px] leading-6 text-graphite">{i + 1}</span>
                             <span className="flex-1">{q.q}</span>
                             {q.step ? (
-                              <a href={`#step-${q.step}`} className="prose-link shrink-0 font-mono text-xs leading-6 text-graphite">
+                              <a href={`#step-${q.step}`} className="prose-link shrink-0 font-label text-[13px] leading-6 text-graphite">
                                 §{pad(q.step)}
                               </a>
                             ) : (
-                              <span className="shrink-0 font-mono text-xs leading-6 text-graphite">Reuse the pattern</span>
+                              <span className="shrink-0 font-label text-[13px] leading-6 text-graphite">Reuse the pattern</span>
                             )}
                           </li>
                         ))}
@@ -849,23 +849,23 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                       <div key="next">
                         <div className="grid gap-10 sm:grid-cols-2">
                           <div>
-                            <p className="font-mono text-xs text-graphite">What it can&apos;t do yet</p>
+                            <p className="font-label text-[13px] text-graphite">What it can&apos;t do yet</p>
                             <ul className="mt-2 grid gap-2 text-[17px] leading-snug">
                               {c.notYet.map((item) => (
                                 <li key={item} className="flex gap-3">
-                                  <span aria-hidden className="font-mono text-xs leading-6 text-graphite">–</span>
+                                  <span aria-hidden className="font-label text-[13px] leading-6 text-graphite">–</span>
                                   {item}
                                 </li>
                               ))}
                             </ul>
                           </div>
                           <div>
-                            <p className="font-mono text-xs text-graphite">Things to try before you stop</p>
+                            <p className="font-label text-[13px] text-graphite">Things to try before you stop</p>
                             <ol className="mt-2 grid gap-4">
                               {c.tryNext.map((item, i) => (
                                 <li key={item.title} className="text-[17px] leading-snug">
                                   <p className="font-medium">
-                                    <span className="mr-2 font-mono text-xs font-normal text-graphite">{i + 1}</span>
+                                    <span className="mr-2 font-label text-[13px] font-normal text-graphite">{i + 1}</span>
                                     {item.title}
                                   </p>
                                   <p className="mt-0.5 text-graphite">{item.text}</p>
@@ -876,7 +876,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                         </div>
                         <div className="mt-10 lg:w-[64%]">
                           <Note label="Coming next">
-                            <p className="text-[19px] font-medium text-ink">{j.next.title}</p>
+                            <p className="text-[18px] font-medium text-ink">{j.next.title}</p>
                             <p className="mt-1">{j.next.teaser}</p>
                             <a href="/why#feedback" className="prose-link mt-2 inline-block text-ink">
                               Tell me what you&apos;d want next

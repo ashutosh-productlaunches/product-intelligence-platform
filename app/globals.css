@@ -5,32 +5,34 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ---- BuildAI Lab tokens ----
-   One paper, one ink, one accent. Signal has one meaning: look here / this is live / this step.
-   Pass and fail are only for a check that passed or failed. Contrast checked against paper
-   and paper-2 for small text (WCAG AA); rule is for lines only, never text. */
+   In the style of the Atlassian website: white canvas, navy text, one cobalt blue.
+   Blue (signal) has one meaning: the action, or this step / this is live.
+   Pass and fail are only for a check that passed or failed. Contrast checked against
+   paper and paper-2 for small text (WCAG AA); rule is for lines only, never text. */
 @theme {
-  --color-paper: #f3f0e8;
-  --color-paper-2: #e7e3da;
-  --color-ink: #1b1a17;
-  --color-graphite: #5e5a52;
-  --color-rule: #cfc9bc;
-  --color-signal: #b33c17;
-  --color-pass: #2f6f4a;
-  --color-fail: #a3271d;
+  --color-paper: #ffffff;
+  --color-paper-2: #f7f8f9;
+  --color-ink: #172b4d;
+  --color-graphite: #44546f;
+  --color-rule: #dcdfe4;
+  --color-signal: #1868db;
+  --color-signal-hover: #1558bc;
+  --color-signal-soft: #e9f2fe;
+  --color-pass: #216e4e;
+  --color-fail: #c9372c;
 }
 
 @theme inline {
-  /* No sans in the system: anything that asks for the default face gets the serif. */
-  --font-sans: var(--font-newsreader), Georgia, serif;
-  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-sans: var(--font-figtree), ui-sans-serif, sans-serif;
+  /* Small labels: the same sans. Kept as its own token so labels can change in one place. */
+  --font-label: var(--font-figtree), ui-sans-serif, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
 body {
   background: var(--color-paper);
   color: var(--color-ink);
-  font-family: var(--font-serif);
-  font-optical-sizing: auto;
+  font-family: var(--font-sans);
 }
 
 ::selection {
@@ -40,14 +42,13 @@ body {
 
 /* Links in running text: a plain underline, no arrows. */
 .prose-link {
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  text-decoration-color: var(--color-graphite);
+  color: var(--color-signal);
+  font-weight: 500;
 }
 .prose-link:hover {
-  text-decoration-color: var(--color-signal);
-  color: var(--color-signal);
+  color: var(--color-signal-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 /* Dot leaders for the table of contents. */
