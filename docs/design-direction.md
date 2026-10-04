@@ -159,10 +159,15 @@ as numbered rows with labelled pairs.
 - **Saved progress:** per journey (`buildailab:j1`); Journey 1 still reads the old key.
 - **Step page:** navy hero (breadcrumb, "Step 6 of 12 · concept", title, the problem), the
   architecture bar, then numbered sections: Why · Do it · See it work · Break it · Understand ·
-  Check yourself. Install parts (3.1, 3.2 …) are stacked, not paged. Reveals stay only where the
-  reveal is the lesson: Break it (predict first), quiz answers, "Didn't work?", "In depth".
-- **Side panel:** step progress, "On this page" (highlights the section you're reading), and
-  the one way forward: Next. On phones it's hidden and the page ends with "Up next".
+  Check yourself. Install parts (3.1, 3.2 …) are stacked, not paged. Nothing is collapsed
+  except where hiding is the lesson: Break it's answer (until you predict) and quiz explanations
+  (until you pick). "Didn't work?", "In depth" and the look options are always open.
+- **Navigation is always visible (4 Oct, after "there is no menu"):** the top bar shows
+  Journeys · Live demo · System map · What you'll learn · Why I built this on wide screens; on
+  phones a **Menu** button opens them first, then every step. Step and finish pages have a
+  left sidebar (Confluence/docs style): the journey's parts and steps, the current step opened
+  to its sections (the one you're reading highlighted), a progress bar, and **Next** pinned at
+  the bottom. Every step page also ends with "Up next". The right-hand side panel is gone.
 - Tabs (`Panes`), the paged install parts (`Parts`), the single-page player and the left-rail
   nav are removed.
 

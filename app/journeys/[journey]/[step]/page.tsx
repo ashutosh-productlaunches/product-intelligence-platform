@@ -12,8 +12,8 @@ import { helpPrompt } from "@/lib/tutor-context";
 import { site } from "@/content/site";
 import { SiteBar } from "@/components/site-bar";
 import { RememberPlace } from "@/components/progress";
-import { Hero, Lozenge, Numbered, PageGrid, Row } from "@/components/scroll-page";
-import { SectionRail } from "@/components/section-rail";
+import { Hero, JourneyFrame, Lozenge, Numbered, Row } from "@/components/scroll-page";
+import { JourneySidebar } from "@/components/journey-sidebar";
 import { ArchitectureBar, CheckUnderstanding, Code, Figure, LookSwatch, Note, PmLens } from "@/components/step-parts";
 import { Experiment, CopyHelp } from "@/components/lab";
 import { bench, benchLabel, button } from "@/components/style";
@@ -55,6 +55,7 @@ export default async function StepPage({ params, searchParams }: Props) {
       journeys={contentsFor(ctx.q)}
       links={PAGES}
       current={{ journey: j.number, step: n }}
+      wide
     />
   );
 
@@ -68,6 +69,25 @@ export default async function StepPage({ params, searchParams }: Props) {
 }
 
 type Ctx = ReturnType<typeof journeyContext>;
+
+// The always-visible left sidebar: every part and step of this journey, this page's sections, and Next.
+function sidebar(bj: BuiltJourney, ctx: Ctx, current: number, sections: { id: string; label: string }[], next: { href: string; label: string }) {
+  const j = bj.journey;
+  const parts = contentsFor(ctx.q).find((x) => x.n === j.number)!.parts!;
+  return (
+    <JourneySidebar
+      journey={{ n: j.number, title: j.name, href: ctx.overviewHref }}
+      parts={parts}
+      current={current}
+      sections={sections}
+      finish={{ href: ctx.stepHref("done"), label: "Finish: what you built" }}
+      next={next}
+    />
+  );
+}
+
+// The page body beside the sidebar: a readable column.
+const column = "mx-auto w-full max-w-[56rem] px-4 pt-12 pb-24 sm:px-6 lg:px-12 lg:pt-14";
 
 function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: number; ctx: Ctx }) {
   const j = bj.journey;
@@ -161,21 +181,17 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
         {s.code && <Code>{s.code}</Code>}
         {s.choices && (
           <div className="mt-6 border-t border-rule">
-            {s.choices.map((c, k) => (
-              <details key={c.name} open={k === 0} className="group min-w-0 border-b border-rule">
-                <summary className="flex cursor-pointer list-none items-center gap-4 py-3">
+            {s.choices.map((c) => (
+              <div key={c.name} className="min-w-0 border-b border-rule pb-5">
+                <div className="flex items-center gap-4 py-3">
                   <LookSwatch look={c.look} />
                   <span className="min-w-0 flex-1">
                     <span className="block text-xl font-semibold">{c.name}</span>
                     <span className="block text-[16px] text-graphite">{c.mood}</span>
                   </span>
-                  <span aria-hidden className="text-[14px] font-medium text-signal group-open:hidden">Show code</span>
-                  <span aria-hidden className="hidden text-[14px] font-medium text-signal group-open:inline">Hide</span>
-                </summary>
-                <div className="pb-4">
-                  <Code>{c.code}</Code>
                 </div>
-              </details>
+                <Code>{c.code}</Code>
+              </div>
             ))}
           </div>
         )}
@@ -223,13 +239,12 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
           </div>
         )}
         {s.fails && (
-          <details className="group mt-6 border-y border-rule">
-            <summary className="flex cursor-pointer list-none items-baseline gap-3 py-3">
-              <span aria-hidden className="inline-block text-[12px] text-graphite transition-transform group-open:rotate-90">▸</span>
-              <span className="text-[18px] font-semibold">Didn&apos;t work?</span>
+          <div className="mt-8 border-t border-rule pt-6">
+            <h3 className="flex items-baseline gap-3">
+              <span className="text-[20px] font-semibold">Didn&apos;t work?</span>
               <span className="font-label text-[13px] text-graphite">{s.fails.causes.length} likely causes</span>
-            </summary>
-            <div className="pb-5 text-[17px] leading-relaxed">
+            </h3>
+            <div className="mt-3 text-[17px] leading-relaxed">
               <ol className="grid list-decimal gap-1.5 pl-5 marker:text-[13px] marker:text-graphite">
                 {s.fails.causes.map((c) => (
                   <li key={c}>{c}</li>
@@ -241,7 +256,7 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
               </p>
               <CopyHelp prompt={helpPrompt({ steps, index: i, appName: ctx.mvp.name })} />
             </div>
-          </details>
+          </div>
         )}
       </>
     ),
@@ -261,12 +276,9 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
           <PmLens>{s.pmLens}</PmLens>
         </div>
         {s.pmDetail && (
-          <details className="group mt-10 border-y border-rule">
-            <summary className="flex cursor-pointer list-none items-baseline gap-3 py-3">
-              <span aria-hidden className="inline-block text-[12px] text-graphite transition-transform group-open:rotate-90">▸</span>
-              <span className="text-[18px] font-semibold">In depth: cost, speed and safety, and what you decide</span>
-            </summary>
-            <div className="pb-6">
+          <div className="mt-12 border-t border-rule pt-6">
+            <h3 className="text-[20px] font-semibold">In depth: cost, speed and safety, and what you decide</h3>
+            <div className="mt-4">
               <div className="grid gap-3">
                 {s.pmDetail.boxes.map((b) => (
                   <Row key={b.name} title={b.name} pairs={(["cost", "speed", "safety"] as const).map((k) => [cap(k), b[k]])} />
@@ -288,7 +300,7 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
                 ))}
               </ul>
             </div>
-          </details>
+          </div>
         )}
       </>
     ),
@@ -297,7 +309,7 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
   if (check) sections.push({ id: "quiz", ...stepSections.quiz, body: <CheckUnderstanding questions={check} step={n} /> });
 
   return (
-    <>
+    <JourneyFrame sidebar={sidebar(bj, ctx, n, sections.map(({ id, label }) => ({ id, label })), next)}>
       <Hero
         crumbs={[
           { label: `Journey ${j.number}`, href: ctx.overviewHref },
@@ -316,10 +328,7 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
         )}
       </Hero>
 
-      <PageGrid
-        railOnPhone={false}
-        rail={<SectionRail progress={{ step: n, total, label: phase.title }} sections={sections.map(({ id, label }) => ({ id, label }))} next={next} back={back} />}
-      >
+      <div className={column}>
         <div className="mb-12">
           <ArchitectureBar current={s.layers} built={built} />
         </div>
@@ -329,18 +338,18 @@ function Step({ bj, n, total, ctx }: { bj: BuiltJourney; n: number; total: numbe
           </Numbered>
         ))}
 
-        {/* Phones: the way forward at the end of the page (the side panel is hidden). */}
-        <div className="mt-4 rounded-[3px] bg-paper-2 p-5 lg:hidden">
+        {/* The way forward at the end of the page. */}
+        <div className="mt-4 rounded-[3px] bg-paper-2 p-5">
           <p className="font-label text-[11px] font-bold tracking-[0.08em] text-graphite uppercase">Up next</p>
-          <a href={next.href} className={`${button} mt-3 w-full text-center`}>
+          <a href={next.href} className={`${button} mt-3`}>
             {next.label}
           </a>
-          <a href={back.href} className="mt-3 block text-center text-[14px] font-medium text-graphite">
+          <a href={back.href} className="mt-3 block text-[14px] font-medium text-graphite hover:text-ink">
             ← {back.label}
           </a>
         </div>
-      </PageGrid>
-    </>
+      </div>
+    </JourneyFrame>
   );
 }
 
@@ -482,32 +491,29 @@ function Finish({ bj, ctx }: { bj: BuiltJourney; ctx: Ctx }) {
   const back = { href: stepHref(total), label: `${total}. ${ctx.steps[total - 1].title}` };
 
   return (
-    <>
+    <JourneyFrame sidebar={sidebar(bj, ctx, total + 1, ids.map((id) => ({ id, label: finishSections[id].label })), next)}>
       <Hero
         crumbs={[{ label: `Journey ${j.number}`, href: ctx.overviewHref }, { label: "Complete" }]}
         eyebrow={`Journey ${j.number} complete`}
         title={ctx.personal ? `You built ${ctx.mvp.name}. More importantly, you understand it.` : "You built an AI app. More importantly, you understand it."}
         lede={c.intro}
       />
-      <PageGrid
-        railOnPhone={false}
-        rail={<SectionRail sections={ids.map((id) => ({ id, label: finishSections[id].label }))} next={next} back={back} />}
-      >
+      <div className={column}>
         {ids.map((id, k) => (
           <Numbered key={id} n={k + 1} id={id} eyebrow={finishSections[id].label} heading={finishSections[id].heading}>
             {body[id]}
           </Numbered>
         ))}
-        <div className="mt-4 rounded-[3px] bg-paper-2 p-5 lg:hidden">
-          <a href={next.href} className={`${button} w-full text-center`}>
+        <div className="mt-4 rounded-[3px] bg-paper-2 p-5">
+          <a href={next.href} className={button}>
             {next.label}
           </a>
-          <a href={back.href} className="mt-3 block text-center text-[14px] font-medium text-graphite">
+          <a href={back.href} className="mt-3 block text-[14px] font-medium text-graphite hover:text-ink">
             ← {back.label}
           </a>
         </div>
         <p className="mt-10 text-[15px] text-graphite">{site.providerNote}</p>
-      </PageGrid>
-    </>
+      </div>
+    </JourneyFrame>
   );
 }

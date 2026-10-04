@@ -150,13 +150,29 @@ export function Row({
       </div>
     </>
   );
-  const cls = `grid gap-3 rounded-[3px] border border-rule bg-paper p-5 sm:grid-cols-[3.5rem_minmax(0,1fr)] sm:gap-5 sm:p-6 ${dim ? "bg-paper-2" : ""}`;
+  // The number gets its own column; without one, the body takes the full width.
+  const cols = n !== undefined ? "sm:grid-cols-[3.5rem_minmax(0,1fr)]" : "";
+  const cls = `grid gap-3 rounded-[3px] border border-rule bg-paper p-5 ${cols} sm:gap-5 sm:p-6 ${dim ? "bg-paper-2" : ""}`;
   return href ? (
     <a href={href} className={`group ${cls} hover:border-signal`}>
       {body}
     </a>
   ) : (
     <div className={cls}>{body}</div>
+  );
+}
+
+// Journey pages: a sidebar fixed down the left (wide screens only) and the page beside it.
+export function JourneyFrame({ sidebar, children }: { sidebar: ReactNode; children: ReactNode }) {
+  return (
+    <div className="lg:grid lg:grid-cols-[17.5rem_minmax(0,1fr)]">
+      <aside className="hidden border-r border-rule bg-paper-2 lg:block">
+        <div className="sticky top-14 h-[calc(100vh-3.5rem)]">{sidebar}</div>
+      </aside>
+      <div id="top" className="min-w-0 scroll-mt-14">
+        {children}
+      </div>
+    </div>
   );
 }
 
