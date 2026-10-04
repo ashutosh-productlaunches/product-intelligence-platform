@@ -63,3 +63,29 @@ export function LegacyStepRedirect({ total }: { total: number }) {
   }, [total]);
   return null;
 }
+
+// The one button that starts a journey or picks it up again. Before any progress it reads
+// "Start with step 1"; after it, "Continue: step N · title" and goes straight there.
+// `places[i]` is step i + 1; the last entry is the finish page.
+export function StartOrResume({
+  journey,
+  places,
+  className,
+  startLabel = "Start with step 1",
+}: {
+  journey: number;
+  places: { title: string; href: string }[];
+  className?: string;
+  startLabel?: string;
+}) {
+  const at = useSavedStep(journey);
+  const total = places.length - 1;
+  const resume = at >= 2 && at <= places.length;
+  const place = resume ? places[at - 1] : places[0];
+  const label = !resume ? startLabel : at > total ? "See what you built" : `Continue: step ${at} · ${place.title}`;
+  return (
+    <a href={place.href} className={className}>
+      {label}
+    </a>
+  );
+}

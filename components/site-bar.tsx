@@ -15,6 +15,7 @@ export type ContentsJourney = {
   href?: string; // overview page; absent for journeys not built yet
   status?: string; // "Planned", "Upcoming" for journeys not built yet
   parts?: { title: string; steps: { n: number; title: string; href: string }[] }[];
+  finishHref?: string;
 };
 type PageLink = { label: string; href: string };
 
@@ -148,6 +149,25 @@ function Contents({
   );
 }
 
+// "Continue" in the bar: one click back to where the learner left off, from any page.
+// Hidden until they've got past step 1, and on the step they're already reading.
+function BarContinue({ j, here }: { j: ContentsJourney; here?: number }) {
+  const at = useSavedStep(j.n);
+  const steps = j.parts!.flatMap((p) => p.steps);
+  if (at < 2 || at > steps.length + 1 || at === here) return null;
+  const finished = at > steps.length;
+  const href = finished ? j.finishHref ?? j.href! : steps[at - 1].href;
+  return (
+    <a
+      href={href}
+      title={finished ? "See what you built" : `Continue: step ${at} · ${steps[at - 1].title}`}
+      className="shrink-0 rounded-full bg-signal px-3.5 py-1.5 text-[14px] font-semibold whitespace-nowrap text-white hover:bg-signal-hover"
+    >
+      {finished ? "Your app" : <>Continue<span className="hidden sm:inline"> · step {at}</span></>}
+    </a>
+  );
+}
+
 export function SiteBar({
   where,
   journeys,
@@ -184,6 +204,12 @@ export function SiteBar({
             </a>
           ))}
         </nav>
+        {journeys
+          .filter((j) => j.parts)
+          .slice(0, 1)
+          .map((j) => (
+            <BarContinue key={j.n} j={j} here={current?.journey === j.n ? current.step : undefined} />
+          ))}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}

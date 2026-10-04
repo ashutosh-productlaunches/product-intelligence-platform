@@ -18,6 +18,7 @@ export function contentsFor(q = ""): ContentsJourney[] {
     n: j.number,
     title: j.name,
     href: `/journeys/${j.number}${q}`,
+    finishHref: `/journeys/${j.number}/done${q}`,
     parts: j.phases.map((ph) => ({
       title: ph.title,
       steps: j.steps.slice(ph.steps[0] - 1, ph.steps[1]).map((s, k) => {
