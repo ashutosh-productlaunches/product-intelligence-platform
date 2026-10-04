@@ -42,15 +42,15 @@ export function FeedbackForm() {
 
   if (state.kind === "sent") {
     return (
-      <p className="rounded-lg border border-emerald-600/40 bg-emerald-50/60 p-4 text-[15px] font-medium dark:border-emerald-500/30 dark:bg-emerald-950/20">
-        ✓ {f.thanks}
+      <p className="rounded-[3px] border border-pass/40 bg-[#dcfff1] p-4 text-[16px] font-medium">
+        {f.thanks}
       </p>
     );
   }
 
-  const label = "text-sm font-semibold";
+  const label = "text-[15px] font-semibold";
   const field =
-    "mt-1.5 w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-[15px] focus:border-zinc-900 focus:outline-none dark:border-zinc-700 dark:bg-zinc-950 dark:focus:border-zinc-200";
+    "mt-1.5 w-full rounded-[3px] border-2 border-rule bg-paper px-3 py-2 text-[16px] focus:border-signal focus:outline-none";
 
   return (
     <form onSubmit={onSubmit} className="grid gap-5">
@@ -59,7 +59,7 @@ export function FeedbackForm() {
         <div className="mt-2 grid gap-1.5">
           {f.roles.map((r, i) => (
             <label key={r.value} className="flex items-center gap-2.5 text-[15px]">
-              <input type="radio" name="role" value={r.value} required={i === 0} className="accent-zinc-900 dark:accent-zinc-100" />
+              <input type="radio" name="role" value={r.value} required={i === 0} className="accent-signal" />
               {r.label}
             </label>
           ))}
@@ -83,13 +83,13 @@ export function FeedbackForm() {
 
       <label className="block">
         <span className={label}>{f.messageLabel}</span>
-        <span className="block text-sm text-zinc-500">{f.messageHint}</span>
+        <span className="block text-[14px] text-graphite">{f.messageHint}</span>
         <textarea name="message" required minLength={3} maxLength={1500} rows={4} className={field} />
       </label>
 
       <label className="block">
         <span className={label}>
-          Email <span className="font-normal text-zinc-500">(optional, if you&apos;d like a reply)</span>
+          Email <span className="font-normal text-graphite">(optional, if you&apos;d like a reply)</span>
         </span>
         <input type="email" name="email" maxLength={200} autoComplete="email" className={field} />
       </label>
@@ -101,13 +101,13 @@ export function FeedbackForm() {
         <button
           type="submit"
           disabled={state.kind === "sending"}
-          className="rounded-lg bg-zinc-900 px-5 py-2.5 text-[15px] font-semibold text-white hover:bg-zinc-800 disabled:opacity-60 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="rounded-full bg-signal px-6 py-2.5 text-[15px] font-semibold text-white hover:bg-signal-hover disabled:opacity-60"
         >
           {state.kind === "sending" ? "Sending…" : "Send"}
         </button>
-        <span className="text-sm text-zinc-500">{f.privacy}</span>
+        <span className="text-[14px] text-graphite">{f.privacy}</span>
       </div>
-      {state.kind === "error" && <p className="text-sm font-medium text-red-700 dark:text-red-400">{state.message}</p>}
+      {state.kind === "error" && <p className="text-[14px] font-medium text-fail">{state.message}</p>}
     </form>
   );
 }

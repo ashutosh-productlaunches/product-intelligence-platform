@@ -86,7 +86,7 @@ export function SystemMap({ flow }: { flow?: Flow }) {
   const onEdges = new Set(flow?.edges);
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="overflow-x-auto rounded-[3px] border border-rule bg-paper p-3">
       <div className="relative" style={{ width: CANVAS.width, height: CANVAS.height }}>
         <svg
           width={CANVAS.width}
