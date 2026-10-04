@@ -12,7 +12,8 @@ import { journeyContext, one, type SearchParams } from "@/lib/journey-context";
 import { contentsFor, PAGES } from "@/lib/contents";
 import { IntakeForm, MvpCard, PatternMenu } from "@/components/intake";
 import { SiteBar } from "@/components/site-bar";
-import { LegacyStepRedirect, ResumeLink } from "@/components/progress";
+import { LegacyStepRedirect, StartOrResume } from "@/components/progress";
+import { button } from "@/components/style";
 import { Lozenge, Row } from "@/components/scroll-page";
 
 // A left-to-right chain of labelled boxes, e.g. Browser → Server → Model. Wraps on small screens.
@@ -60,6 +61,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   // Journey links carry the learner's answers, so every step uses their app.
   const contexts = builtJourneys.map((bj) => ({ bj, ctx: journeyContext(bj, answered ? params : {}) }));
   const q = contexts[0]?.ctx.q ?? "";
+  // Every place in Journey 1, for the Start / Continue buttons: steps 1..12, then the finish.
+  const placesFor = ({ ctx }: (typeof contexts)[number]) => [
+    ...ctx.steps.map((s, i) => ({ title: s.title, href: ctx.stepHref(i + 1) })),
+    { title: "Finish", href: ctx.stepHref("done") },
+  ];
+  const first = contexts[0];
   const builtNumbers = new Set(builtJourneys.map((b) => b.journey.number));
   const eyebrow = "text-xs font-semibold uppercase tracking-widest";
 
@@ -89,13 +96,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           </p>
           <p className="mt-4 max-w-3xl text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">{site.promise}</p>
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3">
-            <a
-              href="#build"
-              className="rounded-lg bg-zinc-900 px-5 py-3 text-[15px] font-semibold text-white hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-            >
-              {site.cta.primary}
+            {/* Straight into step 1, or back to where they left off. */}
+            <StartOrResume journey={first.bj.journey.number} places={placesFor(first)} className={button} startLabel="Start Journey 1: step 1" />
+            <a href="#build" className="text-[15px] font-medium text-signal hover:underline">
+              Or pick your own app first
             </a>
-            <a href={mvp.demoHref} className="text-sm font-medium text-zinc-600 hover:text-zinc-900 hover:underline dark:text-zinc-400 dark:hover:text-zinc-100">
+            <a href={mvp.demoHref} className="text-[15px] font-medium text-graphite hover:text-ink hover:underline">
               {site.cta.secondary}
             </a>
           </div>
@@ -194,9 +200,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
           >
             Try {mvp.name} →
           </a>
-          <a href="#journeys" className="text-sm font-medium text-emerald-700 hover:underline dark:text-emerald-400">
-            Want to understand each layer? Pick a journey ↓
-          </a>
+          <StartOrResume
+            journey={first.bj.journey.number}
+            places={placesFor(first)}
+            className="text-[15px] font-semibold text-signal hover:underline"
+            startLabel={`Build ${mvp.name} yourself: start step 1 →`}
+          />
         </div>
 
         </div>
@@ -213,7 +222,6 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         <div className="mt-8 grid gap-3 lg:max-w-[52rem]">
           {contexts.map(({ bj, ctx }) => {
             const j = bj.journey;
-            const places = [...ctx.steps.map((s, i) => ({ title: s.title, href: ctx.stepHref(i + 1) })), { title: "Finish", href: ctx.stepHref("done") }];
             return (
               <div key={j.number} className="grid gap-3">
                 <Row
@@ -226,7 +234,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                     ["Route", `${j.steps.length} steps in ${j.phases.length} parts: ${j.phases.map((p) => p.title).join(", ")}`],
                   ]}
                 />
-                <ResumeLink journey={j.number} places={places} />
+                <div className="flex flex-wrap items-center gap-x-5 gap-y-2 px-1">
+                  <StartOrResume journey={j.number} places={placesFor({ bj, ctx })} className={button} />
+                  <a href={ctx.overviewHref} className="text-[15px] font-medium text-signal hover:underline">
+                    See all {j.steps.length} steps
+                  </a>
+                </div>
               </div>
             );
           })}

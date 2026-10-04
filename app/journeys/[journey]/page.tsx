@@ -9,7 +9,7 @@ import { site } from "@/content/site";
 import { journeyContext, type SearchParams } from "@/lib/journey-context";
 import { contentsFor, PAGES } from "@/lib/contents";
 import { SiteBar } from "@/components/site-bar";
-import { ResumeLink } from "@/components/progress";
+import { ResumeLink, StartOrResume } from "@/components/progress";
 import { GroupDivider, Hero, Lozenge, Numbered, PageGrid, RailCard, Row } from "@/components/scroll-page";
 
 type Props = { params: Promise<{ journey: string }>; searchParams: Promise<SearchParams> };
@@ -59,9 +59,11 @@ export default async function JourneyPage({ params, searchParams }: Props) {
         lede={j.promise}
       >
         <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-          <a href={ctx.stepHref(1)} className="inline-block rounded-full bg-white px-5 py-2.5 text-[15px] font-semibold text-ink hover:bg-signal-soft">
-            Start with step 1
-          </a>
+          <StartOrResume
+            journey={j.number}
+            places={places}
+            className="inline-block rounded-full bg-white px-5 py-2.5 text-[15px] font-semibold text-ink hover:bg-signal-soft"
+          />
           {ctx.personal && <span className="text-[15px] text-white/80">Personalised for {ctx.mvp.name}</span>}
         </div>
       </Hero>
