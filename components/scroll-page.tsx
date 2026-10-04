@@ -162,6 +162,20 @@ export function Row({
   );
 }
 
+// Journey pages: a sidebar fixed down the left (wide screens only) and the page beside it.
+export function JourneyFrame({ sidebar, children }: { sidebar: ReactNode; children: ReactNode }) {
+  return (
+    <div className="lg:grid lg:grid-cols-[17.5rem_minmax(0,1fr)]">
+      <aside className="hidden border-r border-rule bg-paper-2 lg:block">
+        <div className="sticky top-14 h-[calc(100vh-3.5rem)]">{sidebar}</div>
+      </aside>
+      <div id="top" className="min-w-0 scroll-mt-14">
+        {children}
+      </div>
+    </div>
+  );
+}
+
 // A small status label, Atlassian-style.
 export function Lozenge({ children, tone = "default" }: { children: ReactNode; tone?: "default" | "blue" | "green" }) {
   const c = tone === "blue" ? "bg-signal-soft text-[#0b4fb0]" : tone === "green" ? "bg-[#dcfff1] text-pass" : "bg-paper-2 text-graphite";

@@ -20,6 +20,15 @@ type PageLink = { label: string; href: string };
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+// The main places, always visible in the bar on wide screens.
+const NAV: PageLink[] = [
+  { label: "Journeys", href: "/#journeys" },
+  { label: "Live demo", href: "/demo" },
+  { label: "System map", href: "/architecture" },
+  { label: "What you'll learn", href: "/roadmap" },
+  { label: "Why I built this", href: "/why" },
+];
+
 function JourneyList({
   j,
   here,
@@ -29,9 +38,8 @@ function JourneyList({
   here?: number; // the step on screen, if this is the journey you're in
   onPick: () => void;
 }) {
-  // Without a step on screen, "done" means before the step last visited in this browser.
-  const far = useSavedStep(j.n);
-  const upTo = here ?? far;
+  // Off the journey's pages, mark the step last visited in this browser.
+  const last = useSavedStep(j.n);
   return (
     <div>
       <p className="font-label text-[13px] text-graphite">
@@ -49,7 +57,6 @@ function JourneyList({
             <ol className="mt-1.5 grid">
               {part.steps.map((s) => {
                 const now = s.n === here;
-                const done = s.n < upTo;
                 return (
                   <li key={s.n}>
                     <a
@@ -62,7 +69,7 @@ function JourneyList({
                       <span className="group-hover:text-signal">{s.title}</span>
                       <span aria-hidden className="leader" />
                       <span className={`shrink-0 font-label text-[13px] ${now ? "text-signal" : "text-graphite"}`}>
-                        {now ? "you are here" : done ? "done" : ""}
+                        {now ? "you are here" : here === undefined && s.n === last ? "last visited" : ""}
                       </span>
                     </a>
                   </li>
@@ -92,6 +99,16 @@ function Contents({
 
   return (
     <div className="grid gap-10 md:grid-cols-[minmax(0,7fr)_minmax(0,4fr)] md:gap-16">
+      {/* Phones: the main places first (on wide screens they're in the bar). */}
+      <ul className="grid gap-1 border-b border-rule pb-6 lg:hidden">
+        {NAV.map((l) => (
+          <li key={l.href}>
+            <a href={l.href} onClick={onPick} className="block py-1.5 text-[19px] font-semibold hover:text-signal">
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
       <div className="grid gap-10">
         {built.map((j) => (
           <JourneyList key={j.n} j={j} here={current?.journey === j.n ? current.step : undefined} onPick={onPick} />
@@ -136,11 +153,13 @@ export function SiteBar({
   journeys,
   links,
   current,
+  wide = false,
 }: {
-  where?: string; // e.g. "Journey 1 · Step 6 of 12"
+  where?: string; // e.g. "Journey 1 · Step 6 of 12"; shown on phones, where the links don't fit
   journeys: ContentsJourney[];
   links: PageLink[];
   current?: { journey: number; step?: number };
+  wide?: boolean; // full width, to line up with the journey sidebar
 }) {
   const [open, setOpen] = useState(false);
 
@@ -153,19 +172,32 @@ export function SiteBar({
 
   return (
     <header className="sticky top-0 z-50 border-b border-rule bg-paper">
-      <div className="mx-auto flex h-14 w-full max-w-[76rem] items-center gap-4 px-4 sm:px-6 lg:px-10">
-        <Link href="/" className="shrink-0 text-[19px] font-bold tracking-[-0.01em]">
+      <div className={`mx-auto flex h-14 w-full items-center gap-4 px-4 sm:px-6 ${wide ? "lg:px-5" : "max-w-[76rem] lg:px-10"}`}>
+        <Link href="/" className={`shrink-0 text-[19px] font-bold tracking-[-0.01em] ${wide ? "lg:w-[16.25rem]" : ""}`}>
           BuildAI Lab
         </Link>
-        <p className="min-w-0 flex-1 truncate border-l border-rule pl-4 font-label text-[13px] text-graphite">{where}</p>
+        <p className="min-w-0 flex-1 truncate border-l border-rule pl-4 font-label text-[13px] text-graphite lg:hidden">{where}</p>
+        <nav aria-label="Main" className="hidden min-w-0 flex-1 items-center gap-1 lg:flex">
+          {NAV.map((l) => (
+            <a key={l.href} href={l.href} className="rounded-[3px] px-3 py-1.5 text-[15px] font-medium whitespace-nowrap text-ink hover:bg-paper-2 hover:text-signal">
+              {l.label}
+            </a>
+          ))}
+        </nav>
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
           aria-expanded={open}
           aria-controls="contents"
-          className="shrink-0 rounded-[3px] px-3 py-1.5 text-[14px] font-semibold hover:bg-paper-2"
+          className="shrink-0 rounded-[3px] border border-rule px-3 py-1.5 text-[14px] font-semibold hover:bg-paper-2"
         >
-          {open ? "Close" : "Contents"}
+          {open ? "Close" : (
+            <>
+              <span aria-hidden className="mr-1.5">☰</span>
+              <span className="lg:hidden">Menu</span>
+              <span className="hidden lg:inline">All steps</span>
+            </>
+          )}
         </button>
       </div>
 
